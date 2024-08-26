@@ -1,7 +1,7 @@
 function Footer() {
   return (
-    <footer className="min-h-[4.625rem] bg-[#252525] px-6">
-      <h3 className="text-[#aaa]">Ⓒ 2022 #VANLIFE</h3>
+    <footer className="flex min-h-[4.625rem] items-center justify-center bg-[#252525] px-6">
+      <h3 className="text-sm font-medium text-[#aaa]">Ⓒ 2024 #VANLIFE</h3>
     </footer>
   );
 }

@@ -8,7 +8,7 @@ type ButtonProps = {
 
 function Button({ children, to, colors }: ButtonProps) {
   const commonClasses =
-    "flex items-center justify-center min-h-12 w-full rounded-lg p-2 font-bold transition-all";
+    "flex items-center justify-center min-h-12 w-full rounded-lg p-2 font-bold text-white transition-all";
 
   let colorClasses;
 
@@ -20,10 +20,7 @@ function Button({ children, to, colors }: ButtonProps) {
   }
 
   return to ? (
-    <Link
-      className={`${commonClasses} ${colorClasses} bg- inline-block`}
-      to={to}
-    >
+    <Link className={`${commonClasses} ${colorClasses} inline-block`} to={to}>
       {children}
     </Link>
   ) : (

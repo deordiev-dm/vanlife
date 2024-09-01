@@ -1,5 +1,5 @@
-import image from "./images/homepage.jpg";
-import Button from "./components/Button";
+import image from "../images/homepage.jpg";
+import Button from "../components/utility/Button";
 
 function Homepage() {
   return (

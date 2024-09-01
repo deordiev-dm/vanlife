@@ -1,6 +1,6 @@
-import Button from "./components/Button";
+import Button from "../components/utility/Button";
 
-import aboutBgImage from "./images/aboutBgImage.jpg";
+import aboutBgImage from "../images/aboutBgImage.jpg";
 
 function About() {
   return (

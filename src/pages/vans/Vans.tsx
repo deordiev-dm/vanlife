@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Badge from "../../components/utility/Badge";
 
 export type Van = {
@@ -9,6 +9,7 @@ export type Van = {
   name: string;
   price: number;
   type: "simple" | "rugged" | "luxury";
+  state?: { searchParams: string };
 };
 
 type VanPreview = Omit<Van, "description">;
@@ -16,21 +17,77 @@ type VanPreview = Omit<Van, "description">;
 export default function Vans() {
   const [vansList, setVansList] = useState<Van[]>([]);
 
-  useEffect(() => {
-    async function getData() {
-      const res = await fetch("/api/vans");
-      const data: { vans: Van[] } = await res.json();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const typeFilter = searchParams.get("type");
 
-      setVansList(data.vans);
+  function generateNewSearchParams(
+    key: string,
+    value: string | null,
+  ): URLSearchParams {
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (value === null) {
+      newSearchParams.delete(key);
+    } else {
+      newSearchParams.set(key, value);
     }
 
-    getData();
+    console.log(newSearchParams);
+    return newSearchParams;
+  }
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/vans");
+      const data: { vans: Van[] } = await res.json();
+      setVansList(data.vans);
+    })();
   }, []);
+
+  const displayedVans = typeFilter
+    ? vansList.filter((van) => van.type === typeFilter)
+    : vansList;
 
   return (
     <main className="px-6 pb-12 pt-6">
+      <h1 className="mb-5 text-3xl font-bold">Explore out van options</h1>
+      <div className="mb-5 space-x-3">
+        <button
+          onClick={() =>
+            setSearchParams(generateNewSearchParams("type", "simple"))
+          }
+          className={`${typeFilter === "simple" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
+        >
+          Simple
+        </button>
+        <button
+          onClick={() =>
+            setSearchParams(generateNewSearchParams("type", "rugged"))
+          }
+          className={`${typeFilter === "rugged" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
+        >
+          Rugged
+        </button>
+        <button
+          onClick={() =>
+            setSearchParams(generateNewSearchParams("type", "luxury"))
+          }
+          className={`${typeFilter === "luxury" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
+        >
+          Luxury
+        </button>
+        {typeFilter && (
+          <button
+            onClick={() =>
+              setSearchParams(generateNewSearchParams("type", null))
+            }
+            className="text-sm text-gray-600 underline"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
       <div className="grid grid-cols-2 gap-x-3 gap-y-3 sm:grid-cols-3">
-        {vansList.map((van) => (
+        {displayedVans.map((van) => (
           <VanCard
             key={van.id}
             id={van.id}
@@ -38,6 +95,7 @@ export default function Vans() {
             name={van.name}
             price={van.price}
             type={van.type}
+            state={{ searchParams: `${searchParams.toString()}` }}
           ></VanCard>
         ))}
       </div>
@@ -48,8 +106,9 @@ export default function Vans() {
 function VanCard(props: VanPreview) {
   return (
     <Link
-      to={`/vans/${props.id}`}
+      to={props.id}
       className="space-y-3 rounded-md p-3 shadow-sm transition-shadow hover:shadow-md"
+      state={props.state}
     >
       <div className="aspect-square overflow-hidden rounded-md">
         <img

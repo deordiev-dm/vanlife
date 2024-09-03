@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 
 import { Van } from "./Vans";
@@ -10,6 +10,11 @@ function VanInfopage() {
   const params = useParams();
   const [vanInfo, setVanInfo] = useState<Van>();
 
+  const location = useLocation();
+  const searchParams = location.state?.searchParams || "";
+  const typeFilter = searchParams.match(/type=([^&]+)/);
+  console.log(typeFilter);
+
   useEffect(() => {
     async function getData() {
       const res = await fetch(`/api/vans/${params.id}`);
@@ -19,15 +24,21 @@ function VanInfopage() {
     }
 
     getData();
-  }, []);
+  }, [params.id]);
 
   if (!vanInfo) return;
 
   return (
     <main className="space-y-8 px-6 pb-12 pt-6">
-      <Link to=".." relative="path" className="flex items-center gap-x-3">
+      <Link
+        to={`..?${searchParams}`}
+        relative="path"
+        className="flex items-center gap-x-3"
+      >
         <GoArrowLeft className="w-5 fill-[#858585]" />
-        <span className="font-medium underline">Back to all vans</span>
+        <span className="font-medium underline">
+          Back to {typeFilter ? typeFilter[1] : "all"} vans
+        </span>
       </Link>
       <div className="aspect-square overflow-hidden rounded-md">
         <img src={vanInfo?.imageUrl} alt="" />

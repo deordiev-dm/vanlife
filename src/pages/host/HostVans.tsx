@@ -20,7 +20,7 @@ export default function HostVans() {
         {hostedVans
           ? hostedVans.map((van) => (
               <Link
-                to={`${van.id}`}
+                to={van.id}
                 className="flex items-center gap-x-4 rounded-md bg-white p-3"
                 key={van.id}
               >

@@ -1,21 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Badge from "../../components/utility/Badge";
-
-export type Van = {
-  description: string;
-  id: string;
-  imageUrl: string;
-  name: string;
-  price: number;
-  type: "simple" | "rugged" | "luxury";
-  state?: { searchParams: string };
-};
-
-type VanPreview = Omit<Van, "description">;
+import { Van, VanPreview } from "../../types.ts";
+import { getVansData } from "../../api.ts";
+import LoadingError from "../../errors.ts";
 
 export default function Vans() {
-  const [vansList, setVansList] = useState<Van[]>([]);
+  const [vansList, setVansList] = useState<Van[]>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<LoadingError | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type");
@@ -37,14 +30,39 @@ export default function Vans() {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch("/api/vans");
-      const data: { vans: Van[] } = await res.json();
-      setVansList(data.vans);
+      setIsLoading(true);
+      try {
+        const vans = await getVansData();
+        setVansList(vans);
+      } catch (err) {
+        if (err instanceof LoadingError) {
+          console.error(`${err.status} ${err.statusText}: ${err.message}`);
+          setError(err);
+        } else {
+          throw new Error("Unknown error");
+        }
+      } finally {
+        setIsLoading(false);
+      }
     })();
   }, []);
 
+  if (error)
+    return (
+      <main className="flex items-center justify-center px-6 pb-12 pt-6">
+        <h1 className="text-3xl font-bold">Sorry, something went wrong :( </h1>
+      </main>
+    );
+
+  if (isLoading || !vansList)
+    return (
+      <main className="flex items-center justify-center px-6 pb-12 pt-6">
+        <span className="loader"></span>
+      </main>
+    );
+
   const displayedVans = typeFilter
-    ? vansList.filter((van) => van.type === typeFilter)
+    ? vansList?.filter((van) => van.type === typeFilter)
     : vansList;
 
   return (

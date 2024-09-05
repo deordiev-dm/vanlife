@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 
-import { Van } from "./Vans";
+import { Van } from "../../types";
 import Badge from "../../components/utility/Badge";
 import Button from "../../components/utility/Button";
 
@@ -13,7 +13,6 @@ function VanInfopage() {
   const location = useLocation();
   const searchParams = location.state?.searchParams || "";
   const typeFilter = searchParams.match(/type=([^&]+)/);
-  console.log(typeFilter);
 
   useEffect(() => {
     async function getData() {
@@ -50,7 +49,9 @@ function VanInfopage() {
           <span className="text-2xl">${vanInfo.price}/</span>day
         </p>
         <p className="font-medium">{vanInfo.description}</p>
-        <Button colors="orange">Rent this van</Button>
+        <Button as="button" colors="orange">
+          Rent this van
+        </Button>
       </div>
     </main>
   );

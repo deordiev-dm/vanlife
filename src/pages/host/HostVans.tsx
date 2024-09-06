@@ -1,17 +1,23 @@
 import { useEffect, useState } from "react";
-import { Van } from "../vans/Vans";
 import { Link } from "react-router-dom";
+import { useVans } from "../../hooks/useVans";
 
 export default function HostVans() {
-  const [hostedVans, setHostedVans] = useState<Van[]>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [err, setError] = useState(null);
 
+  const { vans, fetchVans } = useVans();
   useEffect(() => {
-    (async () => {
-      const res = await fetch("/api/host/vans");
-      const data = await res.json();
-      setHostedVans(data.vans);
-    })();
+    if (!vans.length) {
+      setIsLoading(true);
+      fetchVans()
+        .catch((err) => setError(err))
+        .finally(() => setIsLoading(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const hostedVans = vans.filter((van) => van.hostId === "123");
 
   return (
     <section className="space-y-5">

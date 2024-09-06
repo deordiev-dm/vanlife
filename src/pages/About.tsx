@@ -34,7 +34,7 @@ function About() {
             Your destination is waiting. <br />
             Your van is ready.
           </h2>
-          <Button to="/vans" colors="black">
+          <Button as="a" to="/vans" colors="black">
             Expore out vans
           </Button>
         </div>

@@ -6,8 +6,8 @@ import { MdError } from "react-icons/md";
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    email: "b@b.com",
-    password: "p123",
+    email: "",
+    password: "",
   });
 
   const [status, setStatus] = useState<"idle" | "submitting">("idle");

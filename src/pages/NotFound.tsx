@@ -6,7 +6,7 @@ export default function NotFound() {
       <h1 className="text-3xl font-bold">
         Sorry, the page you were looking for was not found.
       </h1>
-      <Button to="/" colors="black">
+      <Button as="a" to="/" colors="black">
         Return to Home
       </Button>
     </main>

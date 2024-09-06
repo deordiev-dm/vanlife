@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Badge from "../../components/utility/Badge";
-import { Van, VanPreview } from "../../types.ts";
-import { getVansData } from "../../api.ts";
-import LoadingError from "../../errors.ts";
+import { VanPreview } from "../../types.ts";
+import { useVans } from "../../hooks/useVans.tsx";
+import ErrorMessage from "../../components/utility/ErrorMessage.tsx";
 
 export default function Vans() {
-  const [vansList, setVansList] = useState<Van[]>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<LoadingError | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<unknown>();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type");
+
+  const { vans, fetchVans } = useVans();
 
   function generateNewSearchParams(
     key: string,
@@ -24,99 +25,84 @@ export default function Vans() {
       newSearchParams.set(key, value);
     }
 
-    console.log(newSearchParams);
     return newSearchParams;
   }
 
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      try {
-        const vans = await getVansData();
-        setVansList(vans);
-      } catch (err) {
-        if (err instanceof LoadingError) {
-          console.error(`${err.status} ${err.statusText}: ${err.message}`);
-          setError(err);
-        } else {
-          throw new Error("Unknown error");
-        }
-      } finally {
-        setIsLoading(false);
+  useEffect(
+    () => {
+      if (!vans.length) {
+        setIsLoading(true);
+        fetchVans()
+          .catch((err) => setError(err))
+          .finally(() => setIsLoading(false));
       }
-    })();
-  }, []);
-
-  if (error)
-    return (
-      <main className="flex items-center justify-center px-6 pb-12 pt-6">
-        <h1 className="text-3xl font-bold">Sorry, something went wrong :( </h1>
-      </main>
-    );
-
-  if (isLoading || !vansList)
-    return (
-      <main className="flex items-center justify-center px-6 pb-12 pt-6">
-        <span className="loader"></span>
-      </main>
-    );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const displayedVans = typeFilter
-    ? vansList?.filter((van) => van.type === typeFilter)
-    : vansList;
+    ? vans?.filter((van) => van.type === typeFilter)
+    : vans;
 
   return (
-    <main className="px-6 pb-12 pt-6">
-      <h1 className="mb-5 text-3xl font-bold">Explore out van options</h1>
-      <div className="mb-5 space-x-3">
-        <button
-          onClick={() =>
-            setSearchParams(generateNewSearchParams("type", "simple"))
-          }
-          className={`${typeFilter === "simple" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
-        >
-          Simple
-        </button>
-        <button
-          onClick={() =>
-            setSearchParams(generateNewSearchParams("type", "rugged"))
-          }
-          className={`${typeFilter === "rugged" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
-        >
-          Rugged
-        </button>
-        <button
-          onClick={() =>
-            setSearchParams(generateNewSearchParams("type", "luxury"))
-          }
-          className={`${typeFilter === "luxury" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
-        >
-          Luxury
-        </button>
-        {typeFilter && (
-          <button
-            onClick={() =>
-              setSearchParams(generateNewSearchParams("type", null))
-            }
-            className="text-sm text-gray-600 underline"
-          >
-            Clear filters
-          </button>
-        )}
-      </div>
-      <div className="grid grid-cols-2 gap-x-3 gap-y-3 sm:grid-cols-3">
-        {displayedVans.map((van) => (
-          <VanCard
-            key={van.id}
-            id={van.id}
-            imageUrl={van.imageUrl}
-            name={van.name}
-            price={van.price}
-            type={van.type}
-            state={{ searchParams: `${searchParams.toString()}` }}
-          ></VanCard>
-        ))}
-      </div>
+    <main className="relative flex flex-col px-6 pb-12 pt-6">
+      {error ? <ErrorMessage /> : null}
+      {isLoading && <span className="loader"></span>}
+      {!error && !isLoading ? (
+        <>
+          <h1 className="mb-5 text-3xl font-bold">Explore out van options</h1>
+          <div className="mb-5 space-x-3">
+            <button
+              onClick={() =>
+                setSearchParams(generateNewSearchParams("type", "simple"))
+              }
+              className={`${typeFilter === "simple" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
+            >
+              Simple
+            </button>
+            <button
+              onClick={() =>
+                setSearchParams(generateNewSearchParams("type", "rugged"))
+              }
+              className={`${typeFilter === "rugged" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
+            >
+              Rugged
+            </button>
+            <button
+              onClick={() =>
+                setSearchParams(generateNewSearchParams("type", "luxury"))
+              }
+              className={`${typeFilter === "luxury" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
+            >
+              Luxury
+            </button>
+            {typeFilter && (
+              <button
+                onClick={() =>
+                  setSearchParams(generateNewSearchParams("type", null))
+                }
+                className="text-sm text-gray-600 underline"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-3 sm:grid-cols-3">
+            {displayedVans.map((van) => (
+              <VanCard
+                key={van.id}
+                id={van.id}
+                imageUrl={van.imageUrl}
+                name={van.name}
+                price={van.price}
+                type={van.type}
+                state={{ searchParams: `${searchParams.toString()}` }}
+              ></VanCard>
+            ))}
+          </div>
+        </>
+      ) : null}
     </main>
   );
 }

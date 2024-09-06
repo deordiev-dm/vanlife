@@ -5,6 +5,7 @@ export type Van = {
   name: string;
   price: number;
   type: "simple" | "rugged" | "luxury";
+  hostId: string;
   state?: { searchParams: string }; // todo: get rid of this
 };
 

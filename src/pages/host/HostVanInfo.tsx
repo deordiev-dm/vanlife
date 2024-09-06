@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
-import { Van } from "../vans/Vans";
+import { Van } from "../../types";
 import Badge from "../../components/utility/Badge";
 
 export default function HostVanInfo() {

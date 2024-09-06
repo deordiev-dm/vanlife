@@ -9,4 +9,4 @@ export type Van = {
   state?: { searchParams: string }; // todo: get rid of this
 };
 
-export type VanPreview = Omit<Van, "description">;
+export type VanPreview = Omit<Van, "description" | "hostId">;

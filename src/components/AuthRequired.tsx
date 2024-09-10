@@ -1,10 +1,11 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function AuthRequired() {
-  const auth = localStorage.getItem("isLoggedIn");
+  const { currentUser } = useAuth();
   const { pathname } = useLocation();
 
-  if (auth === "true") {
+  if (currentUser) {
     return <Outlet />;
   }
 

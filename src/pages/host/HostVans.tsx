@@ -17,9 +17,6 @@ export default function HostVans() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // just to make warning go away
-  console.log(isLoading, err);
-
   const hostedVans = vans.filter((van) => van.hostId === "123");
 
   return (

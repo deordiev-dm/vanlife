@@ -1,24 +1,21 @@
-import { FirebaseError, initializeApp } from "firebase/app";
-import {
-  collection,
-  getDocs,
-  getFirestore,
-  query,
-  where,
-} from "firebase/firestore/lite";
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+
+import { collection, getDocs, getFirestore } from "firebase/firestore/lite";
 import { Van } from "./types";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCI21SiRLKn_9lHh8rsS3zv9AtglrB8Xig",
-  authDomain: "van-life-e28a4.firebaseapp.com",
-  projectId: "van-life-e28a4",
-  storageBucket: "van-life-e28a4.appspot.com",
-  messagingSenderId: "740654481717",
-  appId: "1:740654481717:web:05ba0423113a186d0c8c7c",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+export const auth = getAuth(app);
 
 export async function getVans(): Promise<Van[]> {
   try {
@@ -35,39 +32,5 @@ export async function getVans(): Promise<Van[]> {
   } catch (error) {
     console.error(error);
     throw new Error("Failed to fetch vans data");
-  }
-}
-
-type userData = {
-  email: string;
-  password: string;
-};
-
-export async function loginUser(creds: userData) {
-  const usersRef = collection(db, "users");
-  const q = query(usersRef, where("email", "==", creds.email));
-
-  try {
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      throw new Error("User not found");
-    }
-
-    const user = querySnapshot.docs[0].data();
-
-    if (user.password !== creds.password) {
-      throw new Error("Incorrect password");
-    }
-  } catch (err) {
-    if (err instanceof FirebaseError) {
-      console.error("Network or Firebase error:", err.message);
-      throw new Error("Network error, please try again later.");
-    } else if (err instanceof TypeError) {
-      console.error("Login error:", err.message);
-      throw err; // Re-throw to show specific login errors
-    } else {
-      throw err;
-    }
   }
 }

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Button from "../components/utility/Button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { loginUser } from "../api";
 import { MdError } from "react-icons/md";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -19,6 +19,7 @@ export default function Login() {
     ? location.state.pathname
     : "/host";
 
+  const { loginUser } = useAuth();
   function handleInput(target: EventTarget & HTMLInputElement): void {
     const { name, value } = target;
     setFormData((prevData) => ({
@@ -32,9 +33,8 @@ export default function Login() {
     setStatus("submitting");
     setError(null);
 
-    loginUser(formData)
+    loginUser(formData.email, formData.password)
       .then(() => {
-        localStorage.setItem("isLoggedIn", "true");
         navigate(pathToRedirect, { replace: true });
       })
       .catch((err) => setError(err))

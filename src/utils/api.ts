@@ -1,7 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-import { collection, getDocs, getFirestore } from "firebase/firestore/lite";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore/lite";
 import { Van } from "./types.ts";
 
 const firebaseConfig = {
@@ -17,10 +23,21 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 export const auth = getAuth(app);
 
-export async function getVans(): Promise<Van[]> {
+export type queryParamsType = {
+  prop: string;
+  equalTo: string;
+};
+
+export async function getVans(queryParams?: queryParamsType): Promise<Van[]> {
+  const vansRef = collection(db, "vans");
+
+  const q = queryParams
+    ? query(vansRef, where(queryParams.prop, "==", queryParams.equalTo))
+    : vansRef;
+
   try {
-    const vansCollection = await getDocs(collection(db, "vans"));
-    const vans = vansCollection.docs.map(
+    const querySnapshot = await getDocs(q);
+    const vans = querySnapshot.docs.map(
       (doc) =>
         ({
           ...doc.data(),

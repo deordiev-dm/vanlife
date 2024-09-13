@@ -1,24 +1,29 @@
 import { createContext, useState } from "react";
-import { getVans } from "../utils/api";
+import { getVans, queryParamsType } from "../utils/api";
 import { Van } from "../utils/types";
 
 type VansContextType = {
   vans: Van[];
-  fetchVans: () => Promise<void>;
+  fetchVans: (queryParams?: queryParamsType) => Promise<void>;
+  isAllVansFetched: boolean;
+  setIsAllVansFetched: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const VansContext = createContext<VansContextType | null>(null);
 
 export function VansProvider({ children }: { children: React.ReactNode }) {
   const [vans, setVans] = useState<Van[]>([]);
+  const [isAllVansFetched, setIsAllVansFetched] = useState(false);
 
-  async function fetchVans() {
-    const data = await getVans();
+  async function fetchVans(queryParams?: queryParamsType) {
+    const data = await getVans(queryParams);
     setVans(data);
   }
 
   return (
-    <VansContext.Provider value={{ vans, fetchVans }}>
+    <VansContext.Provider
+      value={{ vans, fetchVans, isAllVansFetched, setIsAllVansFetched }}
+    >
       {children}
     </VansContext.Provider>
   );

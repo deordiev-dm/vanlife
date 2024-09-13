@@ -8,8 +8,9 @@ export default function Dashboard() {
   const { currentUser } = useAuth();
 
   useEffect(() => {
+    if (!currentUser) return;
     if (!vans.length) {
-      fetchVans()
+      fetchVans({ prop: "hostId", equalTo: currentUser?.uid })
         .catch((err) => console.error(err))
         .finally();
     }

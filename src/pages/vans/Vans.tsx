@@ -12,7 +12,7 @@ export default function Vans() {
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type");
 
-  const { vans, fetchVans } = useVans();
+  const { vans, fetchVans, isAllVansFetched, setIsAllVansFetched } = useVans();
 
   function generateNewSearchParams(
     key: string,
@@ -30,9 +30,10 @@ export default function Vans() {
 
   useEffect(
     () => {
-      if (!vans.length) {
+      if (!isAllVansFetched) {
         setIsLoading(true);
         fetchVans()
+          .then(() => setIsAllVansFetched(true))
           .catch((err) => setError(err))
           .finally(() => setIsLoading(false));
       }

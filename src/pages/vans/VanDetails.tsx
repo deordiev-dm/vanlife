@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
 
-import Badge from "../../components/utility/Badge";
-import Button from "../../components/utility/Button";
+import Badge from "../../components/utils/Badge.tsx";
+import Button from "../../components/utils/Button.tsx";
 
 import { useVans } from "../../hooks/useVans.tsx";
-import LoadingError from "../../errors.ts";
-import ErrorMessage from "../../components/utility/ErrorMessage.tsx";
+import LoadingError from "../../utils/errors.ts";
+import ErrorMessage from "../../components/utils/ErrorMessage.tsx";
 
 export default function VanDetails() {
   const params = useParams();
@@ -25,7 +25,6 @@ export default function VanDetails() {
       setIsLoading(true);
       fetchVans()
         .catch((error) => setError(error))
-        // .finally(() => setTimeout(() => setIsLoading(false), 3000));
         .finally(() => setIsLoading(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

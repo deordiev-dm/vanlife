@@ -18,6 +18,7 @@ import Login from "./pages/Login";
 import AuthRequired from "./components/AuthRequired";
 import { VansProvider } from "./contexts/VansContext";
 import AuthProvider from "./contexts/AuthContext";
+import SignUp from "./pages/SignUp";
 
 export default function App() {
   return (
@@ -31,13 +32,14 @@ export default function App() {
               <Route path="vans" element={<Vans />} />
               <Route path="vans/:id" element={<VanDetails />} />
               <Route path="login" element={<Login />} />
+              <Route path="signup" element={<SignUp />} />
               <Route element={<AuthRequired />}>
                 <Route path="host" element={<HostLayout />}>
                   <Route index element={<Dashboard />} />
                   <Route path="income" element={<Income />} />
                   <Route path="reviews" element={<Review />} />
-                  <Route path="vans" element={<HostVans></HostVans>} />
-                  <Route path="vans/:id" element={<HostVanInfo></HostVanInfo>}>
+                  <Route path="vans" element={<HostVans />} />
+                  <Route path="vans/:id" element={<HostVanInfo />}>
                     <Route index element={<HostVanDetails />} />
                     <Route path="pricing" element={<HostVanPricing />} />
                     <Route path="photos" element={<HostVanPhotos />} />

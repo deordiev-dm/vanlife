@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../components/utils/Button";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { MdError } from "react-icons/md";
 import { useAuth } from "../hooks/useAuth";
 import { validateEmail } from "../utils/validateEmail";
-import { FirebaseError } from "firebase/app";
 
-export default function Login() {
+export default function SignUp() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    passwordConfirmation: "",
   });
 
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
@@ -20,14 +21,7 @@ export default function Login() {
     ? location.state.pathname
     : "/host";
 
-  useEffect(() => {
-    if (location.state?.message) {
-      setError(new Error(location.state?.message));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const { loginUser } = useAuth();
+  const { createUser } = useAuth();
   function handleInput(target: EventTarget & HTMLInputElement): void {
     const { name, value } = target;
     setFormData((prevData) => ({
@@ -41,41 +35,27 @@ export default function Login() {
     setStatus("submitting");
     setError(null);
 
-    const { email, password } = { ...formData };
+    const { email, password, passwordConfirmation } = { ...formData };
 
     if (!validateEmail(email)) {
-      setError(new Error("Invalid email. Please try again."));
+      setError(new Error("Invalid email"));
       setStatus("idle");
       return;
     } else if (password.length < 6) {
-      setError(new Error("Password is too short. Please try again."));
+      setError(new Error("Password is too short"));
+      setStatus("idle");
+      return;
+    } else if (password != passwordConfirmation) {
+      setError(new Error("Passwords do not match"));
       setStatus("idle");
       return;
     }
 
-    loginUser(email, password)
+    createUser(email, password)
       .then(() => {
         navigate(pathToRedirect, { replace: true });
       })
-      .catch((err) => {
-        if (err instanceof FirebaseError) {
-          if (err.code === "auth/invalid-email") {
-            setError(new Error("Invalid email. Please try again."));
-          } else if (err.code === "auth/user-not-found") {
-            setError(
-              new Error(
-                `There is no Vanlife account associated with ${email}. Please try again.`,
-              ),
-            );
-          } else if (err.code === "auth/wrong-password") {
-            setError(new Error("Wrong password. Please try again."));
-          } else {
-            setError(err);
-          }
-        } else {
-          setError(err);
-        }
-      })
+      .catch((err) => setError(err))
       .finally(() => setStatus("idle"));
   }
 
@@ -83,7 +63,7 @@ export default function Login() {
     <main className="relative flex flex-col items-center justify-center px-6 pb-12 pt-6">
       <div className="max-w-96">
         <h1 className="mb-8 text-center text-3xl font-bold">
-          Sign in to your account
+          Create your profile
         </h1>
         <form className="mb-8 space-y-4" onSubmit={handleSubmit}>
           <div>
@@ -116,9 +96,23 @@ export default function Login() {
               className="w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
             />
           </div>
-          {error?.message && (
-            <div className="text-red-500">{error.message}</div>
-          )}
+          <div>
+            <label
+              className="mb-1 inline-block pl-1"
+              htmlFor="passwordConfirmation"
+            >
+              Confirm password<span className="text-red-600">*</span>
+            </label>
+            <input
+              type="password"
+              name="passwordConfirmation"
+              id="passwordConfirmation"
+              placeholder="re-enter your password"
+              onChange={(e) => handleInput(e.target as HTMLInputElement)}
+              value={formData.passwordConfirmation}
+              className="w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
+            />
+          </div>
           <Button
             as="button"
             disabled={status === "submitting"}
@@ -129,16 +123,22 @@ export default function Login() {
                 : ""
             }
           >
-            {status === "submitting" ? "Logging in..." : "Sign in"}
+            {status === "submitting" ? "Logging in..." : "Create account"}
           </Button>
         </form>
-        <p className="text-center font-medium">
-          Don't have an account?{" "}
-          <Link className="text-orange-400 hover:underline" to="/signup">
-            Create on now!
-          </Link>
-        </p>
       </div>
+      {error?.message && (
+        <div className="absolute bottom-2 z-10 flex items-center gap-x-2 rounded bg-red-500 px-4 py-2 font-semibold text-slate-50">
+          <MdError className="h-5 w-5" />
+          {error.message}
+        </div>
+      )}
+      {location.state?.message && (
+        <div className="absolute bottom-2 flex items-center gap-x-2 rounded bg-red-500 px-4 py-2 font-semibold text-slate-50">
+          <MdError className="h-5 w-5" />
+          {location.state.message}
+        </div>
+      )}
     </main>
   );
 }

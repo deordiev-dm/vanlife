@@ -1,5 +1,6 @@
 import { NavLink, Link } from "react-router-dom";
 import { IoLogOutOutline } from "react-icons/io5";
+import { useAuth } from "../hooks/useAuth";
 
 function Header() {
   const activeStyles = {
@@ -7,9 +8,7 @@ function Header() {
     color: "#111827",
   };
 
-  function logOut() {
-    localStorage.removeItem("isLoggedIn");
-  }
+  const { logOutUser } = useAuth();
 
   return (
     <header className="flex min-h-16 items-center justify-between bg-[#FFF7ED] px-6 py-4">
@@ -51,7 +50,7 @@ function Header() {
           Login
         </NavLink>
         <button
-          onClick={logOut}
+          onClick={logOutUser}
           className="group-[button]: h-8 w-8 rounded border p-1 transition-all hover:bg-orange-200"
         >
           <IoLogOutOutline className="h-full w-full stroke-black" />

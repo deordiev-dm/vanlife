@@ -1,14 +1,13 @@
 import { createContext, useState } from "react";
-import { getVans } from "../api";
-import { Van } from "../types";
+import { getVans } from "../utils/api";
+import { Van } from "../utils/types";
 
-export const VansContext = createContext<
-  | {
-      vans: Van[];
-      fetchVans: () => Promise<void>;
-    }
-  | undefined
->(undefined);
+type VansContextType = {
+  vans: Van[];
+  fetchVans: () => Promise<void>;
+};
+
+export const VansContext = createContext<VansContextType | null>(null);
 
 export function VansProvider({ children }: { children: React.ReactNode }) {
   const [vans, setVans] = useState<Van[]>([]);

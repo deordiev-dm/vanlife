@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import Badge from "../../components/utility/Badge";
-import { VanPreview } from "../../types.ts";
+import Badge from "../../components/utils/Badge.tsx";
+import { VanPreview } from "../../utils/types.ts";
 import { useVans } from "../../hooks/useVans.tsx";
-import ErrorMessage from "../../components/utility/ErrorMessage.tsx";
+import ErrorMessage from "../../components/utils/ErrorMessage.tsx";
 
 export default function Vans() {
   const [isLoading, setIsLoading] = useState(false);

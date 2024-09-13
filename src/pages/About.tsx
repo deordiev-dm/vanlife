@@ -1,4 +1,4 @@
-import Button from "../components/utility/Button";
+import Button from "../components/utils/Button";
 
 import aboutBgImage from "../images/aboutBgImage.jpg";
 

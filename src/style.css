@@ -4,6 +4,7 @@
 
 body {
   font-family: "Inter";
+  background-color: #fff7ed;
 }
 
 #root {
@@ -14,11 +15,14 @@ body {
 
 main {
   flex: 1 0 auto;
-  background-color: #fff7ed;
 }
 
 footer {
   flex-shrink: 0;
+}
+
+label {
+  cursor: pointer;
 }
 
 .loader {

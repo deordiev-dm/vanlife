@@ -1,30 +1,45 @@
 import { useEffect, useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
-import { Van } from "../../types";
-import Badge from "../../components/utility/Badge";
+import Badge from "../../components/utils/Badge";
+import { useVans } from "../../hooks/useVans";
+import ErrorMessage from "../../components/utils/ErrorMessage";
 
 export default function HostVanInfo() {
-  const params = useParams();
-  const [vanInfo, setVanInfo] = useState<Van>();
-
-  useEffect(() => {
-    async function getData() {
-      const res = await fetch(`/api/vans/${params.id}`);
-      const data = await res.json();
-
-      setVanInfo(data.vans);
-    }
-
-    getData();
-  }, []);
-
   const activeStyles = {
     textDecoration: "underline",
     color: "black",
   };
 
-  if (!vanInfo) return;
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<unknown>();
+  const params = useParams();
+
+  const { vans, fetchVans } = useVans();
+
+  useEffect(
+    () => {
+      if (!vans.length) {
+        setIsLoading(true);
+        fetchVans()
+          .catch((err) => setError(err))
+          .finally(() => setIsLoading(false));
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const displayedVan = vans.find((van) => van.id === params.id);
+
+  if (error) {
+    <ErrorMessage />;
+  }
+
+  if (!displayedVan || isLoading) {
+    return <div className="loader"></div>;
+  }
+
   return (
     <div className="space-y-6">
       <Link to=".." relative="path" className="flex items-center gap-x-3">
@@ -34,15 +49,15 @@ export default function HostVanInfo() {
       <section className="space-y-6 rounded-lg bg-white p-6">
         <div className="flex items-center gap-x-4">
           <img
-            src={vanInfo?.imageUrl}
+            src={displayedVan.imageUrl}
             alt=""
             className="aspect-square w-40 rounded-md"
           />
           <div className="space-y-2">
-            <Badge type={vanInfo.type} />
-            <h1 className="text-2xl font-bold">{vanInfo.name}</h1>
+            <Badge type={displayedVan.type} />
+            <h1 className="text-2xl font-bold">{displayedVan.name}</h1>
             <p className="text-xl font-medium">
-              <span className="text-lg">${vanInfo.price}/</span>day
+              <span className="text-lg">${displayedVan.price}/</span>day
             </p>
           </div>
         </div>
@@ -72,7 +87,7 @@ export default function HostVanInfo() {
           </NavLink>
         </nav>
         <section className="space-y-3">
-          <Outlet context={[vanInfo, setVanInfo]} />
+          <Outlet context={{ displayedVan }} />
         </section>
       </section>
     </div>

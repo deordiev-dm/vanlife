@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 import { collection, getDocs, getFirestore } from "firebase/firestore/lite";
-import { Van } from "./types";
+import { Van } from "./types.ts";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,

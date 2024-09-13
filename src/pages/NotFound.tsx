@@ -1,4 +1,4 @@
-import Button from "../components/utility/Button";
+import Button from "../components/utils/Button";
 
 export default function NotFound() {
   return (

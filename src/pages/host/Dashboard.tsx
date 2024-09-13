@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useVans } from "../../hooks/useVans";
 import { useAuth } from "../../hooks/useAuth";
 import { FaStar } from "react-icons/fa6";
+import NoVans from "../../components/NoVans";
 
 export default function Dashboard() {
   const { vans, fetchVans } = useVans();
@@ -21,7 +22,7 @@ export default function Dashboard() {
     ? vans.filter((van) => van.hostId === currentUser.uid)
     : null;
 
-  return (
+  return hostedVans?.length ? (
     <>
       <div>
         <section className="-ml-6 -mr-6 space-y-5 bg-[#FFEAD0] p-6">
@@ -65,5 +66,7 @@ export default function Dashboard() {
         </div>
       </section>
     </>
+  ) : (
+    <NoVans />
   );
 }

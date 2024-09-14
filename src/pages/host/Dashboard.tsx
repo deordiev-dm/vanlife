@@ -8,6 +8,7 @@ import { getUserTransactions, TransactionType } from "../../utils/api";
 import { nanoid } from "nanoid";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import DashboardDropdown from "../../components/DashboardDropdown";
+import { isWithinLastNDays } from "../../utils/isWithinLastNDays";
 
 export default function Dashboard() {
   const { vans, fetchVans } = useVans();
@@ -60,7 +61,6 @@ export default function Dashboard() {
               Details
             </Link>
           </div>
-
           <p className="text-4xl font-extrabold">${income}</p>
         </section>
         <section className="-ml-6 -mr-6 flex items-center gap-4 bg-[#FFDDB2] p-6">
@@ -105,11 +105,4 @@ export default function Dashboard() {
   ) : (
     <NoVans />
   );
-}
-
-function isWithinLastNDays(timestamp: number, days: number): boolean {
-  const now = Date.now();
-  const nDaysAgo = now - days * 24 * 60 * 60 * 1000;
-
-  return timestamp >= nDaysAgo && timestamp <= now;
 }

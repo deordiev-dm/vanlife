@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { getUserTransactions, TransactionType } from "../../utils/api";
 import { nanoid } from "nanoid";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import DashboardDropdown from "../../components/DashboardDropdown";
 
 export default function Dashboard() {
   const { vans, fetchVans } = useVans();
@@ -45,46 +46,13 @@ export default function Dashboard() {
         <section className="-ml-6 -mr-6 space-y-5 bg-[#FFEAD0] p-6">
           <h1 className="text-3xl font-bold">Welcome!</h1>
           <div className="flex justify-between gap-4">
-            <div className="relative flex items-center gap-x-1 text-[#4d4d4d]">
+            <div className="flex items-center gap-x-1 text-[#4d4d4d]">
               <p>Income in the</p>
-              <div className="group flex items-center gap-x-1">
+              <div className="group relative flex items-center gap-x-1">
                 <button className="font-semibold underline">
                   last {numberOfDays} days
                 </button>
-                <div className="menu invisible absolute right-0 top-6 flex w-32 scale-0 flex-col rounded-xl border bg-white text-black transition-all *:border *:px-4 *:py-1 *:transition-colors group-hover:visible group-hover:flex group-hover:scale-100">
-                  <button
-                    onClick={() => {
-                      setNumberOfDays(7);
-                    }}
-                    className="hover:bg-slate-100"
-                  >
-                    7 days
-                  </button>
-                  <button
-                    onClick={() => {
-                      setNumberOfDays(30);
-                    }}
-                    className="hover:bg-slate-100"
-                  >
-                    30 days
-                  </button>
-                  <button
-                    onClick={() => {
-                      setNumberOfDays(90);
-                    }}
-                    className="hover:bg-slate-100"
-                  >
-                    3 months
-                  </button>
-                  <button
-                    onClick={() => {
-                      setNumberOfDays(365);
-                    }}
-                    className="hover:bg-slate-100"
-                  >
-                    year
-                  </button>
-                </div>
+                <DashboardDropdown setNumberOfDays={setNumberOfDays} />
                 <MdOutlineKeyboardArrowDown className="rotate-180 transition-transform group-hover:rotate-0" />
               </div>
             </div>
@@ -140,8 +108,8 @@ export default function Dashboard() {
 }
 
 function isWithinLastNDays(timestamp: number, days: number): boolean {
-  const now = Date.now(); // current time in milliseconds
-  const nDaysAgo = now - days * 24 * 60 * 60 * 1000; // 'days' worth of milliseconds
+  const now = Date.now();
+  const nDaysAgo = now - days * 24 * 60 * 60 * 1000;
 
   return timestamp >= nDaysAgo && timestamp <= now;
 }

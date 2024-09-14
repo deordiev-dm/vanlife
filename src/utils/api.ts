@@ -51,3 +51,4 @@ export async function getVans(queryParams?: queryParamsType): Promise<Van[]> {
     throw new Error("Failed to fetch vans data");
   }
 }
+

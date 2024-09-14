@@ -52,3 +52,25 @@ export async function getVans(queryParams?: queryParamsType): Promise<Van[]> {
   }
 }
 
+export type TransactionType = {
+  amount: number;
+  timestamp: number;
+  userId: "string";
+  vanId: "string";
+};
+
+export async function getUserTransactions(userUid: string) {
+  const transactionsRef = collection(db, "transactions");
+  const q = query(transactionsRef, where("userId", "==", userUid));
+
+  try {
+    const querySnapshot = await getDocs(q);
+    const transactions: TransactionType[] = querySnapshot.docs.map(
+      (transaction) => transaction.data() as TransactionType,
+    );
+    return transactions;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to fetch transactions");
+  }
+}

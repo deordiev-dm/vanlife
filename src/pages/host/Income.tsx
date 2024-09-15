@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import DashboardDropdown from "../../components/DashboardDropdown";
+import DropdownMenu from "../../components/utils/dropdown/DropdownMenu";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { getUserTransactions, TransactionType } from "../../utils/api";
 import { isWithinLastNDays } from "../../utils/isWithinLastNDays";
 import { useAuth } from "../../hooks/useAuth";
 import IncomeChart from "../../components/IncomeChart";
+import DropdownElement from "../../components/utils/dropdown/DropdownElement";
 
 export default function Dashboard() {
   const [numberOfDays, setNumberOfDays] = useState(30);
@@ -19,13 +20,16 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const income = transactions
-    ? transactions
-        .filter((transaction) =>
-          isWithinLastNDays(transaction.timestamp, numberOfDays),
-        )
-        .reduce((acc, curr) => acc + curr.amount, 0)
-    : 0;
+  const transactionsWithinLastNDays = transactions
+    ? transactions?.filter((transaction) =>
+        isWithinLastNDays(transaction.timestamp, numberOfDays),
+      )
+    : [];
+
+  const income = transactionsWithinLastNDays.reduce(
+    (acc, curr) => acc + curr.amount,
+    0,
+  );
 
   return (
     <>
@@ -35,12 +39,30 @@ export default function Dashboard() {
           <button className="font-semibold underline">
             last {numberOfDays} days
           </button>
-          <DashboardDropdown setNumberOfDays={setNumberOfDays} />
+
+          <DropdownMenu>
+            <DropdownElement onClick={() => setNumberOfDays(7)}>
+              7 days
+            </DropdownElement>
+            <DropdownElement onClick={() => setNumberOfDays(30)}>
+              30 days
+            </DropdownElement>
+            <DropdownElement onClick={() => setNumberOfDays(90)}>
+              90 days
+            </DropdownElement>
+            <DropdownElement onClick={() => setNumberOfDays(180)}>
+              180 days
+            </DropdownElement>
+          </DropdownMenu>
+
           <MdOutlineKeyboardArrowDown className="rotate-180 transition-transform group-hover:rotate-0" />
         </div>
       </div>
       <p className="text-4xl font-extrabold">${income}</p>
-      <IncomeChart transactions={transactions} />
+      <IncomeChart
+        transactions={transactionsWithinLastNDays}
+        numberOfDays={numberOfDays}
+      />
     </>
   );
 }

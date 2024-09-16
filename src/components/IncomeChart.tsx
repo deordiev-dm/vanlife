@@ -2,21 +2,6 @@ import Chart from "chart.js/auto";
 import { TransactionType } from "../utils/api";
 import { useEffect, useRef } from "react";
 
-// const MONTHS_MAP = {
-//   "0": "Jan",
-//   "1": "Feb",
-//   "2": "Mar",
-//   "3": "Apr",
-//   "4": "May",
-//   "5": "Jun",
-//   "6": "Jul",
-//   "7": "Aug",
-//   "8": "Sep",
-//   "9": "Oct",
-//   "10": "Nov",
-//   "11": "Dec",
-// };
-
 type Props = {
   transactions: TransactionType[] | null;
   months: 1 | 3 | 6 | 12;
@@ -39,8 +24,8 @@ function IncomeChart({ transactions, months }: Props) {
 
     const data = formatIncomeData(transactions, months);
 
-    const labels = data.map((item) => item.month);
-    const incomeValues = data.map((item) => item.income);
+    const labels = data.map((item) => item.dateId);
+    const incomeValues = data.map((item) => item.amount);
 
     const maxIncome = Math.max(...incomeValues);
 
@@ -81,41 +66,89 @@ function IncomeChart({ transactions, months }: Props) {
 export default IncomeChart;
 
 function formatIncomeData(transactions: TransactionType[], months: number) {
-  console.log(transactions, months);
+  const transactionsDetails = transactions.map((transaction) => {
+    const date = new Date(transaction.timestamp);
 
-  return [
-    { month: "Jun", income: 500 },
-    { month: "Jul", income: 310 },
-    { month: "Aug", income: 1220 },
-    { month: "Sep", income: 840 },
-  ];
+    return {
+      date,
+      dateId: date.toLocaleString("default", {
+        month: "short",
+        year: "2-digit",
+      }),
+      amount: transaction.amount,
+    };
+  });
+
+  const data: { dateId: string; amount: number }[] = [];
+  const now = new Date();
+
+  for (let i = months; i >= 0; i--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, now.getDate());
+    data.push({
+      dateId: date.toLocaleString("default", {
+        month: "short",
+        year: "2-digit",
+      }),
+      amount: 0,
+    });
+  }
+
+  transactionsDetails.forEach((transaction) => {
+    const item = data.find((entry) => entry.dateId === transaction.dateId);
+    if (item) {
+      item.amount += transaction.amount;
+    }
+  });
+
+  return data;
 }
 
-//   const now = new Date();
-//   const startingPoint = new Date();
-//   startingPoint.setDate(startingPoint.getMonth() - months);
-//   const currentMonth = now.getMonth();
-//   const startingMonth = startingPoint.getMonth();
-//   const monthsList = [];
-//   for (let i = startingMonth; i <= currentMonth; i++) {
-//     monthsList.push(i);
-//   }
-//   const dataByMonth: { [key: string]: number } = {};
-//   monthsList.forEach((month) => {
-//     dataByMonth[MONTHS_MAP[month.toString() as keyof typeof MONTHS_MAP]] = 0;
-//   });
-//   transactions.forEach((transaction) => {
-//     const date = new Date(transaction.timestamp);
-//     const month = date.toLocaleString("default", {
-//       month: "short",
-//     });
-//     if (dataByMonth[month]) {
-//       dataByMonth[month] += transaction.amount;
-//     } else {
-//       dataByMonth[month] = transaction.amount;
-//     }
-//   });
-//   return Object.keys(dataByMonth).map((month) => ({
-//     month,
-//     income: dataByMonth[month],
-//   }));
+/*
+[
+  {
+    "date": "2023-10-29T11:17:55.000Z",
+    "transactionYear": 2023,
+    "transactionMonth": 9,
+    "amount": 560
+  },
+  {
+    "date": "2024-09-12T07:41:25.000Z",
+    "transactionYear": 2024,
+    "transactionMonth": 8,
+    "amount": 120
+  },
+  {
+    "date": "2024-09-06T18:50:36.000Z",
+    "transactionYear": 2024,
+    "transactionMonth": 8,
+    "amount": 130
+  },
+  {
+    "date": "2024-04-08T11:17:55.000Z",
+    "transactionYear": 2024,
+    "transactionMonth": 3,
+    "amount": 680
+  },
+  {
+    "date": "2024-08-23T20:33:00.000Z",
+    "transactionYear": 2024,
+    "transactionMonth": 7,
+    "amount": 300
+  },
+  {
+    "date": "2024-07-26T08:50:36.000Z",
+    "transactionYear": 2024,
+    "transactionMonth": 6,
+    "amount": 840
+  }
+]
+*/
+
+/* 
+[
+  { month: "Jul", income: 310 },
+  { month: "Jun", income: 500 },
+  { month: "Aug", income: 1220 },
+  { month: "Sep", income: 840 },
+];
+ */

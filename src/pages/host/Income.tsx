@@ -26,13 +26,13 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const transactionsWithinLastNDays = transactions
+  const transactionsWithinMonths = transactions
     ? transactions?.filter((transaction) =>
         isWithinNMonths(transaction.timestamp, months),
       )
     : [];
 
-  const income = transactionsWithinLastNDays.reduce(
+  const income = transactionsWithinMonths.reduce(
     (acc, curr) => acc + curr.amount,
     0,
   );
@@ -53,7 +53,7 @@ export default function Dashboard() {
         </DropdownMenu>
       </div>
       <p className="text-4xl font-extrabold">${income}</p>
-      <IncomeChart transactions={transactionsWithinLastNDays} months={months} />
+      <IncomeChart transactions={transactionsWithinMonths} months={months} />
     </>
   );
 }

@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
 import DropdownMenu from "../../components/utils/dropdown/DropdownMenu";
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { getUserTransactions, TransactionType } from "../../utils/api";
-import { isWithinLastNDays } from "../../utils/isWithinLastNDays";
+import { isWithinNMonths } from "../../utils/isWithinNMonths";
 import { useAuth } from "../../hooks/useAuth";
 import IncomeChart from "../../components/IncomeChart";
 import DropdownElement from "../../components/utils/dropdown/DropdownElement";
 
 export default function Dashboard() {
-  const [numberOfDays, setNumberOfDays] = useState(30);
+  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
   const [transactions, setTransactions] = useState<TransactionType[] | null>(
     null,
   );
   const { currentUser } = useAuth();
+
+  const MONTHS_MAP = {
+    1: "month",
+    3: "3 months",
+    6: "6 months",
+    12: "year",
+  };
 
   useEffect(() => {
     if (!currentUser) return;
@@ -22,7 +28,7 @@ export default function Dashboard() {
 
   const transactionsWithinLastNDays = transactions
     ? transactions?.filter((transaction) =>
-        isWithinLastNDays(transaction.timestamp, numberOfDays),
+        isWithinNMonths(transaction.timestamp, months),
       )
     : [];
 
@@ -33,36 +39,21 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="flex items-center gap-x-3">
-        <h1 className="text-3xl font-bold">Income</h1>
-        <div className="group relative flex items-center gap-x-1">
-          <button className="font-semibold underline">
-            last {numberOfDays} days
-          </button>
-
-          <DropdownMenu>
-            <DropdownElement onClick={() => setNumberOfDays(7)}>
-              7 days
-            </DropdownElement>
-            <DropdownElement onClick={() => setNumberOfDays(30)}>
-              30 days
-            </DropdownElement>
-            <DropdownElement onClick={() => setNumberOfDays(90)}>
-              90 days
-            </DropdownElement>
-            <DropdownElement onClick={() => setNumberOfDays(180)}>
-              180 days
-            </DropdownElement>
-          </DropdownMenu>
-
-          <MdOutlineKeyboardArrowDown className="rotate-180 transition-transform group-hover:rotate-0" />
-        </div>
+      <div className="flex flex-col items-start">
+        <h1 className="mb-3 text-3xl font-bold">Income</h1>
+        <DropdownMenu title={`in the last ${MONTHS_MAP[months]}`}>
+          <DropdownElement onClick={() => setMonths(1)}>month</DropdownElement>
+          <DropdownElement onClick={() => setMonths(3)}>
+            3 months
+          </DropdownElement>
+          <DropdownElement onClick={() => setMonths(6)}>
+            6 months
+          </DropdownElement>
+          <DropdownElement onClick={() => setMonths(12)}>year</DropdownElement>
+        </DropdownMenu>
       </div>
       <p className="text-4xl font-extrabold">${income}</p>
-      <IncomeChart
-        transactions={transactionsWithinLastNDays}
-        numberOfDays={numberOfDays}
-      />
+      <IncomeChart transactions={transactionsWithinLastNDays} months={months} />
     </>
   );
 }

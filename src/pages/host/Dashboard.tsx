@@ -6,9 +6,8 @@ import NoVans from "../../components/NoVans";
 import { Link } from "react-router-dom";
 import { getUserTransactions, TransactionType } from "../../utils/api";
 import { nanoid } from "nanoid";
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import DropdownMenu from "../../components/utils/dropdown/DropdownMenu";
-import { isWithinLastNDays } from "../../utils/isWithinLastNDays";
+import { isWithinNMonths } from "../../utils/isWithinNMonths";
 import DropdownElement from "../../components/utils/dropdown/DropdownElement";
 
 export default function Dashboard() {
@@ -17,7 +16,14 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState<TransactionType[] | null>(
     null,
   );
-  const [numberOfDays, setNumberOfDays] = useState(30);
+  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
+
+  const MONTHS_MAP = {
+    1: "month",
+    3: "3 months",
+    6: "6 months",
+    12: "year",
+  };
 
   useEffect(() => {
     if (!currentUser) return;
@@ -36,9 +42,7 @@ export default function Dashboard() {
 
   const income = transactions
     ? transactions
-        .filter((transaction) =>
-          isWithinLastNDays(transaction.timestamp, numberOfDays),
-        )
+        .filter((transaction) => isWithinNMonths(transaction.timestamp, months))
         .reduce((acc, curr) => acc + curr.amount, 0)
     : 0;
 
@@ -49,29 +53,20 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold">Welcome!</h1>
           <div className="flex justify-between gap-4">
             <div className="flex items-center gap-x-1 text-[#4d4d4d]">
-              <p>Income in the</p>
-              <div className="group relative flex items-center gap-x-1">
-                <button className="font-semibold underline">
-                  last {numberOfDays} days
-                </button>
-
-                <DropdownMenu>
-                  <DropdownElement onClick={() => setNumberOfDays(7)}>
-                    7 days
-                  </DropdownElement>
-                  <DropdownElement onClick={() => setNumberOfDays(30)}>
-                    30 days
-                  </DropdownElement>
-                  <DropdownElement onClick={() => setNumberOfDays(90)}>
-                    90 days
-                  </DropdownElement>
-                  <DropdownElement onClick={() => setNumberOfDays(180)}>
-                    180 days
-                  </DropdownElement>
-                </DropdownMenu>
-
-                <MdOutlineKeyboardArrowDown className="rotate-180 transition-transform group-hover:rotate-0" />
-              </div>
+              <DropdownMenu title={`Income in the last ${MONTHS_MAP[months]}`}>
+                <DropdownElement onClick={() => setMonths(1)}>
+                  month
+                </DropdownElement>
+                <DropdownElement onClick={() => setMonths(3)}>
+                  3 months
+                </DropdownElement>
+                <DropdownElement onClick={() => setMonths(6)}>
+                  6 months
+                </DropdownElement>
+                <DropdownElement onClick={() => setMonths(12)}>
+                  year
+                </DropdownElement>
+              </DropdownMenu>
             </div>
             <Link to="income" className="hover:underline">
               Details

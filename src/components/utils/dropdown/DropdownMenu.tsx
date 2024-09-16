@@ -1,11 +1,53 @@
+import React, { createContext } from "react";
+import { CSSProperties, useState } from "react";
+import { MdOutlineKeyboardArrowUp } from "react-icons/md";
+
 type Props = {
   children: React.ReactNode;
+  title: string;
 };
 
-export default function DropdownMenu({ children }: Props) {
+type DropdownContextType = {
+  isMenuOpen: boolean;
+  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export const DropdownContext = createContext<DropdownContextType | null>(null);
+
+export default function DropdownMenu({ children, title }: Props) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const menuStyles: CSSProperties = {
+    visibility: isMenuOpen ? "visible" : "hidden",
+    transform: isMenuOpen ? "scale(1)" : "scale(0)",
+    transition: "all ease-in-out 150ms",
+  };
+
+  const arrowStyles: CSSProperties = {
+    transform: isMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
+  };
+
   return (
-    <div className="menu invisible absolute left-0 top-6 flex w-32 scale-0 flex-col overflow-clip rounded bg-white text-black shadow-xl transition-all *:px-4 *:py-1 *:transition-colors group-hover:visible group-hover:flex group-hover:scale-100">
-      {children}
+    <div
+      className="relative flex items-center space-x-1 rounded-md text-black"
+      onMouseEnter={() => setIsMenuOpen(true)}
+      onMouseLeave={() => setIsMenuOpen(false)}
+    >
+      <span>{title}</span>
+      <MdOutlineKeyboardArrowUp
+        style={arrowStyles}
+        className="transition-transform"
+      />
+      <div
+        style={menuStyles}
+        className="absolute right-0 top-full w-36 px-1 py-2"
+      >
+        <div className="flex flex-col overflow-clip rounded bg-white text-black shadow-xl *:border-b-[1px] *:px-4 *:py-1 *:transition-colors last:border-none">
+          <DropdownContext.Provider value={{ isMenuOpen, setIsMenuOpen }}>
+            {children}
+          </DropdownContext.Provider>
+        </div>
+      </div>
     </div>
   );
 }

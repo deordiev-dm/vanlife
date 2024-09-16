@@ -2,27 +2,27 @@ import Chart from "chart.js/auto";
 import { TransactionType } from "../utils/api";
 import { useEffect, useRef } from "react";
 
-const MONTH_MAP = {
-  0: "Jan",
-  1: "Feb",
-  2: "Mar",
-  3: "Apr",
-  4: "May",
-  5: "Jun",
-  6: "Jul",
-  7: "Aug",
-  8: "Sep",
-  9: "Oct",
-  10: "Nov",
-  11: "Dec",
-};
+// const MONTHS_MAP = {
+//   "0": "Jan",
+//   "1": "Feb",
+//   "2": "Mar",
+//   "3": "Apr",
+//   "4": "May",
+//   "5": "Jun",
+//   "6": "Jul",
+//   "7": "Aug",
+//   "8": "Sep",
+//   "9": "Oct",
+//   "10": "Nov",
+//   "11": "Dec",
+// };
 
 type Props = {
   transactions: TransactionType[] | null;
-  numberOfDays: number;
+  months: 1 | 3 | 6 | 12;
 };
 
-function IncomeChart({ transactions, numberOfDays }: Props) {
+function IncomeChart({ transactions, months }: Props) {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstance = useRef<Chart | null>(null);
 
@@ -37,13 +37,12 @@ function IncomeChart({ transactions, numberOfDays }: Props) {
       chartInstance.current.destroy();
     }
 
-    const data = formatIncomeData(transactions, numberOfDays);
+    const data = formatIncomeData(transactions, months);
 
     const labels = data.map((item) => item.month);
     const incomeValues = data.map((item) => item.income);
 
     const maxIncome = Math.max(...incomeValues);
-    console.log(maxIncome);
 
     chartInstance.current = new Chart(ctx, {
       type: "bar",
@@ -74,50 +73,49 @@ function IncomeChart({ transactions, numberOfDays }: Props) {
         chartInstance.current.destroy();
       }
     };
-  }, [transactions, numberOfDays]);
+  }, [transactions, months]);
 
   return <canvas ref={chartRef} />;
 }
 
 export default IncomeChart;
 
-function formatIncomeData(
-  transactions: TransactionType[],
-  numberOfDays: number,
-) {
-  const now = new Date();
-  const startingPoint = new Date();
-  startingPoint.setDate(startingPoint.getDate() - numberOfDays);
+function formatIncomeData(transactions: TransactionType[], months: number) {
+  console.log(transactions, months);
 
-  const currentMonth = now.getMonth();
-  const startingMonth = startingPoint.getMonth();
-
-  const months = [];
-
-  for (let i = startingMonth; i <= currentMonth; i++) {
-    months.push(i);
-  }
-
-  const dataByMonth: { [key: string]: number } = {};
-  months.forEach((month) => {
-    dataByMonth[MONTH_MAP[month]] = 0;
-  });
-
-  transactions.forEach((transaction) => {
-    const date = new Date(transaction.timestamp);
-    const month = date.toLocaleString("default", {
-      month: "short",
-    });
-
-    if (dataByMonth[month]) {
-      dataByMonth[month] += transaction.amount;
-    } else {
-      dataByMonth[month] = transaction.amount;
-    }
-  });
-
-  return Object.keys(dataByMonth).map((month) => ({
-    month,
-    income: dataByMonth[month],
-  }));
+  return [
+    { month: "Jun", income: 500 },
+    { month: "Jul", income: 310 },
+    { month: "Aug", income: 1220 },
+    { month: "Sep", income: 840 },
+  ];
 }
+
+//   const now = new Date();
+//   const startingPoint = new Date();
+//   startingPoint.setDate(startingPoint.getMonth() - months);
+//   const currentMonth = now.getMonth();
+//   const startingMonth = startingPoint.getMonth();
+//   const monthsList = [];
+//   for (let i = startingMonth; i <= currentMonth; i++) {
+//     monthsList.push(i);
+//   }
+//   const dataByMonth: { [key: string]: number } = {};
+//   monthsList.forEach((month) => {
+//     dataByMonth[MONTHS_MAP[month.toString() as keyof typeof MONTHS_MAP]] = 0;
+//   });
+//   transactions.forEach((transaction) => {
+//     const date = new Date(transaction.timestamp);
+//     const month = date.toLocaleString("default", {
+//       month: "short",
+//     });
+//     if (dataByMonth[month]) {
+//       dataByMonth[month] += transaction.amount;
+//     } else {
+//       dataByMonth[month] = transaction.amount;
+//     }
+//   });
+//   return Object.keys(dataByMonth).map((month) => ({
+//     month,
+//     income: dataByMonth[month],
+//   }));

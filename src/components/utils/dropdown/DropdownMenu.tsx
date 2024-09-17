@@ -34,7 +34,7 @@ export default function DropdownMenu({ children, title }: Props) {
       />
       <div
         style={menuStyles}
-        className="absolute right-0 top-full w-36 px-1 py-2"
+        className="absolute right-0 top-full z-10 w-36 px-1 py-2"
       >
         <div className="flex flex-col overflow-clip rounded bg-white text-black shadow-xl *:border-b-[1px] *:px-4 *:py-1 *:transition-colors last:border-none">
           {children}

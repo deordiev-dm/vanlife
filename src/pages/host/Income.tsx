@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import DropdownMenu from "../../components/utils/dropdown/DropdownMenu";
 import { getUserTransactions, TransactionType } from "../../utils/api";
 import { isWithinNMonths } from "../../utils/isWithinNMonths";
 import { useAuth } from "../../hooks/useAuth";
-import IncomeChart from "../../components/IncomeChart";
-import DropdownElement from "../../components/utils/dropdown/DropdownElement";
-import UserTransactions from "../../components/UserTransactions";
+import IncomeChart from "../../components/income/IncomeChart";
+import UserTransactions from "../../components/income/UserTransactions";
+import IncomeHeader from "../../components/income/IncomeHeader";
 import ErrorMessage from "../../components/utils/ErrorMessage";
 
 export default function Dashboard() {
@@ -16,13 +15,6 @@ export default function Dashboard() {
   const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
-
-  const MONTHS_MAP = {
-    1: "month",
-    3: "3 months",
-    6: "6 months",
-    12: "year",
-  };
 
   useEffect(() => {
     if (!currentUser) return;
@@ -58,20 +50,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="flex flex-col items-start">
-        <h1 className="mb-3 text-4xl font-bold">Income</h1>
-        <DropdownMenu title={`in the last ${MONTHS_MAP[months]}`}>
-          <DropdownElement onClick={() => setMonths(1)}>month</DropdownElement>
-          <DropdownElement onClick={() => setMonths(3)}>
-            3 months
-          </DropdownElement>
-          <DropdownElement onClick={() => setMonths(6)}>
-            6 months
-          </DropdownElement>
-          <DropdownElement onClick={() => setMonths(12)}>year</DropdownElement>
-        </DropdownMenu>
-      </div>
-      <p className="text-4xl font-extrabold">${income}</p>
+      <IncomeHeader income={income} months={months} setMonths={setMonths} />
       <IncomeChart transactions={transactionsWithinMonths} months={months} />
       <UserTransactions transactions={transactionsWithinMonths} />
     </>

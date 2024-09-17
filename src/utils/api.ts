@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 import {
+  addDoc,
   collection,
   getDocs,
   getFirestore,
@@ -74,3 +75,51 @@ export async function getUserTransactions(userUid: string) {
     throw new Error("Failed to fetch transactions");
   }
 }
+
+export type ReviewType = {
+  hostId: string;
+  rate: 1 | 2 | 3 | 4 | 5;
+  reviewBody: string;
+  reviewerName: string;
+  timestamp: number;
+  vanId: string;
+};
+
+export async function getReviews(userUid: string): Promise<ReviewType[]> {
+  const reviewsRef = collection(db, "reviews");
+  const q = query(reviewsRef, where("hostId", "==", userUid));
+
+  try {
+    const querySnapshot = await getDocs(q);
+    const reviews = querySnapshot.docs.map(
+      (review) => review.data() as ReviewType,
+    );
+
+    return reviews;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to fetch reviews");
+  }
+}
+
+export async function addReview(review: ReviewType) {
+  try {
+    // Add a new document with the transaction data
+    await addDoc(collection(db, "reviews"), review);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
+// const data: ReviewType[] = [
+//   {
+//     hostId: "gfnH3KDhGoWdLKbp4gnTQmLFlHu1",
+//     rate: 5,
+//     reviewBody: "lorem ipsum dolor sit amet.",
+//     reviewerName: "Joe Schmoe",
+//     timestamp: 1700314036000,
+//     vanId: "1",
+//   },
+// ];
+
+// data.forEach((item) => addReview(item));

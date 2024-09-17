@@ -10,6 +10,7 @@ import DropdownMenu from "../../components/utils/dropdown/DropdownMenu";
 import { isWithinNMonths } from "../../utils/isWithinNMonths";
 import DropdownElement from "../../components/utils/dropdown/DropdownElement";
 import ErrorMessage from "../../components/utils/ErrorMessage";
+import { useCounterAnimation } from "../../hooks/useCounterAnimation";
 
 export default function Dashboard() {
   const { vans, fetchVans } = useVans();
@@ -44,6 +45,18 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const hostedVans = currentUser
+    ? vans.filter((van) => van.hostId === currentUser.uid)
+    : null;
+
+  const income = transactions
+    ? transactions
+        .filter((transaction) => isWithinNMonths(transaction.timestamp, months))
+        .reduce((acc, curr) => acc + curr.amount, 0)
+    : 0;
+
+  const animatedIncome = useCounterAnimation(income);
+
   if (error) {
     return <ErrorMessage />;
   }
@@ -55,16 +68,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const hostedVans = currentUser
-    ? vans.filter((van) => van.hostId === currentUser.uid)
-    : null;
-
-  const income = transactions
-    ? transactions
-        .filter((transaction) => isWithinNMonths(transaction.timestamp, months))
-        .reduce((acc, curr) => acc + curr.amount, 0)
-    : 0;
 
   return hostedVans?.length ? (
     <>
@@ -92,7 +95,7 @@ export default function Dashboard() {
               Details
             </Link>
           </div>
-          <p className="text-4xl font-extrabold">${income}</p>
+          <p className="text-4xl font-extrabold">${animatedIncome}</p>
         </section>
         <section className="-ml-6 -mr-6 flex items-center gap-4 bg-[#FFDDB2] p-6">
           <h2 className="flex text-2xl font-bold">Review score</h2>

@@ -9,6 +9,7 @@ import { nanoid } from "nanoid";
 import DropdownMenu from "../../components/utils/dropdown/DropdownMenu";
 import { isWithinNMonths } from "../../utils/isWithinNMonths";
 import DropdownElement from "../../components/utils/dropdown/DropdownElement";
+import ErrorMessage from "../../components/utils/ErrorMessage";
 
 export default function Dashboard() {
   const { vans, fetchVans } = useVans();
@@ -17,6 +18,8 @@ export default function Dashboard() {
     null,
   );
   const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<unknown>(null);
 
   const MONTHS_MAP = {
     1: "month",
@@ -29,12 +32,29 @@ export default function Dashboard() {
     if (!currentUser) return;
     if (!vans.length) {
       fetchVans({ prop: "hostId", equalTo: currentUser?.uid })
-        .catch((err) => console.error(err))
+        .catch((err) => setError(err))
         .finally();
     }
-    getUserTransactions(currentUser.uid).then((data) => setTransactions(data));
+    getUserTransactions(currentUser.uid)
+      .then((data) => setTransactions(data))
+      .catch((err) => setError(err))
+      .finally(() => {
+        setIsLoading(false);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (error) {
+    return <ErrorMessage />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="absolute left-1/2 top-1/2 flex items-center justify-center">
+        <span className="loader"></span>
+      </div>
+    );
+  }
 
   const hostedVans = currentUser
     ? vans.filter((van) => van.hostId === currentUser.uid)

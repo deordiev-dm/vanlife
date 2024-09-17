@@ -1,5 +1,5 @@
 import Chart from "chart.js/auto";
-import { TransactionType } from "../utils/api";
+import { TransactionType } from "../../utils/api";
 import { useEffect, useRef } from "react";
 
 type Props = {
@@ -52,7 +52,6 @@ function IncomeChart({ transactions, months }: Props) {
       },
     });
 
-    // Cleanup function to destroy chart when component unmounts
     return () => {
       if (chartInstance.current) {
         chartInstance.current.destroy();
@@ -73,7 +72,7 @@ function formatIncomeData(transactions: TransactionType[], months: number) {
       date,
       dateId: date.toLocaleString("default", {
         month: "short",
-        year: "2-digit",
+        year: "numeric",
       }),
       amount: transaction.amount,
     };
@@ -87,7 +86,7 @@ function formatIncomeData(transactions: TransactionType[], months: number) {
     data.push({
       dateId: date.toLocaleString("default", {
         month: "short",
-        year: "2-digit",
+        year: "numeric",
       }),
       amount: 0,
     });
@@ -102,53 +101,3 @@ function formatIncomeData(transactions: TransactionType[], months: number) {
 
   return data;
 }
-
-/*
-[
-  {
-    "date": "2023-10-29T11:17:55.000Z",
-    "transactionYear": 2023,
-    "transactionMonth": 9,
-    "amount": 560
-  },
-  {
-    "date": "2024-09-12T07:41:25.000Z",
-    "transactionYear": 2024,
-    "transactionMonth": 8,
-    "amount": 120
-  },
-  {
-    "date": "2024-09-06T18:50:36.000Z",
-    "transactionYear": 2024,
-    "transactionMonth": 8,
-    "amount": 130
-  },
-  {
-    "date": "2024-04-08T11:17:55.000Z",
-    "transactionYear": 2024,
-    "transactionMonth": 3,
-    "amount": 680
-  },
-  {
-    "date": "2024-08-23T20:33:00.000Z",
-    "transactionYear": 2024,
-    "transactionMonth": 7,
-    "amount": 300
-  },
-  {
-    "date": "2024-07-26T08:50:36.000Z",
-    "transactionYear": 2024,
-    "transactionMonth": 6,
-    "amount": 840
-  }
-]
-*/
-
-/* 
-[
-  { month: "Jul", income: 310 },
-  { month: "Jun", income: 500 },
-  { month: "Aug", income: 1220 },
-  { month: "Sep", income: 840 },
-];
- */

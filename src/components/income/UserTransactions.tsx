@@ -1,4 +1,5 @@
-import { TransactionType } from "../utils/api";
+import { nanoid } from "nanoid";
+import { TransactionType } from "../../utils/api";
 
 type Props = {
   transactions: TransactionType[];
@@ -15,7 +16,10 @@ function UserTransactions({ transactions }: Props) {
       </h2>
       <div className="space-y-4">
         {sortedTransactions.map((transaction) => (
-          <article className="flex items-center justify-between rounded bg-white p-4">
+          <article
+            key={nanoid()}
+            className="flex items-center justify-between rounded bg-white p-4"
+          >
             <div className="text-3xl font-semibold">${transaction.amount}</div>
             <div className="text-lg">
               {`${new Date(transaction.timestamp).getDate()}/${new Date(transaction.timestamp).getMonth() + 1}/${new Date(transaction.timestamp).getFullYear()}`}

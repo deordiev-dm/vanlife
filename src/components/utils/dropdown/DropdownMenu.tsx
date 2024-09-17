@@ -1,4 +1,3 @@
-import React, { createContext } from "react";
 import { CSSProperties, useState } from "react";
 import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 
@@ -6,13 +5,6 @@ type Props = {
   children: React.ReactNode;
   title: string;
 };
-
-type DropdownContextType = {
-  isMenuOpen: boolean;
-  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-export const DropdownContext = createContext<DropdownContextType | null>(null);
 
 export default function DropdownMenu({ children, title }: Props) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,7 +21,9 @@ export default function DropdownMenu({ children, title }: Props) {
 
   return (
     <div
+      tabIndex={0}
       className="relative flex items-center space-x-1 rounded-md text-black"
+      onClick={() => setIsMenuOpen((prevState) => !prevState)}
       onMouseEnter={() => setIsMenuOpen(true)}
       onMouseLeave={() => setIsMenuOpen(false)}
     >
@@ -43,9 +37,7 @@ export default function DropdownMenu({ children, title }: Props) {
         className="absolute right-0 top-full w-36 px-1 py-2"
       >
         <div className="flex flex-col overflow-clip rounded bg-white text-black shadow-xl *:border-b-[1px] *:px-4 *:py-1 *:transition-colors last:border-none">
-          <DropdownContext.Provider value={{ isMenuOpen, setIsMenuOpen }}>
-            {children}
-          </DropdownContext.Provider>
+          {children}
         </div>
       </div>
     </div>

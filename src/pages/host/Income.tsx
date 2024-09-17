@@ -5,6 +5,7 @@ import { isWithinNMonths } from "../../utils/isWithinNMonths";
 import { useAuth } from "../../hooks/useAuth";
 import IncomeChart from "../../components/IncomeChart";
 import DropdownElement from "../../components/utils/dropdown/DropdownElement";
+import UserTransactions from "../../components/UserTransactions";
 
 export default function Dashboard() {
   const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
@@ -40,7 +41,7 @@ export default function Dashboard() {
   return (
     <>
       <div className="flex flex-col items-start">
-        <h1 className="mb-3 text-3xl font-bold">Income</h1>
+        <h1 className="mb-3 text-4xl font-bold">Income</h1>
         <DropdownMenu title={`in the last ${MONTHS_MAP[months]}`}>
           <DropdownElement onClick={() => setMonths(1)}>month</DropdownElement>
           <DropdownElement onClick={() => setMonths(3)}>
@@ -54,6 +55,7 @@ export default function Dashboard() {
       </div>
       <p className="text-4xl font-extrabold">${income}</p>
       <IncomeChart transactions={transactionsWithinMonths} months={months} />
+      <UserTransactions transactions={transactionsWithinMonths} />
     </>
   );
 }

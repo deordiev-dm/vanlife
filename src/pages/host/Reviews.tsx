@@ -5,6 +5,7 @@ import ErrorMessage from "../../components/utils/ErrorMessage";
 import ReviewsHeader from "../../components/reviews/ReviewsHeader";
 import ReviewsChart from "../../components/reviews/ReviewsChart";
 import { isWithinNMonths } from "../../utils/isWithinNMonths";
+import ReviewsCards from "../../components/reviews/ReviewsCards";
 
 export default function Reviews() {
   const { currentUser } = useAuth();
@@ -41,13 +42,16 @@ export default function Reviews() {
   }
 
   const filteredReviews = reviews
-    ? reviews.filter((review) => isWithinNMonths(review.timestamp, months))
+    ? reviews
+        .filter((review) => isWithinNMonths(review.timestamp, months))
+        .sort((a, b) => b.timestamp - a.timestamp)
     : null;
 
   return (
     <>
       <ReviewsHeader months={months} setMonths={setMonths} />
       <ReviewsChart reviews={filteredReviews} />
+      <ReviewsCards reviews={filteredReviews} />
     </>
   );
 }

@@ -4,7 +4,12 @@ import { useAuth } from "../../hooks/useAuth";
 import { FaStar } from "react-icons/fa6";
 import NoVans from "../../components/NoVans";
 import { Link } from "react-router-dom";
-import { getUserTransactions, TransactionType } from "../../utils/api";
+import {
+  getReviews,
+  getUserTransactions,
+  ReviewType,
+  TransactionType,
+} from "../../utils/api";
 import { nanoid } from "nanoid";
 import DropdownMenu from "../../components/utils/dropdown/DropdownMenu";
 import { isWithinNMonths } from "../../utils/isWithinNMonths";
@@ -18,6 +23,8 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState<TransactionType[] | null>(
     null,
   );
+  const [reviews, setReviews] = useState<ReviewType[] | null>(null);
+
   const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
@@ -38,6 +45,10 @@ export default function Dashboard() {
     }
     getUserTransactions(currentUser.uid)
       .then((data) => setTransactions(data))
+      .catch((err) => setError(err));
+
+    getReviews(currentUser.uid)
+      .then((data) => setReviews(data))
       .catch((err) => setError(err))
       .finally(() => {
         setIsLoading(false);
@@ -56,6 +67,15 @@ export default function Dashboard() {
     : 0;
 
   const animatedIncome = useCounterAnimation(income);
+
+  const filteredReviews = reviews
+    ? reviews.filter((review) => isWithinNMonths(review.timestamp, months))
+    : null;
+
+  const averageScore = filteredReviews?.length
+    ? filteredReviews.reduce((acc, curr) => acc + curr.rate, 0) /
+      filteredReviews.length
+    : null;
 
   if (error) {
     return <ErrorMessage />;
@@ -101,7 +121,7 @@ export default function Dashboard() {
           <h2 className="flex text-2xl font-bold">Review score</h2>
           <span className="flex flex-1 items-center pl-2 text-lg font-bold">
             <FaStar className="mr-1 fill-orange-500" />
-            <span>5.0</span>
+            <span className="min-w-7">{averageScore?.toFixed(1)}</span>
             <span className="font-normal text-[#4d4d4d]">/5</span>
           </span>
 

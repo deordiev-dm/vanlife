@@ -33,7 +33,7 @@ function IncomeHeader({ setMonths, months, income }: Props) {
           <DropdownElement onClick={() => setMonths(12)}>year</DropdownElement>
         </DropdownMenu>
       </div>
-      <p className="text-5xl font-bold">${animatedIncome}</p>
+      <p className="min-w-40 text-5xl font-bold">${animatedIncome}</p>
     </div>
   );
 }

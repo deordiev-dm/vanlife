@@ -53,7 +53,7 @@ function ChartLine({
           style={{
             width: `${percent}%`,
             transitionProperty: "width",
-            transitionTimingFunction: "ease",
+            transitionTimingFunction: "ease-in-out",
             transitionDuration: "300ms",
           }}
         ></span>

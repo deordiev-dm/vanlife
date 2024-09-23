@@ -83,6 +83,7 @@ export type ReviewType = {
   reviewerName: string;
   timestamp: number;
   vanId: string;
+  id: string;
 };
 
 export async function getReviews(userUid: string): Promise<ReviewType[]> {
@@ -92,7 +93,7 @@ export async function getReviews(userUid: string): Promise<ReviewType[]> {
   try {
     const querySnapshot = await getDocs(q);
     const reviews = querySnapshot.docs.map(
-      (review) => review.data() as ReviewType,
+      (review) => ({ ...review.data(), id: review.id }) as ReviewType,
     );
 
     return reviews;

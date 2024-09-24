@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 import {
   addDoc,
@@ -21,8 +22,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+export const db = getFirestore(app);
+
 export const auth = getAuth(app);
+export const storage = getStorage();
 
 export type queryParamsType = {
   prop: string;

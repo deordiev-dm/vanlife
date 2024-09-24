@@ -16,6 +16,7 @@ import { isWithinNMonths } from "../../utils/isWithinNMonths";
 import DropdownElement from "../../components/utils/dropdown/DropdownElement";
 import ErrorMessage from "../../components/utils/ErrorMessage";
 import { useCounterAnimation } from "../../hooks/useCounterAnimation";
+import Button from "../../components/utils/Button";
 
 export default function Dashboard() {
   const { vans, fetchVans } = useVans();
@@ -154,6 +155,9 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+        <Button as="a" to="add-van" colors="orange">
+          Add a new van
+        </Button>
       </section>
     </>
   ) : (

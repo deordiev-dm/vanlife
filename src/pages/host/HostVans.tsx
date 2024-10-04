@@ -6,9 +6,10 @@ import ErrorMessage from "../../components/utils/ErrorMessage";
 
 export default function HostVans() {
   const [isLoading, setIsLoading] = useState(false);
-  const [err, setError] = useState(null);
-
+  const [error, setError] = useState(null);
+  const { currentUser } = useAuth();
   const { vans, fetchVans } = useVans();
+
   useEffect(() => {
     if (!vans.length) {
       setIsLoading(true);
@@ -16,10 +17,7 @@ export default function HostVans() {
         .catch((err) => setError(err))
         .finally(() => setIsLoading(false));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const { currentUser } = useAuth();
+  }, [fetchVans, vans.length]);
 
   const hostedVans = currentUser
     ? vans.filter((van) => van.hostId === currentUser.uid)
@@ -30,7 +28,7 @@ export default function HostVans() {
       <h2 className="text-3xl font-bold">Your listed vans</h2>
       <section className="space-y-3">
         {isLoading && <div className="loader"></div>}
-        {err && <ErrorMessage />}
+        {error && <ErrorMessage />}
         {hostedVans.map((van) => (
           <Link
             to={van.id}

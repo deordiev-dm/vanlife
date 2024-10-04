@@ -1,29 +1,39 @@
 import { useEffect, useState } from "react";
-import { getUserTransactions, TransactionType } from "../../utils/api";
+import { getUserTransactions, type Transaction } from "../../utils/api";
 import { isWithinNMonths } from "../../utils/isWithinNMonths";
-import { useAuth } from "../../hooks/useAuth";
 import IncomeChart from "../../components/income/IncomeChart";
 import UserTransactions from "../../components/income/UserTransactions";
 import IncomeHeader from "../../components/income/IncomeHeader";
 import ErrorMessage from "../../components/utils/ErrorMessage";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Dashboard() {
-  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
-  const [transactions, setTransactions] = useState<TransactionType[] | null>(
-    null,
-  );
+  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3); // todo: move state to the address bar
   const { currentUser } = useAuth();
+  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
-    if (!currentUser) return;
-    getUserTransactions(currentUser.uid)
-      .then((data) => setTransactions(data))
-      .catch((err) => setError(err))
-      .finally(() => setIsLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const fetchData = async () => {
+      try {
+        if (!currentUser) {
+          console.error("User is not logged in");
+          throw new Error("User is not logged in");
+        }
+
+        const transactionsData = await getUserTransactions(currentUser.uid);
+        setTransactions(transactionsData);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentUser]);
 
   if (error) {
     return <ErrorMessage />;

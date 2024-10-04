@@ -5,10 +5,10 @@ import { FaStar } from "react-icons/fa6";
 import NoVans from "../../components/NoVans";
 import { Link } from "react-router-dom";
 import {
-  getReviews,
+  getUserReviews,
   getUserTransactions,
-  ReviewType,
-  TransactionType,
+  type Review,
+  type Transaction,
 } from "../../utils/api";
 import { nanoid } from "nanoid";
 import DropdownMenu from "../../components/utils/dropdown/DropdownMenu";
@@ -21,12 +21,9 @@ import Button from "../../components/utils/Button";
 export default function Dashboard() {
   const { vans, fetchVans } = useVans();
   const { currentUser } = useAuth();
-  const [transactions, setTransactions] = useState<TransactionType[] | null>(
-    null,
-  );
-  const [reviews, setReviews] = useState<ReviewType[] | null>(null);
-
-  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
+  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3); // todo: move state to the address bar
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
@@ -35,27 +32,35 @@ export default function Dashboard() {
     3: "3 months",
     6: "6 months",
     12: "year",
-  };
+  } as const;
 
   useEffect(() => {
-    if (!currentUser) return;
-    if (!vans.length) {
-      fetchVans({ prop: "hostId", equalTo: currentUser?.uid })
-        .catch((err) => setError(err))
-        .finally();
+    if (!currentUser) {
+      console.error("User is not logged in");
+      throw new Error("User is not logged in");
     }
-    getUserTransactions(currentUser.uid)
-      .then((data) => setTransactions(data))
-      .catch((err) => setError(err));
 
-    getReviews(currentUser.uid)
-      .then((data) => setReviews(data))
-      .catch((err) => setError(err))
-      .finally(() => {
+    const fetchData = async () => {
+      try {
+        if (!vans.length) {
+          await fetchVans({ prop: "hostId", equalTo: currentUser.uid });
+        }
+        const [transactionsData, reviewsData] = await Promise.all([
+          getUserTransactions(currentUser.uid),
+          getUserReviews(currentUser.uid),
+        ]);
+
+        setTransactions(transactionsData);
+        setReviews(reviewsData);
+      } catch (err) {
+        setError(err);
+      } finally {
         setIsLoading(false);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      }
+    };
+
+    fetchData();
+  }, [currentUser, fetchVans, vans.length]);
 
   const hostedVans = currentUser
     ? vans.filter((van) => van.hostId === currentUser.uid)

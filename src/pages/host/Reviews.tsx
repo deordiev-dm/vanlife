@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { getReviews, ReviewType } from "../../utils/api";
+import { getUserReviews, type Review } from "../../utils/api";
 import ErrorMessage from "../../components/utils/ErrorMessage";
 import ReviewsHeader from "../../components/reviews/ReviewsHeader";
 import ReviewsChart from "../../components/reviews/ReviewsChart";
@@ -10,24 +10,28 @@ import ReviewsCards from "../../components/reviews/ReviewsCards";
 export default function Reviews() {
   const { currentUser } = useAuth();
 
+  const [reviews, setReviews] = useState<Review[] | null>(null);
+  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
-  const [reviews, setReviews] = useState<ReviewType[] | null>(null);
-  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
 
   useEffect(() => {
     if (!currentUser) return;
 
-    getReviews(currentUser.uid)
-      .then((data) => {
+    const fetchData = async () => {
+      try {
+        const data = await getUserReviews(currentUser.uid);
         setReviews(data);
-      })
-      .catch((err) => setError(err))
-      .finally(() => {
+      } catch (err) {
+        setError(err);
+      } finally {
         setIsLoading(false);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      }
+    };
+
+    fetchData();
+  }, [currentUser]);
 
   if (error) {
     return <ErrorMessage />;

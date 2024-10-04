@@ -56,7 +56,7 @@ export async function getVans(queryParams?: queryParamsType): Promise<Van[]> {
   }
 }
 
-export type TransactionType = {
+export type Transaction = {
   amount: number;
   timestamp: number;
   userId: "string";
@@ -69,8 +69,8 @@ export async function getUserTransactions(userUid: string) {
 
   try {
     const querySnapshot = await getDocs(q);
-    const transactions: TransactionType[] = querySnapshot.docs.map(
-      (transaction) => transaction.data() as TransactionType,
+    const transactions: Transaction[] = querySnapshot.docs.map(
+      (transaction) => transaction.data() as Transaction,
     );
     return transactions;
   } catch (error) {
@@ -79,7 +79,7 @@ export async function getUserTransactions(userUid: string) {
   }
 }
 
-export type ReviewType = {
+export type Review = {
   hostId: string;
   rate: 1 | 2 | 3 | 4 | 5;
   reviewBody: string;
@@ -89,14 +89,14 @@ export type ReviewType = {
   id: string;
 };
 
-export async function getReviews(userUid: string): Promise<ReviewType[]> {
+export async function getUserReviews(userUid: string): Promise<Review[]> {
   const reviewsRef = collection(db, "reviews");
   const q = query(reviewsRef, where("hostId", "==", userUid));
 
   try {
     const querySnapshot = await getDocs(q);
     const reviews = querySnapshot.docs.map(
-      (review) => ({ ...review.data(), id: review.id }) as ReviewType,
+      (review) => ({ ...review.data(), id: review.id }) as Review,
     );
 
     return reviews;
@@ -106,7 +106,7 @@ export async function getReviews(userUid: string): Promise<ReviewType[]> {
   }
 }
 
-export async function addReview(review: ReviewType) {
+export async function addReview(review: Review) {
   try {
     // Add a new document with the transaction data
     await addDoc(collection(db, "reviews"), review);
@@ -114,16 +114,3 @@ export async function addReview(review: ReviewType) {
     console.error("Error adding document: ", e);
   }
 }
-
-// const data: ReviewType[] = [
-//   {
-//     hostId: "gfnH3KDhGoWdLKbp4gnTQmLFlHu1",
-//     rate: 5,
-//     reviewBody: "lorem ipsum dolor sit amet.",
-//     reviewerName: "Joe Schmoe",
-//     timestamp: 1700314036000,
-//     vanId: "1",
-//   },
-// ];
-
-// data.forEach((item) => addReview(item));

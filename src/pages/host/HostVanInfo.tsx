@@ -11,24 +11,27 @@ export default function HostVanInfo() {
     color: "black",
   };
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>();
   const params = useParams();
 
   const { vans, fetchVans } = useVans();
 
-  useEffect(
-    () => {
-      if (!vans.length) {
-        setIsLoading(true);
-        fetchVans()
-          .catch((err) => setError(err))
-          .finally(() => setIsLoading(false));
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!vans.length) {
+          await fetchVans();
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+    };
+
+    fetchData();
+  }, [fetchVans, vans.length]);
 
   const displayedVan = vans.find((van) => van.id === params.id);
 

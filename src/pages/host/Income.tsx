@@ -6,6 +6,7 @@ import UserTransactions from "../../components/income/UserTransactions";
 import IncomeHeader from "../../components/income/IncomeHeader";
 import ErrorMessage from "../../components/utils/ErrorMessage";
 import { useAuth } from "../../hooks/useAuth";
+import { useLocation } from "react-router-dom";
 
 export default function Dashboard() {
   const [months, setMonths] = useState<1 | 3 | 6 | 12>(3); // todo: move state to the address bar
@@ -14,6 +15,11 @@ export default function Dashboard() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
+
+  // todo: implement this
+  const location = useLocation();
+  const monthsFromLocation = location.state?.monthsFilter as number | undefined;
+  console.log(monthsFromLocation);
 
   useEffect(() => {
     const fetchData = async () => {

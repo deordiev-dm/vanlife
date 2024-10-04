@@ -4,6 +4,7 @@ import Badge from "../../components/utils/Badge.tsx";
 import { VanPreview } from "../../utils/types.ts";
 import { useVans } from "../../hooks/useVans.tsx";
 import ErrorMessage from "../../components/utils/ErrorMessage.tsx";
+import generateNewSearchParams from "../../utils/generateNewSearchParams.ts";
 
 export default function Vans() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,20 +14,6 @@ export default function Vans() {
   const typeFilter = searchParams.get("type");
 
   const { vans, fetchVans, isAllVansFetched, setIsAllVansFetched } = useVans();
-
-  function generateNewSearchParams(
-    key: string,
-    value: string | null,
-  ): URLSearchParams {
-    const newSearchParams = new URLSearchParams(searchParams);
-    if (value === null) {
-      newSearchParams.delete(key);
-    } else {
-      newSearchParams.set(key, value);
-    }
-
-    return newSearchParams;
-  }
 
   useEffect(
     () => {
@@ -56,7 +43,9 @@ export default function Vans() {
           <div className="mb-5 space-x-3">
             <button
               onClick={() =>
-                setSearchParams(generateNewSearchParams("type", "simple"))
+                setSearchParams(
+                  generateNewSearchParams(searchParams, "type", "simple"),
+                )
               }
               className={`${typeFilter === "simple" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
             >
@@ -64,7 +53,9 @@ export default function Vans() {
             </button>
             <button
               onClick={() =>
-                setSearchParams(generateNewSearchParams("type", "rugged"))
+                setSearchParams(
+                  generateNewSearchParams(searchParams, "type", "rugged"),
+                )
               }
               className={`${typeFilter === "rugged" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
             >
@@ -72,7 +63,9 @@ export default function Vans() {
             </button>
             <button
               onClick={() =>
-                setSearchParams(generateNewSearchParams("type", "luxury"))
+                setSearchParams(
+                  generateNewSearchParams(searchParams, "type", "luxury"),
+                )
               }
               className={`${typeFilter === "luxury" ? "bg-orange-400" : "bg-orange-200"} rounded px-3 py-1 text-sm transition-colors`}
             >
@@ -81,7 +74,9 @@ export default function Vans() {
             {typeFilter && (
               <button
                 onClick={() =>
-                  setSearchParams(generateNewSearchParams("type", null))
+                  setSearchParams(
+                    generateNewSearchParams(searchParams, "type", null),
+                  )
                 }
                 className="text-sm text-gray-600 underline"
               >

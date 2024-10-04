@@ -1,10 +1,14 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useSearchParams } from "react-router-dom";
 
 export default function HostLayout() {
   const activeStyles = {
     textDecoration: "underline",
     color: "black",
+    pointerEvents: "none" as const,
   };
+
+  const [searchParams, _] = useSearchParams();
+  const monthsFilter = Number(searchParams.get("months")) || 3;
 
   return (
     <main className="space-y-5 px-6 pb-12 pt-6">
@@ -13,6 +17,7 @@ export default function HostLayout() {
           className="text-gray-600 hover:text-black"
           to="."
           style={(obj) => (obj.isActive ? activeStyles : undefined)}
+          state={{ monthsFilter }}
           end
         >
           Dashboard
@@ -20,6 +25,7 @@ export default function HostLayout() {
         <NavLink
           className="text-gray-600 hover:text-gray-950"
           style={(obj) => (obj.isActive ? activeStyles : undefined)}
+          state={{ monthsFilter }}
           to="income"
         >
           Income
@@ -34,6 +40,7 @@ export default function HostLayout() {
         <NavLink
           className="text-gray-600 hover:text-gray-950"
           style={(obj) => (obj.isActive ? activeStyles : undefined)}
+          state={{ monthsFilter }}
           to="reviews"
         >
           Reviews

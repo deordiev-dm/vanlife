@@ -23,9 +23,16 @@ export default function Dashboard() {
 
   const location = useLocation();
   const monthsFromLocation = location.state?.monthsFilter as number | undefined;
-
   const [searchParams, setSearchParams] = useSearchParams();
-  const monthsFilter = monthsFromLocation || 3;
+
+  useEffect(() => {
+    if (monthsFromLocation) {
+      setSearchParams({ months: monthsFromLocation.toString() });
+    }
+  }, [monthsFromLocation, setSearchParams]);
+
+  const monthsFilter =
+    Number(searchParams.get("months")) || monthsFromLocation || 3;
 
   useEffect(() => {
     if (!currentUser) {

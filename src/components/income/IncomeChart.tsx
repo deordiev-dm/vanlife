@@ -1,13 +1,13 @@
 import Chart from "chart.js/auto";
-import { TransactionType } from "../../utils/api";
+import { Transaction } from "../../utils/api";
 import { useEffect, useRef } from "react";
 
-type Props = {
-  transactions: TransactionType[] | null;
-  months: 1 | 3 | 6 | 12;
+type IncomeChartProps = {
+  transactions: Transaction[] | null;
+  monthsFilter: number;
 };
 
-function IncomeChart({ transactions, months }: Props) {
+function IncomeChart({ transactions, monthsFilter }: IncomeChartProps) {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstance = useRef<Chart | null>(null);
 
@@ -22,12 +22,10 @@ function IncomeChart({ transactions, months }: Props) {
       chartInstance.current.destroy();
     }
 
-    const data = formatIncomeData(transactions, months);
+    const data = formatIncomeData(transactions, monthsFilter);
 
     const labels = data.map((item) => item.dateId);
     const incomeValues = data.map((item) => item.amount);
-
-    const maxIncome = Math.max(...incomeValues);
 
     chartInstance.current = new Chart(ctx, {
       type: "bar",
@@ -46,7 +44,6 @@ function IncomeChart({ transactions, months }: Props) {
         scales: {
           y: {
             beginAtZero: true,
-            max: Math.ceil(maxIncome * 1.05),
           },
         },
       },
@@ -57,14 +54,14 @@ function IncomeChart({ transactions, months }: Props) {
         chartInstance.current.destroy();
       }
     };
-  }, [transactions, months]);
+  }, [transactions, monthsFilter]);
 
   return <canvas ref={chartRef} />;
 }
 
 export default IncomeChart;
 
-function formatIncomeData(transactions: TransactionType[], months: number) {
+function formatIncomeData(transactions: Transaction[], months: number) {
   const transactionsDetails = transactions.map((transaction) => {
     const date = new Date(transaction.timestamp);
 

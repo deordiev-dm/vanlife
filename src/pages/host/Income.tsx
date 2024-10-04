@@ -6,20 +6,27 @@ import UserTransactions from "../../components/income/UserTransactions";
 import IncomeHeader from "../../components/income/IncomeHeader";
 import ErrorMessage from "../../components/utils/ErrorMessage";
 import { useAuth } from "../../hooks/useAuth";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 export default function Dashboard() {
-  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3); // todo: move state to the address bar
   const { currentUser } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // todo: implement this
   const location = useLocation();
   const monthsFromLocation = location.state?.monthsFilter as number | undefined;
-  console.log(monthsFromLocation);
+
+  useEffect(() => {
+    if (monthsFromLocation) {
+      setSearchParams({ months: monthsFromLocation.toString() });
+    }
+  }, [monthsFromLocation, setSearchParams]);
+
+  const monthsFilter =
+    Number(searchParams.get("months")) || monthsFromLocation || 3;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,6 +48,17 @@ export default function Dashboard() {
     fetchData();
   }, [currentUser]);
 
+  const transactionsWithinMonths = transactions
+    ? transactions?.filter((transaction) =>
+        isWithinNMonths(transaction.timestamp, monthsFilter),
+      )
+    : [];
+
+  const income = transactionsWithinMonths.reduce(
+    (acc, curr) => acc + curr.amount,
+    0,
+  );
+
   if (error) {
     return <ErrorMessage />;
   }
@@ -53,21 +71,18 @@ export default function Dashboard() {
     );
   }
 
-  const transactionsWithinMonths = transactions
-    ? transactions?.filter((transaction) =>
-        isWithinNMonths(transaction.timestamp, months),
-      )
-    : [];
-
-  const income = transactionsWithinMonths.reduce(
-    (acc, curr) => acc + curr.amount,
-    0,
-  );
-
   return (
     <>
-      <IncomeHeader income={income} months={months} setMonths={setMonths} />
-      <IncomeChart transactions={transactionsWithinMonths} months={months} />
+      <IncomeHeader
+        monthsFilter={monthsFilter}
+        searchParams={searchParams}
+        setSearchParams={setSearchParams}
+        income={income}
+      />
+      <IncomeChart
+        transactions={transactionsWithinMonths}
+        monthsFilter={monthsFilter}
+      />
       <UserTransactions transactions={transactionsWithinMonths} />
     </>
   );

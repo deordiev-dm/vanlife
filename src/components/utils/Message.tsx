@@ -1,14 +1,8 @@
 import React from "react";
 import { IoIosCloseCircle } from "react-icons/io";
 
-// it should be fixed to the top of the screen
-// based on some prop it should either be a banner or alert type
-// based on prop it should be an error, warning or success
-// pass the text as children
-
 type Props = {
   children?: React.ReactNode;
-  variant: "alert" | "banner";
   status: "neutral" | "error" | "success";
   onClose: () => void;
 };

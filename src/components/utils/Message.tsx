@@ -23,7 +23,7 @@ export default function Message({
 
   return (
     <div
-      className={`${backgroundColor} fixed left-1/2 top-0 z-50 flex w-10/12 -translate-x-1/2 items-center justify-between gap-x-4 rounded px-6 py-4 text-white opacity-95`}
+      className={`${backgroundColor} fixed left-1/2 top-4 z-50 flex w-10/12 -translate-x-1/2 items-center justify-between gap-x-4 rounded px-6 py-4 text-white`}
     >
       <div>
         <h3 className="text-lg font-medium">{title}</h3>

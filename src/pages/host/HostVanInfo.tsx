@@ -90,7 +90,7 @@ export default function HostVanInfo() {
           </NavLink>
         </nav>
         <section className="space-y-3">
-          <Outlet context={{ displayedVan }} />
+          <Outlet context={{ displayedVan, fetchVans }} />
         </section>
       </section>
     </div>

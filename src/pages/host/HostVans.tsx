@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useVans } from "../../hooks/useVans";
 import { useAuth } from "../../hooks/useAuth";
 import ErrorMessage from "../../components/utils/ErrorMessage";
+import Button from "../../components/utils/Button";
 
 export default function HostVans() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +27,7 @@ export default function HostVans() {
   return (
     <section className="space-y-5">
       <h2 className="text-3xl font-bold">Your listed vans</h2>
-      <section className="space-y-3">
+      <div className="space-y-3">
         {isLoading && <div className="loader"></div>}
         {error && <ErrorMessage />}
         {hostedVans.map((van) => (
@@ -46,7 +47,10 @@ export default function HostVans() {
             </div>
           </Link>
         ))}
-      </section>
+        <Button as="a" to="add-van" colors="orange">
+          Add a new van
+        </Button>
+      </div>
     </section>
   );
 }

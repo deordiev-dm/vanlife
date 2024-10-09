@@ -5,9 +5,11 @@ import { getStorage } from "firebase/storage";
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   getFirestore,
   query,
+  setDoc,
   where,
 } from "firebase/firestore/lite";
 import { Van } from "./types.ts";
@@ -53,6 +55,33 @@ export async function getVans(queryParams?: queryParamsType): Promise<Van[]> {
   } catch (error) {
     console.error(error);
     throw new Error("Failed to fetch vans data");
+  }
+}
+
+export async function editVan(vanId: string, fieldToUpdate: Partial<Van>) {
+  // get van data from the db
+  // update the field that needs to be updated
+  // update the db with the new van data
+
+  const vansRef = collection(db, "vans");
+  const q = query(vansRef, where("id", "==", vanId));
+
+  try {
+    const querySnapshot = await getDocs(q);
+    const van = querySnapshot.docs[0];
+
+    if (!van) {
+      throw new Error("Van not found");
+    }
+
+    const vanData = van.data() as Van;
+    const updatedVan = { ...vanData, ...fieldToUpdate };
+
+    const result = await setDoc(doc(db, "vans", vanId), updatedVan);
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to edit van data");
   }
 }
 
@@ -108,7 +137,6 @@ export async function getUserReviews(userUid: string): Promise<Review[]> {
 
 export async function addReview(review: Review) {
   try {
-    // Add a new document with the transaction data
     await addDoc(collection(db, "reviews"), review);
   } catch (e) {
     console.error("Error adding document: ", e);

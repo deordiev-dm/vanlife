@@ -16,7 +16,9 @@ export default function RadioButton({
   onChange,
 }: RadioButtonProps) {
   return (
-    <label className="group flex cursor-pointer items-center gap-2 rounded-lg p-1 focus-within:outline focus-within:outline-2 focus-within:outline-orange-400">
+    <label
+      className={`group cursor-pointer rounded-lg px-3 py-2 transition-colors ${checked ? "bg-orange-400 text-black" : "bg-gray-300 text-gray-500"}`}
+    >
       <input
         type="radio"
         value={value}
@@ -25,14 +27,6 @@ export default function RadioButton({
         onChange={onChange}
         className="peer sr-only"
       />
-
-      <span
-        className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${checked ? "border-orange-400" : "border-gray-400"}`}
-      >
-        <span
-          className={`h-3 w-3 rounded-full transition-colors ${checked && "bg-orange-400"} `}
-        ></span>
-      </span>
       <span>{label}</span>
     </label>
   );

@@ -39,7 +39,7 @@ export default function VansListSection({
           </div>
         ))}
       </div>
-      <Button as="a" to="add-van" colors="orange">
+      <Button as="a" to="vans/add-van" colors="orange">
         Add a new van
       </Button>
     </section>

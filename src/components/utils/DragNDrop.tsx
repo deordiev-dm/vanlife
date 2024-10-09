@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 
 const baseStyle: CSSProperties = {
   borderWidth: "2px",
-  borderStyle: "dashed",
+  borderStyle: "solid",
   borderColor: "#fb923c",
   color: "#fb923c",
   width: "100%",
@@ -44,13 +44,24 @@ const draggingStyle: CSSProperties = {
   minHeight: "10rem",
 };
 
-type DragNDropProps = {
-  setImage: (files: File[]) => void;
+const errorStyle: CSSProperties = {
+  borderColor: "#ef4444",
+  color: "#ef4444",
 };
 
-export default function DragNDrop({ setImage }: DragNDropProps) {
-  const [isDragging, setIsDragging] = useState(false);
+type DragNDropProps = {
+  setImage: (files: File[]) => void;
+  image: File | null;
+  inputError?: boolean;
+};
 
+export default function DragNDrop({
+  setImage,
+  image,
+  inputError,
+}: DragNDropProps) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const {
     getRootProps,
     getInputProps,
@@ -60,8 +71,12 @@ export default function DragNDrop({ setImage }: DragNDropProps) {
     isDragAccept,
   } = useDropzone({
     onDrop: (acceptedFiles) => {
-      setIsDragging(false);
-      setImage(acceptedFiles);
+      const file = acceptedFiles[0];
+      if (file && file.type.startsWith("image/")) {
+        setIsDragging(false);
+        setImage(acceptedFiles);
+        setImagePreview(URL.createObjectURL(acceptedFiles[0]));
+      }
     },
     accept: { "image/*": [] },
     multiple: false,
@@ -91,22 +106,37 @@ export default function DragNDrop({ setImage }: DragNDropProps) {
   const style = useMemo(
     () => ({
       ...baseStyle,
+      ...(inputError && !image && errorStyle),
       ...(isFocused && focusedStyle),
       ...(isDragging && draggingStyle),
       ...(isDragAccept && acceptedStyle),
       ...(isDragReject && rejectStyle),
     }),
-    [isFocused, isDragAccept, isDragReject, isDragging],
+    [isFocused, isDragAccept, isDragReject, isDragging, image, inputError],
   );
 
   return (
     <div {...getRootProps({ style })}>
       <input {...getInputProps()} />
-      {!isDragActive && (
-        <p>Drag 'n' drop the van image here, or click to select one</p>
-      )}
-      {isDragAccept && <p>Drop the van image right here...</p>}
-      {isDragReject && <p>Only images are allowed</p>}
+      <div className="flex flex-col items-center">
+        {!isDragActive && (
+          <p>Drag 'n' drop the van image here, or click to select one</p>
+        )}
+        {isDragAccept && <p>Drop the van image right here...</p>}
+        {isDragReject && <p>Only images are allowed</p>}
+        {image && (
+          <div className="mt-2 flex items-center gap-x-2">
+            <p className="text-sm text-gray-500">Selected file: {image.name}</p>
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Image Preview"
+                className="max-w-16 rounded-lg border border-gray-300"
+              />
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

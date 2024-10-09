@@ -23,7 +23,7 @@ export default function AddVan() {
   const [formData, setFormData] = useState<formDataType>({
     name: "",
     description: "",
-    price: 0,
+    price: 20,
     type: "simple",
     image: null,
   });
@@ -31,10 +31,12 @@ export default function AddVan() {
   const [submitStatus, setSubmitStatus] = useState<"error" | "success" | null>(
     null,
   );
+  const [inputError, setInputError] = useState(false);
 
   const { currentUser } = useAuth();
 
   function handleInput(target: HTMLInputElement | HTMLTextAreaElement): void {
+    setInputError(false);
     const { name, value } = target;
 
     setFormData((prevData) => ({
@@ -46,10 +48,19 @@ export default function AddVan() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    setInputError(false);
+    setSubmitStatus(null);
+
     if (!currentUser) return;
 
-    if (!formData.image) {
-      alert("Please upload an image!");
+    if (
+      !formData.name ||
+      !formData.description ||
+      !formData.price ||
+      !formData.type ||
+      !formData.image
+    ) {
+      setInputError(true);
       return;
     }
 
@@ -84,18 +95,19 @@ export default function AddVan() {
           id: vanId,
         };
 
-        setIsSubmitting(false);
-        setSubmitStatus("error");
-        throw new Error("This is a test error");
-
         await setDoc(doc(db, "vans", vanId), newVan);
         setIsSubmitting(false);
         setSubmitStatus("success");
+        setFormData({
+          name: "",
+          description: "",
+          price: 20,
+          type: "simple",
+          image: null,
+        });
       },
     );
   }
-
-  console.log(formData);
 
   return (
     <>
@@ -103,40 +115,51 @@ export default function AddVan() {
         <h1 className="text-3xl font-bold">Host a new van</h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="name" className="mb-1 inline-block pl-1">
-              Name
+            <label
+              htmlFor="name"
+              className="mb-1 inline-block pl-1 text-lg font-semibold"
+            >
+              Van Name<span className="text-base text-red-500">*</span>
             </label>
             <input
               id="name"
               name="name"
               type="text"
               placeholder="Create a name for your van"
-              required
               onChange={(e) => handleInput(e.target as HTMLInputElement)}
               value={formData.name}
-              className="w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
+              className={`input-validate w-full rounded-lg border p-3 transition-colors hover:border-orange-400 ${inputError && !formData.name ? "border-red-500" : ""}`}
             />
           </div>
           <div>
-            <label htmlFor="description" className="mb-1 inline-block pl-1">
-              Description
+            <label
+              htmlFor="description"
+              className="mb-1 inline-block pl-1 text-lg font-semibold"
+            >
+              Description<span className="text-base text-red-500">*</span>
             </label>
             <textarea
               id="description"
               name="description"
               placeholder="Tell everyone why your van is going to create a memorable trip"
-              required
               onChange={(e) => handleInput(e.target as HTMLTextAreaElement)}
               value={formData.description}
-              className="min-h-20 w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
+              className={`input-validate min-h-20 w-full rounded-lg border p-3 transition-colors hover:border-orange-400 ${inputError && !formData.description ? "border-red-500" : ""}`}
             />
           </div>
           <div>
-            <label htmlFor="price" className="mb-1 inline-block pl-1">
-              Price per day in $
+            <label
+              htmlFor="price"
+              className="inline-block pl-1 text-lg font-semibold"
+            >
+              Price per day in USD
+              <span className="text-base text-red-500">*</span>
             </label>
+            <p className="mb-2 pl-1 text-sm text-gray-400">
+              The minumum price is 20USD
+            </p>
             <NumberInput
-              min={0}
+              min={20}
               max={999}
               id="price"
               price={formData.price}
@@ -146,32 +169,43 @@ export default function AddVan() {
                   price: newValue,
                 }))
               }
+              className={`${inputError && formData.price < 20 && "border-red-500"}`}
             />
           </div>
-          <div className="flex gap-x-2">
-            <RadioButton
-              label="Simple"
-              value="simple"
-              name="type"
-              checked={formData.type === "simple"}
-              onChange={(e) => handleInput(e.target as HTMLInputElement)}
-            />
-            <RadioButton
-              label="Luxury"
-              value="luxury"
-              name="type"
-              checked={formData.type === "luxury"}
-              onChange={(e) => handleInput(e.target as HTMLInputElement)}
-            />
-            <RadioButton
-              label="Rugged"
-              value="rugged"
-              name="type"
-              checked={formData.type === "rugged"}
-              onChange={(e) => handleInput(e.target as HTMLInputElement)}
-            />
+          <div>
+            <h3 className="mb-1 inline-block pl-1 text-lg font-semibold">
+              Choose a type that best describes your van
+              <span className="text-base text-red-500">*</span>
+            </h3>
+            <div className="flex gap-x-2">
+              <RadioButton
+                label="Simple"
+                value="simple"
+                name="type"
+                checked={formData.type === "simple"}
+                onChange={(e) => handleInput(e.target as HTMLInputElement)}
+              />
+              <RadioButton
+                label="Luxury"
+                value="luxury"
+                name="type"
+                checked={formData.type === "luxury"}
+                onChange={(e) => handleInput(e.target as HTMLInputElement)}
+              />
+              <RadioButton
+                label="Rugged"
+                value="rugged"
+                name="type"
+                checked={formData.type === "rugged"}
+                onChange={(e) => handleInput(e.target as HTMLInputElement)}
+              />
+            </div>
           </div>
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-start space-y-2">
+            <label className="inline-block pl-1 text-lg font-semibold">
+              Upload an image of your van
+              <span className="text-base text-red-500">*</span>
+            </label>
             <DragNDrop
               setImage={(files) =>
                 setFormData((prevData) => ({
@@ -179,27 +213,44 @@ export default function AddVan() {
                   image: files ? files[0] : null,
                 }))
               }
-            ></DragNDrop>
+              image={formData.image}
+              inputError={inputError}
+            />
           </div>
           <Button
             as="button"
             colors="orange"
             disabled={isSubmitting}
-            style={{
-              backgroundColor: isSubmitting ? "grey" : "",
-            }}
+            className="disabled:bg-gray-300"
           >
-            {isSubmitting ? "Submitting the data" : "Send data"}
+            {isSubmitting ? "Submitting the data..." : "Post the van"}
           </Button>
         </form>
       </div>
+      {inputError && (
+        <Message
+          status={"error"}
+          onClose={() => setInputError(false)}
+          title="Error: The form has not been fully completed!"
+        >
+          Please fill out all the required fields
+        </Message>
+      )}
       {submitStatus === "success" && (
-        <Message status={"success"} onClose={() => setSubmitStatus(null)}>
+        <Message
+          status={"success"}
+          onClose={() => setSubmitStatus(null)}
+          title="Form data has been submitted successfully!"
+        >
           The van is now available to rent!
         </Message>
       )}
       {submitStatus === "error" && (
-        <Message status={"error"} onClose={() => setSubmitStatus(null)}>
+        <Message
+          status={"error"}
+          onClose={() => setSubmitStatus(null)}
+          title="Internal Error!"
+        >
           There was an error while submitting the van. Please try again.
         </Message>
       )}

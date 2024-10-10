@@ -71,6 +71,7 @@ function VanDetailField({
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(Object.values(value)[0]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { value } = event.target;
@@ -82,6 +83,16 @@ function VanDetailField({
     value: string,
     inputValue: string,
   ): Promise<void> {
+    setError(null);
+
+    if (!inputValue) {
+      setError(new Error("Field cannot be empty"));
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+      return;
+    }
+
     let fieldToUpdate: Partial<Van> = {};
     switch (value) {
       case "name": {
@@ -125,44 +136,52 @@ function VanDetailField({
   }
 
   return (
-    <div>
-      <div className="mb-1 flex items-center gap-x-2">
-        <span className="text-lg font-semibold">{label}: </span>
-        <button
-          type="button"
-          className="rounded p-1 transition-colors hover:bg-orange-400"
-          onClick={() => setIsEditing(!isEditing)}
-        >
-          {isEditing ? (
-            <MdOutlineEditOff className="h-5 w-5" />
-          ) : (
-            <MdOutlineModeEdit className="h-5 w-5" />
-          )}
-        </button>
-      </div>
+    <>
+      {error && error.message === "Field cannot be empty" && (
+        <Message status="error" onClose={() => setError(null)} title="Error!">
+          {error.message}
+        </Message>
+      )}
       <div>
-        {isEditing ? (
-          <div className="flex items-center gap-x-[2px]">
-            <input
-              type="text"
-              required
-              value={inputValue}
-              onChange={handleInputChange}
-              className="rounded-s-lg border px-3 py-1 transition-colors hover:border-orange-400"
-            />
-            <button
-              onClick={() =>
-                handleVanEdit(van, Object.keys(value)[0], inputValue)
-              }
-              className={`rounded-e-lg border p-1 px-3 text-white transition-colors hover:bg-orange-500 active:bg-orange-600 ${loading ? "pointer-events-none border-gray-300 bg-gray-300" : "border-orange-400 bg-orange-400"}`}
-            >
-              {loading ? "Loading..." : "Save"}
-            </button>
-          </div>
-        ) : (
-          <span>{Object.values(value)[0]}</span>
-        )}
+        <div className="mb-1 flex items-center gap-x-2">
+          <span className="text-lg font-semibold">{label}: </span>
+          <button
+            type="button"
+            className="rounded p-1 transition-colors hover:bg-orange-400"
+            onClick={() => setIsEditing(!isEditing)}
+          >
+            {isEditing ? (
+              <MdOutlineEditOff className="h-5 w-5" />
+            ) : (
+              <MdOutlineModeEdit className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+        <div>
+          {isEditing ? (
+            <div className="flex items-center gap-x-[2px]">
+              <input
+                type="text"
+                required
+                value={inputValue}
+                onChange={handleInputChange}
+                className="rounded-s-lg border px-3 py-1 transition-colors hover:border-orange-400"
+              />
+              <button
+                onClick={() =>
+                  handleVanEdit(van, Object.keys(value)[0], inputValue)
+                }
+                className="disabled:bg-grey-300 rounded-e-lg border border-orange-400 bg-orange-400 p-1 px-3 text-white transition-colors hover:bg-orange-500 active:bg-orange-600 disabled:pointer-events-none disabled:border-gray-300"
+                disabled={loading || !inputValue}
+              >
+                {loading ? "Loading..." : "Save"}
+              </button>
+            </div>
+          ) : (
+            <span>{Object.values(value)[0]}</span>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

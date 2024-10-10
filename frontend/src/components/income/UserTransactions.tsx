@@ -1,8 +1,8 @@
 import { nanoid } from "nanoid";
-import { TransactionType } from "../../utils/api";
+import { Transaction } from "../../utils/api";
 
 type Props = {
-  transactions: TransactionType[];
+  transactions: Transaction[];
 };
 
 function UserTransactions({ transactions }: Props) {

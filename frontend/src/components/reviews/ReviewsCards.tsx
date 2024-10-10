@@ -1,8 +1,8 @@
-import { ReviewType } from "../../utils/api";
+import { Review } from "../../utils/api";
 import { FaStar } from "react-icons/fa6";
 
 type Props = {
-  reviews: ReviewType[] | null;
+  reviews: Review[] | null;
 };
 
 export default function ReviewsCards({ reviews }: Props) {

@@ -1,8 +1,8 @@
-import { ReviewType } from "../../utils/api";
+import { Review } from "../../utils/api";
 import { FaStar } from "react-icons/fa6";
 
 type Props = {
-  reviews: ReviewType[] | null;
+  reviews: Review[] | null;
 };
 
 export default function ReviewsChart({ reviews }: Props) {
@@ -34,13 +34,7 @@ export default function ReviewsChart({ reviews }: Props) {
   );
 }
 
-function ChartLine({
-  stars,
-  reviews,
-}: {
-  stars: number;
-  reviews: ReviewType[];
-}) {
+function ChartLine({ stars, reviews }: { stars: number; reviews: Review[] }) {
   const filteredReviews = reviews.filter((review) => review.rate === stars);
 
   const percent = (filteredReviews.length / reviews.length) * 100;

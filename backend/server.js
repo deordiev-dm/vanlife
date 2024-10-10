@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const vanRoutes = require('./routes/vanRoutes');
 
 dotenv.config();
 
@@ -10,9 +11,7 @@ app.use(express.json());
 
 connectDB();
 
-app.get('/', (req, res) => {
-  res.send('API is running');
-});
+app.use('/api', vanRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

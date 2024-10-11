@@ -1,35 +1,50 @@
 import { createContext, useState } from "react";
-import { getVans, queryParamsType } from "../utils/api";
-import { Van } from "../utils/types";
+import { type Van } from "../utils/types";
 
 type VansContextType = {
   vans: Van[];
-  fetchVans: (queryParams?: queryParamsType) => Promise<void>;
-  isAllVansFetched: boolean;
-  setIsAllVansFetched: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchVans: () => Promise<void>;
+  isLoading: boolean;
+  error: unknown;
 };
 
 export const VansContext = createContext<VansContextType | null>(null);
 
 export function VansProvider({ children }: { children: React.ReactNode }) {
   const [vans, setVans] = useState<Van[]>([]);
-  const [isAllVansFetched, setIsAllVansFetched] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<unknown>(null);
 
   /**
-   * Fetches a list of vans based on the provided query parameters and updates the state with the fetched data.
+   * Fetches the list of vans from the database.
    *
-   * @param {queryParamsType} [queryParams] - Optional query parameters to filter the vans.
-   * @returns {Promise<void>} A promise that resolves when the vans data has been fetched and the state has been updated.
+   * This function makes an asynchronous request to the backend API to retrieve
+   * all vans. It handles the loading state, error state, and updates the vans
+   * state with the fetched data.
+   *
+   * @async
+   * @function
+   * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
+   * @throws Will log an error to the console if the fetch operation fails.
    */
-  async function fetchVans(queryParams?: queryParamsType) {
-    const data = await getVans(queryParams);
-    setVans(data);
+  async function fetchVans(): Promise<void> {
+    setIsLoading(true);
+    try {
+      console.info("Making a request to the database to fetch all vans");
+      const res = await fetch("http://localhost:3000/api/vans");
+      const data = await res.json();
+
+      setVans(data);
+    } catch (error) {
+      console.error(error);
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <VansContext.Provider
-      value={{ vans, fetchVans, isAllVansFetched, setIsAllVansFetched }}
-    >
+    <VansContext.Provider value={{ vans, fetchVans, isLoading, error }}>
       {children}
     </VansContext.Provider>
   );

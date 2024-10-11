@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Badge from "../../components/utils/Badge.tsx";
 import { VanPreview } from "../../utils/types.ts";
@@ -7,27 +7,15 @@ import ErrorMessage from "../../components/utils/ErrorMessage.tsx";
 import generateNewSearchParams from "../../utils/generateNewSearchParams.ts";
 
 export default function Vans() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<unknown>();
-
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type");
+  const { vans, fetchVans, isLoading, error } = useVans();
 
-  const { vans, fetchVans, isAllVansFetched, setIsAllVansFetched } = useVans();
-
-  useEffect(
-    () => {
-      if (!isAllVansFetched) {
-        setIsLoading(true);
-        fetchVans()
-          .then(() => setIsAllVansFetched(true))
-          .catch((err) => setError(err))
-          .finally(() => setIsLoading(false));
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  useEffect(() => {
+    if (!vans.length) {
+      fetchVans();
+    }
+  }, []);
 
   const displayedVans = typeFilter
     ? vans?.filter((van) => van.type === typeFilter)

@@ -1,8 +1,12 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+
 const connectDB = require('./config/db');
+
 const vanRoutes = require('./routes/vanRoutes');
+const userRoutes = require('./routes/userRoutes');
+
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 
 dotenv.config();
@@ -19,6 +23,7 @@ connectDB();
 app.use(cors());
 
 app.use('/api', vanRoutes);
+app.use('/api/users', userRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

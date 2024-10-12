@@ -1,6 +1,8 @@
 import { createContext, useState } from "react";
 import { type Van } from "../utils/types";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 type VansContextType = {
   vans: Van[];
   fetchVans: () => Promise<void>;
@@ -31,7 +33,7 @@ export function VansProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       console.info("Making a request to the database to fetch all vans");
-      const res = await fetch("http://localhost:3000/api/vans");
+      const res = await fetch(`${BACKEND_URL}/api/vans`);
       const data = await res.json();
 
       setVans(data);

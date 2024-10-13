@@ -6,38 +6,51 @@ import Badge from "../../components/utils/Badge.tsx";
 import Button from "../../components/utils/Button.tsx";
 
 import { useVans } from "../../hooks/useVans.tsx";
-import LoadingError from "../../utils/errors.ts";
 import ErrorMessage from "../../components/utils/ErrorMessage.tsx";
+import { getVanById } from "../../utils/api.ts";
+import { type Van } from "../../utils/types.ts";
 
 export default function VanDetails() {
   const params = useParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<LoadingError | null>(null);
-
   const location = useLocation();
   const searchParams = location.state?.searchParams || "";
   const typeFilter = searchParams.match(/type=([^&]+)/);
 
-  const { vans, fetchVans } = useVans();
+  const [error, setError] = useState<unknown>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { vans } = useVans();
+  const [displayedVan, setDisplayedVan] = useState<Van | undefined>(
+    vans.find((van) => van._id == params.id),
+  );
 
   useEffect(() => {
-    if (!vans.length) {
-      setIsLoading(true);
-      fetchVans()
-        .catch((error) => setError(error))
-        .finally(() => setIsLoading(false));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const fetchData = async () => {
+      if (!displayedVan) {
+        setIsLoading(true);
+        try {
+          if (params.id) {
+            const van = await getVanById(params.id);
+            setDisplayedVan(van);
+          } else {
+            throw new Error("No id has been provided");
+          }
+        } catch (error) {
+          setError(error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
 
-  const displayedVan = vans.find((van) => van.id == params.id);
+    fetchData();
+  }, [displayedVan, params.id]);
 
   return (
     <main className="relative flex flex-col space-y-8 px-6 pb-12 pt-6">
       {error ? <ErrorMessage /> : null}
       {isLoading && <span className="loader"></span>}
       {!error && !isLoading && displayedVan && (
-        <>
+        <div className="flex max-w-xl flex-col items-start gap-y-6">
           <Link
             to={`..?${searchParams}`}
             relative="path"
@@ -48,8 +61,8 @@ export default function VanDetails() {
               Back to {typeFilter ? typeFilter[1] : "all"} vans
             </span>
           </Link>
-          <div className="aspect-square overflow-hidden rounded-md">
-            <img src={displayedVan.imageUrl} alt="" />
+          <div className="overflow-hidden rounded-md">
+            <img className="w-full" src={displayedVan.imageUrl} alt="" />
           </div>
           <div className="space-y-5">
             <Badge type={displayedVan.type} />
@@ -62,7 +75,7 @@ export default function VanDetails() {
               Rent this van
             </Button>
           </div>
-        </>
+        </div>
       )}
     </main>
   );

@@ -2,6 +2,8 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 import {
   addDoc,
   collection,
@@ -29,41 +31,22 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage();
 
-export type queryParamsType = {
-  prop: string;
-  equalTo: string;
-};
-
 /**
- * Fetches a list of vans from the Firestore database.
+ * Fetches a van by its ID from the backend API.
  *
- * @param {queryParamsType} [queryParams] - Optional query parameters to filter the vans.
- * @returns {Promise<Van[]>} A promise that resolves to an array of Van objects.
- * @throws {Error} Throws an error if fetching the vans data fails.
+ * @param id - The unique identifier of the van to fetch.
+ * @returns A promise that resolves to a `Van` object.
+ * @throws Will throw an error if the fetch operation fails.
  */
-export async function getVans(queryParams?: queryParamsType): Promise<Van[]> {
-  const vansRef = collection(db, "vans");
+export const getVanById = async (id: string) => {
+  const response = await fetch(`${BACKEND_URL}/api/vans/${id}`);
 
-  const q = queryParams
-    ? query(vansRef, where(queryParams.prop, "==", queryParams.equalTo))
-    : vansRef;
-
-  try {
-    const querySnapshot = await getDocs(q);
-    const vans = querySnapshot.docs.map(
-      (doc) =>
-        ({
-          ...doc.data(),
-          id: doc.id,
-        }) as Van,
-    );
-
-    return vans;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Failed to fetch vans data");
+  if (!response.ok) {
+    throw new Error("Failed to fetch van");
   }
-}
+
+  return (await response.json()) as Van;
+};
 
 /**
  * Edits a van's data in the database.

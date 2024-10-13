@@ -1,23 +1,62 @@
+import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function AuthRequired() {
-  const { currentUser, authLoading } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const token = localStorage.getItem("token");
   const { pathname } = useLocation();
 
-  if (authLoading) return <div className="loader"></div>;
+  useEffect(() => {
+    if (!token) {
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      return;
+    }
 
-  if (currentUser) {
-    return <Outlet />;
+    const validateToken = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/auth/validate-token`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Unathorized");
+        }
+
+        setIsAuthenticated(true);
+      } catch (error) {
+        // token is invalid or expired
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validateToken();
+  }, [token]);
+
+  if (isLoading) {
+    return <div className="loader"></div>;
+  }
+
+  if (isAuthenticated) {
+    return <Outlet></Outlet>;
   }
 
   return (
-    <main>
-      <Navigate
-        replace
-        state={{ message: "You must login first", pathname }}
-        to="/login"
-      />
-    </main>
+    <Navigate
+      replace
+      state={{ message: "You must login first", pathname }}
+      to="/login"
+    />
   );
 }

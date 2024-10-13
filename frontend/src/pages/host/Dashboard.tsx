@@ -35,11 +35,6 @@ export default function Dashboard() {
     Number(searchParams.get("months")) || monthsFromLocation || 3;
 
   useEffect(() => {
-    if (!currentUser) {
-      console.error("User is not logged in");
-      throw new Error("User is not logged in");
-    }
-
     const fetchData = async () => {
       try {
         if (!vans.length) {

@@ -26,8 +26,7 @@ export default function Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { loginUser, currentUser } = useAuth();
-  console.info(currentUser);
+  const { loginUser } = useAuth();
 
   function handleInput(target: EventTarget & HTMLInputElement): void {
     const { name, value } = target;

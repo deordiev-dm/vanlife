@@ -43,7 +43,9 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         if (!vans.length) {
-          await fetchVans({ prop: "hostId", equalTo: currentUser.uid });
+          // ! this shit was causing an astronomical amount of requests to the server per second!
+          // ! DO NOT UNCOMMENT UNTIL FIX DATA FETCHING
+          // await fetchVans({ prop: "hostId", equalTo: currentUser.uid });
         }
         const [transactionsData, reviewsData] = await Promise.all([
           getUserTransactions(currentUser.uid),

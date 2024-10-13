@@ -1,61 +1,100 @@
-import { createContext, useEffect, useState } from "react";
-import { auth } from "../utils/api";
+import { createContext, useState } from "react";
+import { type SignUpUser, type User } from "../utils/types";
 
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  User,
-  UserCredential,
-} from "firebase/auth";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+export type AuthContextType = {
+  currentUser: User | null;
+  isAuthLoading: boolean;
+  authError: unknown;
+  loginUser: (email: string, password: string) => Promise<void>;
+  registerUser: (newUser: SignUpUser) => Promise<void>;
+  logOutUser: () => void;
+};
+
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 type AuthProviderProps = {
   children: React.ReactNode;
 };
 
-export type AuthContextType = {
-  currentUser: User | null;
-  loginUser: (email: string, password: string) => Promise<UserCredential>;
-  createUser: (email: string, password: string) => Promise<UserCredential>;
-  logOutUser: () => Promise<void>;
-  authLoading: boolean;
-};
-
-export const AuthContext = createContext<AuthContextType | null>(null);
-
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<unknown>(null);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+  const loginUser = async (email: string, password: string) => {
+    setIsAuthLoading(true);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const { token, user } = await response.json();
+
+      localStorage.setItem("token", token);
       setCurrentUser(user);
-      setAuthLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  async function loginUser(email: string, password: string) {
-    return await signInWithEmailAndPassword(auth, email, password);
-  }
-
-  async function createUser(email: string, password: string) {
-    return await createUserWithEmailAndPassword(auth, email, password);
-  }
-
-  async function logOutUser() {
-    return await signOut(auth);
-  }
-
-  const value = {
-    currentUser,
-    loginUser,
-    createUser,
-    logOutUser,
-    authLoading,
+    } catch (error) {
+      console.error(error);
+      setAuthError(error);
+    } finally {
+      setIsAuthLoading(false);
+    }
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const registerUser = async (newUser: SignUpUser) => {
+    setIsAuthLoading(true);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/users/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      if (!response.ok) {
+        throw new Error("Registration failed");
+      }
+
+      const { user, token } = await response.json();
+
+      localStorage.setItem("token", token);
+      setCurrentUser(user);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const logOutUser = () => {
+    localStorage.removeItem("token");
+    setCurrentUser(null);
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        currentUser,
+        isAuthLoading,
+        authError,
+        loginUser,
+        registerUser,
+        logOutUser,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }

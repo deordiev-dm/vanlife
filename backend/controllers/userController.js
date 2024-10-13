@@ -23,7 +23,18 @@ const registerUser = async (req, res) => {
 
     await user.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
+
+    res.status(201).json({
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        role: user.role,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -46,16 +57,15 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '1h',
     });
 
     res.json({
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
-        email: user.email,
         role: user.role,
       },
     });

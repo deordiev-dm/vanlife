@@ -3,7 +3,6 @@ import Button from "../components/utils/Button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { validateEmail } from "../utils/validateEmail";
-import { FirebaseError } from "firebase/app";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -27,7 +26,9 @@ export default function Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { loginUser } = useAuth();
+  const { loginUser, currentUser } = useAuth();
+  console.info(currentUser);
+
   function handleInput(target: EventTarget & HTMLInputElement): void {
     const { name, value } = target;
     setFormData((prevData) => ({
@@ -36,7 +37,7 @@ export default function Login() {
     }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus("submitting");
     setError(null);
@@ -53,31 +54,9 @@ export default function Login() {
       return;
     }
 
-    loginUser(email, password)
-      .then(() => {
-        navigate(pathToRedirect, { replace: true });
-      })
-      .catch((err) => {
-        if (err instanceof FirebaseError) {
-          if (err.code === "auth/invalid-email") {
-            setError(new Error("Invalid email. Please try again."));
-          } else if (err.code === "auth/user-not-found") {
-            setError(
-              new Error(
-                `There is no Vanlife account associated with ${email}. Please try again.`,
-              ),
-            );
-          } else if (err.code === "auth/wrong-password") {
-            setError(new Error("Wrong password. Please try again."));
-          } else {
-            setError(err);
-          }
-        } else {
-          setError(err);
-        }
-      })
-      .finally(() => setStatus("idle"));
-  }
+    await loginUser(email, password);
+    navigate(pathToRedirect, { replace: true });
+  };
 
   return (
     <main className="relative flex flex-col items-center justify-center px-6 pb-12 pt-6">

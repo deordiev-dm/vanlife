@@ -1,6 +1,6 @@
 const experss = require('express');
 const { getAllVans, getVanById } = require('../controllers/vanController');
-const getVanReviews = require('../controllers/reviewController');
+const { getVanReviews } = require('../controllers/reviewController');
 
 const router = experss.Router();
 

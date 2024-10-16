@@ -89,27 +89,16 @@ export type Transaction = {
   vanId: "string";
 };
 
-/**
- * Fetches the transactions for a specific user from the Firestore database.
- *
- * @param {string} userUid - The unique identifier of the user whose transactions are to be fetched.
- * @returns {Promise<Transaction[]>} A promise that resolves to an array of transactions.
- * @throws {Error} If there is an error fetching the transactions.
- */
-export async function getUserTransactions(userUid: string) {
-  const transactionsRef = collection(db, "transactions");
-  const q = query(transactionsRef, where("userId", "==", userUid));
+export async function getUserTransactions(userId: string) {
+  const res = await fetch(
+    `${BACKEND_URL}/api/users/${userId}/hostTransactions`,
+  );
 
-  try {
-    const querySnapshot = await getDocs(q);
-    const transactions: Transaction[] = querySnapshot.docs.map(
-      (transaction) => transaction.data() as Transaction,
-    );
-    return transactions;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Failed to fetch transactions");
+  if (!res.ok) {
+    throw new Error("Failed to fetch host transactions");
   }
+
+  return (await res.json()) as Transaction[];
 }
 
 export type Review = {
@@ -122,28 +111,14 @@ export type Review = {
   id: string;
 };
 
-/**
- * Fetches user reviews from the Firestore database based on the provided user UID.
- *
- * @param {string} userUid - The UID of the user whose reviews are to be fetched.
- * @returns {Promise<Review[]>} A promise that resolves to an array of reviews.
- * @throws {Error} Throws an error if the reviews could not be fetched.
- */
-export async function getUserReviews(userUid: string): Promise<Review[]> {
-  const reviewsRef = collection(db, "reviews");
-  const q = query(reviewsRef, where("hostId", "==", userUid));
+export async function getUserReviews(userId: string): Promise<Review[]> {
+  const res = await fetch(`${BACKEND_URL}/api/users/${userId}/hostReviews`);
 
-  try {
-    const querySnapshot = await getDocs(q);
-    const reviews = querySnapshot.docs.map(
-      (review) => ({ ...review.data(), id: review.id }) as Review,
-    );
-
-    return reviews;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Failed to fetch reviews");
+  if (!res.ok) {
+    throw new Error("Failed to fetch host transactions");
   }
+
+  return (await res.json()) as Review[];
 }
 
 /**

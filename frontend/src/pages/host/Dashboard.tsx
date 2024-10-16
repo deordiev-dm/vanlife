@@ -34,6 +34,8 @@ export default function Dashboard() {
   const monthsFilter =
     Number(searchParams.get("months")) || monthsFromLocation || 3;
 
+  console.log("currentUser", currentUser);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,8 +45,8 @@ export default function Dashboard() {
           // await fetchVans({ prop: "hostId", equalTo: currentUser.uid });
         }
         const [transactionsData, reviewsData] = await Promise.all([
-          getUserTransactions(currentUser.uid),
-          getUserReviews(currentUser.uid),
+          getUserTransactions(currentUser._id),
+          getUserReviews(currentUser._id),
         ]);
 
         setTransactions(transactionsData);

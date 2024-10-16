@@ -5,6 +5,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export type AuthContextType = {
   currentUser: User | null;
+  setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   isAuthLoading: boolean;
   authError: unknown;
   loginUser: (email: string, password: string) => Promise<void>;
@@ -87,6 +88,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     <AuthContext.Provider
       value={{
         currentUser,
+        setCurrentUser,
         isAuthLoading,
         authError,
         loginUser,

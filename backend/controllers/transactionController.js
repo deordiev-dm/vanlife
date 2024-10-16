@@ -17,4 +17,4 @@ const getHostTransactions = async (req, res) => {
   }
 };
 
-module.exports = getHostTransactions;
+module.exports = { getHostTransactions };

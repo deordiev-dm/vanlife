@@ -18,8 +18,8 @@ const getVanReviews = async (req, res) => {
   }
 };
 
-const getReviewsForHost = async (req, res) => {
-  const { hostId } = req.params;
+const getHostReviews = async (req, res) => {
+  const { userId } = req.params;
 
   try {
     const reviews = await Review.aggregate([
@@ -33,8 +33,11 @@ const getReviewsForHost = async (req, res) => {
       },
       {
         $match: {
-          'van.hostId': new mongoose.Types.ObjectId(hostId),
+          'van.hostId': new mongoose.Types.ObjectId(userId),
         },
+      },
+      {
+        $unwind: '$van',
       },
     ]);
 
@@ -49,8 +52,4 @@ const getReviewsForHost = async (req, res) => {
   }
 };
 
-module.exports = { getVanReviews, getReviewsForHost };
-
-//       {
-//  $unwind: '$van',
-// },
+module.exports = { getVanReviews, getHostReviews };

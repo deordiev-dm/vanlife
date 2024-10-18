@@ -6,6 +6,8 @@ const connectDB = require('./config/db');
 
 const vanRoutes = require('./routes/vanRoutes');
 const userRoutes = require('./routes/userRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
 
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 
@@ -24,6 +26,8 @@ app.use(cors());
 
 app.use('/api/vans', vanRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

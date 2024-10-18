@@ -33,7 +33,7 @@ export default function VansListSection({
               <h3 className="text-lg font-bold">{van.name}</h3>
               <p>${van.price}/day</p>
             </div>
-            <Link to={`vans/${van.id}`} className="hover:underline">
+            <Link to={`vans/${van._id}`} className="hover:underline">
               Edit
             </Link>
           </div>

@@ -5,7 +5,6 @@ import { getStorage } from "firebase/storage";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 import {
-  addDoc,
   collection,
   doc,
   getDocs,
@@ -49,6 +48,23 @@ export const getVanById = async (id: string) => {
 };
 
 /**
+ * Fetches the vans associated with a specific host.
+ *
+ * @param hostId - The unique identifier of the host.
+ * @returns A promise that resolves to an array of vans associated with the host.
+ * @throws Will throw an error if the fetch operation fails.
+ */
+export const getHostVans = async (hostId: string) => {
+  const response = await fetch(`${BACKEND_URL}/api/users/${hostId}/hostVans`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch host vans");
+  }
+
+  return (await response.json()) as Van[];
+};
+
+/**
  * Edits a van's data in the database.
  *
  * @param {string} vanId - The ID of the van to be updated.
@@ -83,12 +99,21 @@ export async function editVan(
 }
 
 export type Transaction = {
-  amount: number;
-  timestamp: number;
-  userId: "string";
-  vanId: "string";
+  _id: string;
+  sum: number;
+  senderId: string;
+  receiverId: string;
+  vanId: string;
+  createdAt: string;
 };
 
+/**
+ * Fetches the transactions for a specific user.
+ *
+ * @param userId - The ID of the user whose transactions are to be fetched.
+ * @returns A promise that resolves to an array of transactions.
+ * @throws Will throw an error if the fetch operation fails.
+ */
 export async function getUserTransactions(userId: string) {
   const res = await fetch(
     `${BACKEND_URL}/api/users/${userId}/hostTransactions`,
@@ -102,13 +127,14 @@ export async function getUserTransactions(userId: string) {
 }
 
 export type Review = {
-  hostId: string;
+  _id: string;
   rate: 1 | 2 | 3 | 4 | 5;
-  reviewBody: string;
-  reviewerName: string;
-  timestamp: number;
+  reviewBody?: string;
+  reviewerId: string;
   vanId: string;
-  id: string;
+  van: Van;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export async function getUserReviews(userId: string): Promise<Review[]> {
@@ -119,20 +145,4 @@ export async function getUserReviews(userId: string): Promise<Review[]> {
   }
 
   return (await res.json()) as Review[];
-}
-
-/**
- * Adds a review to the "reviews" collection in the database.
- *
- * @param {Review} review - The review object to be added.
- * @throws {Error} Throws an error if the review could not be added.
- * @returns {Promise<void>} A promise that resolves when the review is successfully added.
- */
-export async function addReview(review: Review) {
-  try {
-    await addDoc(collection(db, "reviews"), review);
-  } catch (err) {
-    console.error("Error adding document: ", err);
-    throw new Error("Failed to add review");
-  }
 }

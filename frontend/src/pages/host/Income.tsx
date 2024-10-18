@@ -36,7 +36,7 @@ export default function Dashboard() {
           throw new Error("User is not logged in");
         }
 
-        const transactionsData = await getUserTransactions(currentUser.uid);
+        const transactionsData = await getUserTransactions(currentUser._id);
         setTransactions(transactionsData);
       } catch (err) {
         setError(err);
@@ -50,12 +50,15 @@ export default function Dashboard() {
 
   const transactionsWithinMonths = transactions
     ? transactions?.filter((transaction) =>
-        isWithinNMonths(transaction.timestamp, monthsFilter),
+        isWithinNMonths(
+          new Date(transaction.createdAt).getTime(),
+          monthsFilter,
+        ),
       )
     : [];
 
   const income = transactionsWithinMonths.reduce(
-    (acc, curr) => acc + curr.amount,
+    (acc, curr) => acc + curr.sum,
     0,
   );
 

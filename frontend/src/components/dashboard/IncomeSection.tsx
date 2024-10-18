@@ -22,9 +22,12 @@ export default function IncomeSection({
   const income = transactions
     ? transactions
         .filter((transaction) =>
-          isWithinNMonths(transaction.timestamp, monthsFilter),
+          isWithinNMonths(
+            new Date(transaction.createdAt).getTime(),
+            monthsFilter,
+          ),
         )
-        .reduce((acc, curr) => acc + curr.amount, 0)
+        .reduce((acc, curr) => acc + curr.sum, 0)
     : 0;
 
   const animatedIncome = useCounterAnimation(income);

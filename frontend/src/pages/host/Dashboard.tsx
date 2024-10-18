@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useVans } from "../../hooks/useVans";
 import { useAuth } from "../../hooks/useAuth";
 import {
+  getHostVans,
   getUserReviews,
   getUserTransactions,
   type Review,
@@ -12,13 +12,14 @@ import IncomeSection from "../../components/dashboard/IncomeSection";
 import ReviewScoreSection from "../../components/dashboard/ReviewScoreSection";
 import VansListSection from "../../components/dashboard/VansListSection";
 import { useLocation, useSearchParams } from "react-router-dom";
+import { Van } from "../../utils/types";
 
 export default function Dashboard() {
-  const { vans, fetchVans } = useVans();
+  const [vans, setVans] = useState<Van[] | null>(null);
   const { currentUser } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [reviews, setReviews] = useState<Review[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
 
   const location = useLocation();
@@ -34,20 +35,27 @@ export default function Dashboard() {
   const monthsFilter =
     Number(searchParams.get("months")) || monthsFromLocation || 3;
 
-  console.log("currentUser", currentUser);
-
   useEffect(() => {
     const fetchData = async () => {
+      if (!currentUser) {
+        setError("User is not authenticated");
+        return;
+      }
+
       try {
-        if (!vans.length) {
-          // ! this shit was causing an astronomical amount of requests to the server per second!
-          // ! DO NOT UNCOMMENT UNTIL FIX DATA FETCHING
-          // await fetchVans({ prop: "hostId", equalTo: currentUser.uid });
+        setIsLoading(true);
+
+        if (!vans) {
+          const hostVans = await getHostVans(currentUser._id);
+          setVans(hostVans);
         }
+
         const [transactionsData, reviewsData] = await Promise.all([
           getUserTransactions(currentUser._id),
           getUserReviews(currentUser._id),
         ]);
+
+        console.log("transactionsData", transactionsData);
 
         setTransactions(transactionsData);
         setReviews(reviewsData);
@@ -59,13 +67,15 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, [currentUser, fetchVans, vans.length]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (error || !currentUser) {
     return <ErrorMessage />;
   }
 
-  if (isLoading && !vans.length) {
+  if (isLoading || !vans) {
     return (
       <div className="absolute left-1/2 top-1/2 flex items-center justify-center">
         <span className="loader"></span>
@@ -84,7 +94,7 @@ export default function Dashboard() {
         />
         <ReviewScoreSection reviews={reviews} monthsFilter={monthsFilter} />
       </div>
-      <VansListSection vans={vans} userId={currentUser.uid} />
+      <VansListSection vans={vans} userId={currentUser._id} />
     </>
   );
 }

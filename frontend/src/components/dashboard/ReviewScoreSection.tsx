@@ -14,7 +14,7 @@ export default function ReviewScoreSection({
 }: ReviewScoreSectionProps) {
   const filteredReviews = reviews
     ? reviews.filter((review) =>
-        isWithinNMonths(review.timestamp, monthsFilter),
+        isWithinNMonths(new Date(review.createdAt).getTime(), monthsFilter),
       )
     : null;
 

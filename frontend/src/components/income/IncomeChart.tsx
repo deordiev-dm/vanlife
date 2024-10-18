@@ -63,7 +63,7 @@ export default IncomeChart;
 
 function formatIncomeData(transactions: Transaction[], months: number) {
   const transactionsDetails = transactions.map((transaction) => {
-    const date = new Date(transaction.timestamp);
+    const date = new Date(transaction.createdAt);
 
     return {
       date,
@@ -71,7 +71,7 @@ function formatIncomeData(transactions: Transaction[], months: number) {
         month: "short",
         year: "numeric",
       }),
-      amount: transaction.amount,
+      amount: transaction.sum,
     };
   });
 

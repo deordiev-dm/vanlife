@@ -1,8 +1,8 @@
 import { useOutletContext } from "react-router-dom";
 import { type Van } from "../../utils/types";
 import { MdOutlineModeEdit, MdOutlineEditOff } from "react-icons/md";
-import { useEffect, useState } from "react";
-import { editVan, queryParamsType } from "../../utils/api";
+import { useState } from "react";
+import { editVan } from "../../utils/api";
 import Message from "../../components/utils/Message";
 
 type VanDetailFieldProps = {
@@ -18,14 +18,9 @@ export default function HostVanDetails() {
   const [submitStatus, setSubmitStatus] = useState<"error" | "success" | null>(
     null,
   );
-  const { displayedVan, fetchVans } = useOutletContext<{
+  const { displayedVan } = useOutletContext<{
     displayedVan: Van;
-    fetchVans: (queryParams?: queryParamsType) => Promise<void>;
   }>();
-
-  useEffect(() => {
-    fetchVans();
-  }, [submitStatus, fetchVans]);
 
   if (!displayedVan) return <div className="loader"></div>;
 
@@ -121,7 +116,7 @@ function VanDetailField({
     try {
       setLoading(true);
 
-      await editVan(van.id, fieldToUpdate);
+      await editVan(van._id, fieldToUpdate);
       setSubmitStatus("success");
       setTimeout(() => {
         setSubmitStatus(null);

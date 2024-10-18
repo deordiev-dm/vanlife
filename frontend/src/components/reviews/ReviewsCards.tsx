@@ -14,7 +14,7 @@ export default function ReviewsCards({ reviews }: Props) {
       <div className="space-y-3">
         {reviews.map((review) => {
           return (
-            <article key={review.id} className="space-y-2 border-b pb-2">
+            <article key={review._id} className="space-y-2 border-b pb-2">
               <div className="flex gap-x-1">
                 {[...Array(5)].map((_, index) => (
                   <FaStar
@@ -26,9 +26,9 @@ export default function ReviewsCards({ reviews }: Props) {
                 ))}
               </div>
               <div className="flex gap-x-2">
-                <div className="font-semibold">{review.reviewerName}</div>
+                <div className="font-semibold">{review.reviewerId}</div>
                 <div className="text-gray-600">
-                  {new Date(review.timestamp).toLocaleString("default", {
+                  {new Date(review.createdAt).toLocaleString("default", {
                     month: "long",
                     day: "numeric",
                     year: "numeric",

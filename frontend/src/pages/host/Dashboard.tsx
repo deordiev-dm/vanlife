@@ -55,8 +55,6 @@ export default function Dashboard() {
           getUserReviews(currentUser._id),
         ]);
 
-        console.log("transactionsData", transactionsData);
-
         setTransactions(transactionsData);
         setReviews(reviewsData);
       } catch (err) {

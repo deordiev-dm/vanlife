@@ -5,8 +5,8 @@ const { getVanReviews } = require('../controllers/reviewController');
 const router = experss.Router();
 
 router.get('/', getAllVans);
+router.post('/', addVan);
 router.get('/:id', getVanById);
 router.get('/:vanId/reviews', getVanReviews);
-router.post('/addVan', addVan);
 
 module.exports = router;

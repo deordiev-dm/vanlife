@@ -64,6 +64,25 @@ export const getHostVans = async (hostId: string) => {
   return (await response.json()) as Van[];
 };
 
+export const createVan = async (vanCreationData: Omit<Van, "_id">) => {
+  const response = await fetch(`${BACKEND_URL}/api/vans`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(vanCreationData),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create a van");
+  }
+
+  const data = await response.json();
+  const van = data.van;
+
+  return van;
+};
+
 /**
  * Edits a van's data in the database.
  *

@@ -4,6 +4,7 @@ import { MdOutlineModeEdit, MdOutlineEditOff } from "react-icons/md";
 import { useState } from "react";
 import { editVan } from "../../utils/api";
 import Message from "../../components/utils/Message";
+import { useVans } from "../../hooks/useVans";
 
 type VanDetailFieldProps = {
   label: string;
@@ -67,6 +68,7 @@ function VanDetailField({
   const [inputValue, setInputValue] = useState(Object.values(value)[0]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { setVans } = useVans();
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { value } = event.target;
@@ -116,7 +118,17 @@ function VanDetailField({
     try {
       setLoading(true);
 
-      await editVan(van._id, fieldToUpdate);
+      const updatedVan = await editVan(van._id, fieldToUpdate);
+      setVans((prevVans) => {
+        return prevVans.map((van) => {
+          if (van._id === updatedVan._id) {
+            return updatedVan;
+          } else {
+            return van;
+          }
+        });
+      });
+
       setSubmitStatus("success");
       setTimeout(() => {
         setSubmitStatus(null);

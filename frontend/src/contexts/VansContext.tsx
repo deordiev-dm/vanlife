@@ -5,6 +5,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 type VansContextType = {
   vans: Van[];
+  setVans: React.Dispatch<React.SetStateAction<Van[]>>;
   fetchVans: () => Promise<void>;
   isLoading: boolean;
   error: unknown;
@@ -46,7 +47,9 @@ export function VansProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <VansContext.Provider value={{ vans, fetchVans, isLoading, error }}>
+    <VansContext.Provider
+      value={{ vans, setVans, fetchVans, isLoading, error }}
+    >
       {children}
     </VansContext.Provider>
   );

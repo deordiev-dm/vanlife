@@ -4,15 +4,7 @@ import { getStorage } from "firebase/storage";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-import {
-  collection,
-  doc,
-  getDocs,
-  getFirestore,
-  query,
-  setDoc,
-  where,
-} from "firebase/firestore/lite";
+import { getFirestore } from "firebase/firestore/lite";
 import { Van } from "./types.ts";
 
 const firebaseConfig = {
@@ -84,37 +76,33 @@ export const createVan = async (vanCreationData: Omit<Van, "_id">) => {
 };
 
 /**
- * Edits a van's data in the database.
+ * Updates a van's details by sending a PUT request to the backend.
  *
- * @param {string} vanId - The ID of the van to be updated.
- * @param {Partial<Van>} fieldToUpdate - An object containing the fields to update.
- * @returns {Promise<void>} - A promise that resolves when the van data has been successfully updated.
- * @throws {Error} - Throws an error if the van is not found or if the update fails.
+ * @param {string} vanId - The unique identifier of the van to be updated.
+ * @param {Partial<Van>} fieldToUpdate - An object containing the fields to be updated.
+ * @returns {Promise<Van>} - A promise that resolves to the updated van object.
+ * @throws {Error} - Throws an error if the update operation fails.
  */
 export async function editVan(
   vanId: string,
   fieldToUpdate: Partial<Van>,
-): Promise<void> {
-  const vansRef = collection(db, "vans");
-  const q = query(vansRef, where("id", "==", vanId));
+): Promise<Van> {
+  const response = await fetch(`${BACKEND_URL}/api/vans/${vanId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(fieldToUpdate),
+  });
 
-  try {
-    const querySnapshot = await getDocs(q);
-    const van = querySnapshot.docs[0];
+  const data = await response.json();
 
-    if (!van) {
-      throw new Error("Van not found");
-    }
-
-    const vanData = van.data() as Van;
-    const updatedVan = { ...vanData, ...fieldToUpdate };
-
-    const result = await setDoc(doc(db, "vans", vanId), updatedVan);
-    return result;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Failed to edit van data");
+  if (!response.ok) {
+    throw new Error(`Failed updating van: ${data.message}`);
   }
+
+  const updatedVan = data.updatedVan as Van;
+  return updatedVan;
 }
 
 export type Transaction = {

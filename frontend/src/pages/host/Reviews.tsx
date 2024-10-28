@@ -21,7 +21,7 @@ export default function Reviews() {
 
     const fetchData = async () => {
       try {
-        const data = await getUserReviews(currentUser.uid);
+        const data = await getUserReviews(currentUser._id);
         setReviews(data);
       } catch (err) {
         setError(err);
@@ -47,8 +47,13 @@ export default function Reviews() {
 
   const filteredReviews = reviews
     ? reviews
-        .filter((review) => isWithinNMonths(review.timestamp, months))
-        .sort((a, b) => b.timestamp - a.timestamp)
+        .filter((review) =>
+          isWithinNMonths(new Date(review.createdAt).getTime(), months),
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
     : null;
 
   return (

@@ -7,7 +7,7 @@ type Props = {
 
 function UserTransactions({ transactions }: Props) {
   const sortedTransactions = transactions.sort(
-    (a, b) => b.timestamp - a.timestamp,
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
   return (
     <>
@@ -20,9 +20,9 @@ function UserTransactions({ transactions }: Props) {
             key={nanoid()}
             className="flex items-center justify-between rounded bg-white p-4"
           >
-            <div className="text-3xl font-semibold">${transaction.amount}</div>
+            <div className="text-3xl font-semibold">${transaction.sum}</div>
             <div className="text-lg">
-              {`${new Date(transaction.timestamp).getDate()}/${new Date(transaction.timestamp).getMonth() + 1}/${new Date(transaction.timestamp).getFullYear()}`}
+              {`${new Date(transaction.createdAt).getDate()}/${new Date(transaction.createdAt).getMonth() + 1}/${new Date(transaction.createdAt).getFullYear()}`}
             </div>
           </article>
         ))}

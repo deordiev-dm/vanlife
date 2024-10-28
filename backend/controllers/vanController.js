@@ -75,9 +75,32 @@ const addVan = async (req, res) => {
   }
 };
 
+const editVanData = async (req, res) => {
+  const { vanId } = req.params;
+  const vanUpdates = req.body;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(vanId)) {
+      return res.status(400).json({ message: 'Invalid van ID' });
+    }
+
+    const updatedVan = await Van.findByIdAndUpdate(vanId, vanUpdates, { new: true, runValidators: true });
+
+    if (!updatedVan) {
+      return res.status(404).json({ message: 'Van not found' });
+    }
+
+    res.json({ message: 'Van updated successfully', updatedVan });
+  } catch (error) {
+    console.error('Error updating van', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   getAllVans,
   getVanById,
   getHostVans,
   addVan,
+  editVanData,
 };

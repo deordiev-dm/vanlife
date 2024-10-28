@@ -1,11 +1,8 @@
 import { useState } from "react";
 import Button from "../../components/utils/Button";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { db, storage } from "../../utils/api";
-import { doc, setDoc } from "firebase/firestore/lite";
-import { Van } from "../../utils/types";
+import { createVan, storage } from "../../utils/api";
 import { useAuth } from "../../hooks/useAuth";
-import { nanoid } from "nanoid";
 import Message from "../../components/utils/Message";
 import NumberInput from "../../components/utils/NumberInput";
 import RadioButton from "../../components/utils/RadioButton";
@@ -83,28 +80,32 @@ export default function AddVan() {
         // on success
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
         const { name, description, price, type } = formData;
-        const vanId = nanoid();
 
-        const newVan: Van = {
+        const newVan = {
           name,
           description,
           price,
           type,
           imageUrl: downloadURL,
-          hostId: currentUser.uid,
-          id: vanId,
+          hostId: currentUser._id,
         };
 
-        await setDoc(doc(db, "vans", vanId), newVan);
-        setIsSubmitting(false);
-        setSubmitStatus("success");
-        setFormData({
-          name: "",
-          description: "",
-          price: 20,
-          type: "simple",
-          image: null,
-        });
+        try {
+          await createVan(newVan);
+          setSubmitStatus("success");
+          setFormData({
+            name: "",
+            description: "",
+            price: 20,
+            type: "simple",
+            image: null,
+          });
+        } catch (error) {
+          console.error(error);
+          setSubmitStatus("error");
+        } finally {
+          setIsSubmitting(false);
+        }
       },
     );
   }

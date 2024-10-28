@@ -7,8 +7,10 @@ import { validateEmail } from "../utils/validateEmail";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
+    role: "host" as const,
     passwordConfirmation: "",
   });
 
@@ -21,7 +23,7 @@ export default function SignUp() {
     ? location.state.pathname
     : "/host";
 
-  const { createUser } = useAuth();
+  const { registerUser } = useAuth();
   function handleInput(target: EventTarget & HTMLInputElement): void {
     const { name, value } = target;
     setFormData((prevData) => ({
@@ -35,7 +37,9 @@ export default function SignUp() {
     setStatus("submitting");
     setError(null);
 
-    const { email, password, passwordConfirmation } = { ...formData };
+    const { name, role, email, password, passwordConfirmation } = {
+      ...formData,
+    };
 
     if (!validateEmail(email)) {
       setError(new Error("Invalid email"));
@@ -51,7 +55,12 @@ export default function SignUp() {
       return;
     }
 
-    createUser(email, password)
+    registerUser({
+      name,
+      email,
+      password,
+      role,
+    })
       .then(() => {
         navigate(pathToRedirect, { replace: true });
       })
@@ -66,6 +75,21 @@ export default function SignUp() {
           Create your profile
         </h1>
         <form className="mb-8 space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label className="mb-1 inline-block pl-1" htmlFor="name">
+              Your name<span className="text-red-600">*</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              name="name"
+              placeholder="e.g. Joe Doe"
+              required
+              onChange={(e) => handleInput(e.target as HTMLInputElement)}
+              value={formData.name}
+              className="w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
+            />
+          </div>
           <div>
             <label className="mb-1 inline-block pl-1" htmlFor="email">
               Email address<span className="text-red-600">*</span>

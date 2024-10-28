@@ -1,9 +1,10 @@
 import { useOutletContext } from "react-router-dom";
 import { type Van } from "../../utils/types";
 import { MdOutlineModeEdit, MdOutlineEditOff } from "react-icons/md";
-import { useEffect, useState } from "react";
-import { editVan, queryParamsType } from "../../utils/api";
+import { useState } from "react";
+import { editVan } from "../../utils/api";
 import Message from "../../components/utils/Message";
+import { useVans } from "../../hooks/useVans";
 
 type VanDetailFieldProps = {
   label: string;
@@ -18,14 +19,9 @@ export default function HostVanDetails() {
   const [submitStatus, setSubmitStatus] = useState<"error" | "success" | null>(
     null,
   );
-  const { displayedVan, fetchVans } = useOutletContext<{
+  const { displayedVan } = useOutletContext<{
     displayedVan: Van;
-    fetchVans: (queryParams?: queryParamsType) => Promise<void>;
   }>();
-
-  useEffect(() => {
-    fetchVans();
-  }, [submitStatus, fetchVans]);
 
   if (!displayedVan) return <div className="loader"></div>;
 
@@ -72,6 +68,7 @@ function VanDetailField({
   const [inputValue, setInputValue] = useState(Object.values(value)[0]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { setVans } = useVans();
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { value } = event.target;
@@ -121,7 +118,17 @@ function VanDetailField({
     try {
       setLoading(true);
 
-      await editVan(van.id, fieldToUpdate);
+      const updatedVan = await editVan(van._id, fieldToUpdate);
+      setVans((prevVans) => {
+        return prevVans.map((van) => {
+          if (van._id === updatedVan._id) {
+            return updatedVan;
+          } else {
+            return van;
+          }
+        });
+      });
+
       setSubmitStatus("success");
       setTimeout(() => {
         setSubmitStatus(null);

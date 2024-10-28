@@ -21,7 +21,7 @@ export default function HostVans() {
   }, [fetchVans, vans.length]);
 
   const hostedVans = currentUser
-    ? vans.filter((van) => van.hostId === currentUser.uid)
+    ? vans.filter((van) => van.hostId === currentUser._id)
     : [];
 
   return (
@@ -32,9 +32,9 @@ export default function HostVans() {
         {error && <ErrorMessage />}
         {hostedVans.map((van) => (
           <Link
-            to={van.id}
+            to={van._id}
             className="flex items-center gap-x-4 rounded-md bg-white p-3"
-            key={van.id}
+            key={van._id}
           >
             <img
               src={van.imageUrl}

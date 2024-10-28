@@ -33,7 +33,7 @@ export default function HostVanInfo() {
     fetchData();
   }, [fetchVans, vans.length]);
 
-  const displayedVan = vans.find((van) => van.id === params.id);
+  const displayedVan = vans.find((van) => van._id === params.id);
 
   if (error) {
     <ErrorMessage />;
@@ -90,7 +90,7 @@ export default function HostVanInfo() {
           </NavLink>
         </nav>
         <section className="space-y-3">
-          <Outlet context={{ displayedVan, fetchVans }} />
+          <Outlet context={{ displayedVan }} />
         </section>
       </section>
     </div>

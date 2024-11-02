@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { getUserTransactions, type Transaction } from "../../utils/api";
-import { isWithinNMonths } from "../../utils/isWithinNMonths";
+import { type Transaction } from "../../lib/types/types";
+import { getUserTransactions } from "@/features/transactions/database/transactions";
+import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";
 import IncomeChart from "../../components/income/IncomeChart";
 import UserTransactions from "../../components/income/UserTransactions";
 import IncomeHeader from "../../components/income/IncomeHeader";

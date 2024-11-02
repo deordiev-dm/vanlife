@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import Button from "../components/utils/Button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { validateEmail } from "../utils/validateEmail";
+import Button from "@/components/utils/Button";
+import { useAuth } from "@/hooks/useAuth";
+import { validateEmail } from "@/lib/utils/validateEmail";
 
-export default function Login() {
+export default function SignIn() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",

@@ -20,3 +20,23 @@ export type SignUpUser = {
   password: string;
   role: "host" | "renter";
 };
+
+export type Transaction = {
+  _id: string;
+  sum: number;
+  senderId: string;
+  receiverId: string;
+  vanId: string;
+  createdAt: string;
+};
+
+export type Review = {
+  _id: string;
+  rate: 1 | 2 | 3 | 4 | 5;
+  reviewBody?: string;
+  reviewerId: string;
+  vanId: string;
+  van: Van;
+  createdAt: string;
+  updatedAt: string;
+};

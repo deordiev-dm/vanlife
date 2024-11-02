@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Button from "../components/utils/Button";
+import Button from "@/components/utils/Button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { MdError } from "react-icons/md";
-import { useAuth } from "../hooks/useAuth";
-import { validateEmail } from "../utils/validateEmail";
+import { useAuth } from "@/hooks/useAuth";
+import { validateEmail } from "@/lib/utils/validateEmail";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({

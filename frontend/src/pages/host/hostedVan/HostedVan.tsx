@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
-import Badge from "../../components/utils/Badge";
-import { useVans } from "../../hooks/useVans";
-import ErrorMessage from "../../components/utils/ErrorMessage";
+import Badge from "@/components/utils/Badge";
+import { useVans } from "@/hooks/useVans";
+import ErrorMessage from "@/components/utils/ErrorMessage";
 
-export default function HostVanInfo() {
+export default function HostedVan() {
   const activeStyles = {
     textDecoration: "underline",
     color: "black",

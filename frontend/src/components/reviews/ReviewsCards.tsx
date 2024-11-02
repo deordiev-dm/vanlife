@@ -1,4 +1,4 @@
-import { Review } from "../../utils/api";
+import { Review } from "../../lib/types/types";
 import { FaStar } from "react-icons/fa6";
 
 type Props = {

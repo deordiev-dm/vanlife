@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { Transaction } from "../../utils/api";
+import { Transaction } from "../../lib/types/types";
 
 type Props = {
   transactions: Transaction[];

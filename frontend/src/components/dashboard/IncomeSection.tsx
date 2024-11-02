@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import generateNewSearchParams from "../../utils/generateNewSearchParams";
-import DropdownElement from "../utils/dropdown/DropdownElement";
-import DropdownMenu from "../utils/dropdown/DropdownMenu";
-import { useCounterAnimation } from "../../hooks/useCounterAnimation";
-import { type Transaction } from "../../utils/api";
-import { isWithinNMonths } from "../../utils/isWithinNMonths";
+import generateNewSearchParams from "@/lib/utils/generateNewSearchParams";
+import DropdownElement from "@/components/utils/dropdown/DropdownElement";
+import DropdownMenu from "@/components/utils/dropdown/DropdownMenu";
+import { useCounterAnimation } from "@/hooks/useCounterAnimation";
+import { Transaction } from "@/lib/types/types";
+import { isWithinNMonths } from "@/lib/utils/isWithinNMonths";
 
 type IncomeSectionProps = {
   monthsFilter: number;

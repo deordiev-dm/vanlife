@@ -1,7 +1,7 @@
 import { FaStar } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import { type Review } from "../../utils/api";
-import { isWithinNMonths } from "../../utils/isWithinNMonths";
+import { type Review } from "../../lib/types/types";
+import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";
 
 type ReviewScoreSectionProps = {
   reviews: Review[] | null;

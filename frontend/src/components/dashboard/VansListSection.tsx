@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { Link } from "react-router-dom";
 import Button from "../utils/Button";
-import { Van } from "../../utils/types";
+import { Van } from "../../lib/types/types";
 
 type VansListSectionProps = {
   vans: Van[];

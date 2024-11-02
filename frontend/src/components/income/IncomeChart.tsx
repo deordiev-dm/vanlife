@@ -1,5 +1,5 @@
 import Chart from "chart.js/auto";
-import { Transaction } from "../../utils/api";
+import { Transaction } from "../../lib/types/types";
 import { useEffect, useRef } from "react";
 
 type IncomeChartProps = {

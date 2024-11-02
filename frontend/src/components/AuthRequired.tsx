@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function AuthRequired() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -21,16 +21,13 @@ export default function AuthRequired() {
 
     const validateToken = async () => {
       try {
-        const response = await fetch(
-          `${BACKEND_URL}/api/users/validate-token`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
+        const response = await fetch(`${BASE_URL}/api/users/validate-token`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-        );
+        });
 
         if (!response.ok) {
           throw new Error("Unathorized");

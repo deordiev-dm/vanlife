@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { getUserReviews, type Review } from "../../utils/api";
+import { type Review } from "../../lib/types/types";
+import { getUserReviews } from "@/features/reviews/database/reviews";
 import ErrorMessage from "../../components/utils/ErrorMessage";
 import ReviewsHeader from "../../components/reviews/ReviewsHeader";
 import ReviewsChart from "../../components/reviews/ReviewsChart";
-import { isWithinNMonths } from "../../utils/isWithinNMonths";
+import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";
 import ReviewsCards from "../../components/reviews/ReviewsCards";
 
 export default function Reviews() {

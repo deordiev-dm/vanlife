@@ -1,10 +1,11 @@
-import { useOutletContext } from "react-router-dom";
-import { type Van } from "../../utils/types";
-import { MdOutlineModeEdit, MdOutlineEditOff } from "react-icons/md";
 import { useState } from "react";
-import { editVan } from "../../utils/api";
-import Message from "../../components/utils/Message";
-import { useVans } from "../../hooks/useVans";
+import { useOutletContext } from "react-router-dom";
+import { MdOutlineModeEdit, MdOutlineEditOff } from "react-icons/md";
+
+import { type Van } from "@/lib/types/types";
+import { editVan } from "@/features/vans/database/vans";
+import Message from "@/components/utils/Message";
+import { useVans } from "@/hooks/useVans";
 
 type VanDetailFieldProps = {
   label: string;
@@ -15,7 +16,7 @@ type VanDetailFieldProps = {
   >;
 };
 
-export default function HostVanDetails() {
+export default function HostedVanDetails() {
   const [submitStatus, setSubmitStatus] = useState<"error" | "success" | null>(
     null,
   );

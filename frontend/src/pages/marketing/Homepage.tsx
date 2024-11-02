@@ -1,14 +1,15 @@
-import image from "../images/homepage.jpg";
-import Button from "../components/utils/Button";
+import Button from "@/components/utils/Button";
+import bg from "@/assets/img/homepage.jpg";
 
 function Homepage() {
   return (
     <main
       className="flex flex-col justify-center bg-cover bg-center px-6 py-16 text-white"
-      style={{ backgroundImage: `url(${image})` }}
+      style={{ backgroundImage: `url(${bg})` }}
     >
       <h1 className="mb-4 text-balance text-3xl font-extrabold">
         You got the travel plans, we got the travel vans.
+        
       </h1>
       <p className="mb-14 font-medium">
         Add adventure to your life by joining the #vanlife movement. Rent the

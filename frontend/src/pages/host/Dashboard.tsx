@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import {
-  getHostVans,
-  getUserReviews,
-  getUserTransactions,
-  type Review,
-  type Transaction,
-} from "../../utils/api";
-import ErrorMessage from "../../components/utils/ErrorMessage";
-import IncomeSection from "../../components/dashboard/IncomeSection";
-import ReviewScoreSection from "../../components/dashboard/ReviewScoreSection";
-import VansListSection from "../../components/dashboard/VansListSection";
+import { useAuth } from "@/hooks/useAuth";
+
+import { getUserReviews } from "@/features/reviews/database/reviews";
+import { getUserTransactions } from "@/features/transactions/database/transactions";
+import { type Review, type Transaction } from "@/lib/types/types";
+
+import { getHostVans } from "@/features/vans/database/vans";
+
+import ErrorMessage from "@/components/utils/ErrorMessage";
+import IncomeSection from "@/components/dashboard/IncomeSection";
+import ReviewScoreSection from "@/components/dashboard/ReviewScoreSection";
+import VansListSection from "@/components/dashboard/VansListSection";
 import { useLocation, useSearchParams } from "react-router-dom";
-import { Van } from "../../utils/types";
+import { Van } from "@/lib/types/types";
 
 export default function Dashboard() {
   const [vans, setVans] = useState<Van[] | null>(null);

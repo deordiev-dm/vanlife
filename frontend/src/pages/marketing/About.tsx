@@ -1,13 +1,12 @@
-import Button from "../components/utils/Button";
-
-import aboutBgImage from "../images/aboutBgImage.jpg";
+import Button from "@/components/utils/Button";
+import bg from "@/assets/img/about.jpg";
 
 function About() {
   return (
     <main className="space-y-12 pb-12">
       <div className="aspect-video max-h-56 w-full">
         <img
-          src={aboutBgImage}
+          src={bg}
           className="h-full w-full object-cover object-bottom"
           alt="white van under blue sky"
         />

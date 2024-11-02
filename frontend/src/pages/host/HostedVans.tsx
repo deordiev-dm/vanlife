@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 import ErrorMessage from "../../components/utils/ErrorMessage";
 import Button from "../../components/utils/Button";
 
-export default function HostVans() {
+export default function HostedVans() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const { currentUser } = useAuth();

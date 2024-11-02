@@ -1,12 +1,14 @@
 import { useState } from "react";
-import Button from "../../components/utils/Button";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { createVan, storage } from "../../utils/api";
-import { useAuth } from "../../hooks/useAuth";
-import Message from "../../components/utils/Message";
-import NumberInput from "../../components/utils/NumberInput";
-import RadioButton from "../../components/utils/RadioButton";
-import DragNDrop from "../../components/utils/DragNDrop";
+import { storage } from "@/database/firebase";
+import { createVan } from "@/features/vans/database/vans";
+import { useAuth } from "@/hooks/useAuth";
+
+import Button from "@/components/utils/Button";
+import Message from "@/components/utils/Message";
+import NumberInput from "@/components/utils/NumberInput";
+import RadioButton from "@/components/utils/RadioButton";
+import DragNDrop from "@/components/utils/DragNDrop";
 
 type formDataType = {
   name: string;

@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import Badge from "../../components/utils/Badge.tsx";
-import { useVans } from "../../hooks/useVans.tsx";
-import ErrorMessage from "../../components/utils/ErrorMessage.tsx";
-import generateNewSearchParams from "../../utils/generateNewSearchParams.ts";
-import { Van } from "../../utils/types.ts";
+import Badge from "@/components/utils/Badge.tsx";
+import { useVans } from "@/hooks/useVans.tsx";
+import ErrorMessage from "@/components/utils/ErrorMessage.tsx";
+import generateNewSearchParams from "@/lib/utils/generateNewSearchParams";
 
-export default function Vans() {
+import { Van } from "@/lib/types/types";
+export default function VansCatalog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type");
   const { vans, fetchVans, isLoading, error } = useVans();

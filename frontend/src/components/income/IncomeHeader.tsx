@@ -1,6 +1,6 @@
 import { useCounterAnimation } from "@/hooks/useCounterAnimation";
-import DropdownElement from "@/components/utils/dropdown/DropdownElement";
-import DropdownMenu from "@/components/utils/dropdown/DropdownMenu";
+import DropdownElement from "@/components/ui/dropdown/DropdownElement";
+import DropdownMenu from "@/components/ui/dropdown/DropdownMenu";
 import generateNewSearchParams from "@/lib/utils/generateNewSearchParams";
 
 type IncomeHeaderProps = {

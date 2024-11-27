@@ -24,7 +24,7 @@ function Badge({ type }: BadgeProps) {
   return (
     <div
       style={styles}
-      className="inline-block min-h-6 rounded-lg px-4 py-1 text-center font-semibold capitalize text-[#FFEAD0]"
+      className="inline-block rounded-2xl px-3 py-2 text-center text-lg font-semibold capitalize text-white"
     >
       {type}
     </div>

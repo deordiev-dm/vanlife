@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
-import { GoArrowLeft } from "react-icons/go";
+import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon";
 
-import Badge from "@/components/utils/Badge.tsx";
-import Button from "@/components/utils/Button.tsx";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
 
 import { useVans } from "@/hooks/useVans.tsx";
-import ErrorMessage from "@/components/utils/ErrorMessage.tsx";
+import ErrorMessage from "@/components/ui/ErrorPopup";
 import { getVanById } from "@/features/vans/database/vans";
 import { type Van } from "@/lib/types/types";
+import LoadingCard from "@/components/ui/LoadingCard";
 
 export default function VanDetails() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function VanDetails() {
   const searchParams = location.state?.searchParams || "";
   const typeFilter = searchParams.match(/type=([^&]+)/);
 
+  const [isModalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { vans } = useVans();
@@ -45,38 +47,56 @@ export default function VanDetails() {
     fetchData();
   }, [displayedVan, params.id]);
 
+  useEffect(() => {
+    if (error) {
+      setModalOpen(true);
+    }
+  }, [error]);
+
   return (
-    <main className="relative flex flex-col space-y-8 px-6 pb-12 pt-6">
-      {error ? <ErrorMessage /> : null}
-      {isLoading && <span className="loader"></span>}
-      {!error && !isLoading && displayedVan && (
-        <div className="flex max-w-xl flex-col items-start gap-y-6">
+    <main>
+      <div className="container relative pb-16 pt-24 md:pt-32">
+        <div className="space-y-8">
           <Link
             to={`..?${searchParams}`}
             relative="path"
-            className="flex items-center gap-x-3"
+            className="group inline-flex items-center gap-x-2 px-3"
           >
-            <GoArrowLeft className="w-5 fill-[#858585]" />
-            <span className="font-medium underline">
+            <ArrowLeftIcon className="h-5 w-5 transition group-hover:-translate-x-2" />
+            <span className="nav-link group-hover:before:w-full">
               Back to {typeFilter ? typeFilter[1] : "all"} vans
             </span>
           </Link>
-          <div className="overflow-hidden rounded-md">
-            <img className="w-full" src={displayedVan.imageUrl} alt="" />
-          </div>
-          <div className="space-y-5">
-            <Badge type={displayedVan.type} />
-            <h1 className="text-3xl font-bold">{displayedVan.name}</h1>
-            <p className="text-xl font-medium">
-              <span className="text-2xl">${displayedVan.price}/</span>day
-            </p>
-            <p className="font-medium">{displayedVan.description}</p>
-            <Button as="button" colors="orange">
-              Rent this van
-            </Button>
+
+          <div className="grid gap-y-8 md:grid-cols-2 md:gap-x-16">
+            {isModalOpen && <ErrorMessage setModalOpen={setModalOpen} />}
+            {isLoading && <LoadingCard />}
+            {displayedVan && !error && !isLoading && (
+              <>
+                <div className="overflow-hidden rounded-md">
+                  <img className="w-full" src={displayedVan.imageUrl} alt="" />
+                </div>
+                <div className="space-y-6 md:pt-4">
+                  <h1 className="text-3xl font-bold lg:text-4xl">
+                    {displayedVan.name}
+                  </h1>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="font-medium">
+                      <span className="text-2xl font-bold">
+                        ${displayedVan.price}
+                      </span>
+                      /day
+                    </div>
+                    <Badge type={displayedVan.type} />
+                  </div>
+                  <p className="text-lg">{displayedVan.description}</p>
+                  <Button as="button">Rent this van</Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </main>
   );
 }

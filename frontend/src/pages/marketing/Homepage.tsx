@@ -1,23 +1,36 @@
-import Button from "@/components/utils/Button";
+import Button from "@/components/ui/Button";
 import bg from "@/assets/img/homepage.jpg";
 
 function Homepage() {
   return (
     <main
       className="flex flex-col justify-center bg-cover bg-center"
-      style={{ backgroundImage: `url(${bg})` }}
+      style={{ backgroundImage: `url(${bg})`, backgroundColor: "#171717" }}
     >
-      <div className="container space-y-8 py-16 text-white">
-        <h1 className="mb-12 text-balance text-3xl font-extrabold tracking-tight md:text-4xl 2xl:text-5xl">
+      <div className="container max-w-3xl space-y-8 pb-16 pt-36 text-white">
+        <h1 className="mb-12 text-balance text-4xl font-extrabold tracking-tight md:text-5xl 2xl:text-6xl">
           You got the travel plans, we got the travel vans.
         </h1>
-        <p className="md:text-xl 2xl:text-2xl">
-          Add adventure to your life by joining the #vanlife movement. Rent the
-          perfect van to make your perfect road trip.
-        </p>
-        <Button as="a" to="/vans" colors="orange">
-          Find your van
-        </Button>
+        <div className="max-w-3xl space-y-12 md:text-xl">
+          <p className="font-semibold md:text-2xl 2xl:text-2xl">
+            Add adventure to your life by joining the #vanlife movement. Rent
+            the perfect van to make your perfect road trip.
+          </p>
+          <div className="space-y-2">
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores,
+              totam.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam
+              dicta incidunt odio soluta consectetur, maxime aliquid dignissimos
+              cupiditate ut ea?
+            </p>
+          </div>
+          <Button as="a" to="/vans">
+            Find your van
+          </Button>
+        </div>
       </div>
     </main>
   );

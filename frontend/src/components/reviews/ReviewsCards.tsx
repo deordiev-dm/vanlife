@@ -1,5 +1,5 @@
 import { Review } from "../../lib/types/types";
-import { FaStar } from "react-icons/fa6";
+// import { FaStar } from "react-icons/fa6";
 
 type Props = {
   reviews: Review[] | null;
@@ -16,14 +16,14 @@ export default function ReviewsCards({ reviews }: Props) {
           return (
             <article key={review._id} className="space-y-2 border-b pb-2">
               <div className="flex gap-x-1">
-                {[...Array(5)].map((_, index) => (
+                {/* {[...Array(5)].map((_, index) => (
                   <FaStar
                     key={index}
                     className={
                       index < review.rate ? "fill-orange-400" : "fill-gray-400"
                     }
                   />
-                ))}
+                ))} */}
               </div>
               <div className="flex gap-x-2">
                 <div className="font-semibold">{review.reviewerId}</div>

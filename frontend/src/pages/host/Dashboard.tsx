@@ -7,7 +7,7 @@ import { type Review, type Transaction } from "@/lib/types/types";
 
 import { getHostVans } from "@/features/vans/database/vans";
 
-import ErrorMessage from "@/components/utils/ErrorMessage";
+import ErrorMessage from "@/components/ui/ErrorPopup";
 import IncomeSection from "@/components/dashboard/IncomeSection";
 import ReviewScoreSection from "@/components/dashboard/ReviewScoreSection";
 import VansListSection from "@/components/dashboard/VansListSection";

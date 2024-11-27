@@ -1,7 +1,6 @@
 import { useState } from "react";
-import Button from "@/components/utils/Button";
+import Button from "@/components/ui/Button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { MdError } from "react-icons/md";
 import { useAuth } from "@/hooks/useAuth";
 import { validateEmail } from "@/lib/utils/validateEmail";
 
@@ -140,7 +139,6 @@ export default function SignUp() {
           <Button
             as="button"
             disabled={status === "submitting"}
-            colors="orange"
             className={
               status === "submitting"
                 ? "bg-slate-300 hover:bg-slate-300 active:bg-slate-300"
@@ -153,13 +151,11 @@ export default function SignUp() {
       </div>
       {error?.message && (
         <div className="absolute bottom-2 z-10 flex items-center gap-x-2 rounded bg-red-500 px-4 py-2 font-semibold text-slate-50">
-          <MdError className="h-5 w-5" />
           {error.message}
         </div>
       )}
       {location.state?.message && (
         <div className="absolute bottom-2 flex items-center gap-x-2 rounded bg-red-500 px-4 py-2 font-semibold text-slate-50">
-          <MdError className="h-5 w-5" />
           {location.state.message}
         </div>
       )}

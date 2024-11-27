@@ -1,5 +1,5 @@
-import DropdownElement from "../utils/dropdown/DropdownElement";
-import DropdownMenu from "../utils/dropdown/DropdownMenu";
+import DropdownElement from "../ui/dropdown/DropdownElement";
+import DropdownMenu from "../ui/dropdown/DropdownMenu";
 
 const MONTHS_MAP = {
   1: "month",

@@ -1,5 +1,5 @@
 import { CSSProperties, useState } from "react";
-import { MdOutlineKeyboardArrowUp } from "react-icons/md";
+// import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 
 type Props = {
   children: React.ReactNode;
@@ -28,10 +28,10 @@ export default function DropdownMenu({ children, title }: Props) {
       onMouseLeave={() => setIsMenuOpen(false)}
     >
       <span>{title}</span>
-      <MdOutlineKeyboardArrowUp
+      {/* <MdOutlineKeyboardArrowUp
         style={arrowStyles}
         className="transition-transform"
-      />
+      /> */}
       <div
         style={menuStyles}
         className="absolute right-0 top-full z-10 w-36 px-1 py-2"

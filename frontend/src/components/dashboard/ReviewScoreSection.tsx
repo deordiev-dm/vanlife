@@ -1,4 +1,4 @@
-import { FaStar } from "react-icons/fa6";
+// import { FaStar } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { type Review } from "../../lib/types/types";
 import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";
@@ -27,7 +27,7 @@ export default function ReviewScoreSection({
     <section className="-ml-6 -mr-6 flex items-center gap-4 bg-[#FFDDB2] p-6">
       <h2 className="flex text-2xl font-bold">Review score</h2>
       <span className="flex flex-1 items-center pl-2 text-lg font-bold">
-        <FaStar className="mr-1 fill-orange-500" />
+        {/* <FaStar className="mr-1 fill-orange-500" /> */}
         <span className="min-w-7">{averageScore?.toFixed(1)}</span>
         <span className="font-normal text-[#4d4d4d]">/5</span>
       </span>

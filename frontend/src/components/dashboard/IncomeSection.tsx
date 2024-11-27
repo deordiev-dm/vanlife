@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import generateNewSearchParams from "@/lib/utils/generateNewSearchParams";
-import DropdownElement from "@/components/utils/dropdown/DropdownElement";
-import DropdownMenu from "@/components/utils/dropdown/DropdownMenu";
+import DropdownElement from "@/components/ui/dropdown/DropdownElement";
+import DropdownMenu from "@/components/ui/dropdown/DropdownMenu";
 import { useCounterAnimation } from "@/hooks/useCounterAnimation";
 import { Transaction } from "@/lib/types/types";
 import { isWithinNMonths } from "@/lib/utils/isWithinNMonths";

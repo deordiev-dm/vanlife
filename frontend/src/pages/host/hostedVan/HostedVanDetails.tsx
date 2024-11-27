@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { MdOutlineModeEdit, MdOutlineEditOff } from "react-icons/md";
+// import { MdOutlineModeEdit, MdOutlineEditOff } from "react-icons/md";
 
 import { type Van } from "@/lib/types/types";
 import { editVan } from "@/features/vans/database/vans";
-import Message from "@/components/utils/Message";
+import Message from "@/components/ui/Message";
 import { useVans } from "@/hooks/useVans";
 
 type VanDetailFieldProps = {
@@ -158,11 +158,13 @@ function VanDetailField({
             className="rounded p-1 transition-colors hover:bg-orange-400"
             onClick={() => setIsEditing(!isEditing)}
           >
-            {isEditing ? (
-              <MdOutlineEditOff className="h-5 w-5" />
-            ) : (
-              <MdOutlineModeEdit className="h-5 w-5" />
-            )}
+            {
+              isEditing
+                ? ""
+                : // <MdOutlineEditOff className="h-5 w-5" />
+                  ""
+              // <MdOutlineModeEdit className="h-5 w-5" />
+            }
           </button>
         </div>
         <div>

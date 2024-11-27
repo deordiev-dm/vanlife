@@ -1,5 +1,5 @@
 import React from "react";
-import { IoIosCloseCircle } from "react-icons/io";
+// import { IoIosCloseCircle } from "react-icons/io";
 
 type Props = {
   children?: React.ReactNode;
@@ -30,7 +30,7 @@ export default function Message({
         {children && <p>{children}</p>}
       </div>
       <button onClick={() => onClose()} className="h-6 w-6 flex-shrink-0">
-        <IoIosCloseCircle className="h-full w-full" />
+        {/* <IoIosCloseCircle className="h-full w-full" /> */}
       </button>
     </div>
   );

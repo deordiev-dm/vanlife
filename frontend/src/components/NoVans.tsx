@@ -1,4 +1,4 @@
-import Button from "./utils/Button";
+import Button from "./ui/Button";
 
 function NoVans() {
   return (

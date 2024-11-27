@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useVans } from "../../hooks/useVans";
 import { useAuth } from "../../hooks/useAuth";
-import ErrorMessage from "../../components/utils/ErrorMessage";
-import Button from "../../components/utils/Button";
+import ErrorMessage from "../../components/ui/ErrorPopup";
+import Button from "../../components/ui/Button";
 
 export default function HostedVans() {
   const [isLoading, setIsLoading] = useState(false);

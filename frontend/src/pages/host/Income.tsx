@@ -5,7 +5,7 @@ import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";
 import IncomeChart from "../../components/income/IncomeChart";
 import UserTransactions from "../../components/income/UserTransactions";
 import IncomeHeader from "../../components/income/IncomeHeader";
-import ErrorMessage from "../../components/utils/ErrorMessage";
+import ErrorMessage from "../../components/ui/ErrorPopup";
 import { useAuth } from "../../hooks/useAuth";
 import { useLocation, useSearchParams } from "react-router-dom";
 

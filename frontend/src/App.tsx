@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CombinedProvider from "@/contexts/CombinedProvider";
 
-import Layout from "@/components/Layout";
-import HostLayout from "@/components/HostLayout";
+import Layout from "@/components/layouts/Layout";
+import HostLayout from "@/components/layouts/HostLayout";
 
 import Homepage from "@/pages/marketing/Homepage";
 import About from "@/pages/marketing/About";

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { type Review } from "../../lib/types/types";
 import { getUserReviews } from "@/features/reviews/database/reviews";
-import ErrorMessage from "../../components/utils/ErrorMessage";
+import ErrorMessage from "../../components/ui/ErrorPopup";
 import ReviewsHeader from "../../components/reviews/ReviewsHeader";
 import ReviewsChart from "../../components/reviews/ReviewsChart";
 import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";

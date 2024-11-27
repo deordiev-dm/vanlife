@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { GoArrowLeft } from "react-icons/go";
+// import { GoArrowLeft } from "react-icons/go";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
-import Badge from "@/components/utils/Badge";
+import Badge from "@/components/ui/Badge";
 import { useVans } from "@/hooks/useVans";
-import ErrorMessage from "@/components/utils/ErrorMessage";
+import ErrorMessage from "@/components/ui/ErrorPopup";
 
 export default function HostedVan() {
   const activeStyles = {
@@ -46,7 +46,7 @@ export default function HostedVan() {
   return (
     <div className="space-y-6">
       <Link to=".." relative="path" className="flex items-center gap-x-3">
-        <GoArrowLeft className="w-5 fill-[#858585]" />
+        {/* <GoArrowLeft className="w-5 fill-[#858585]" /> */}
         <span className="font-medium underline">Back to all vans</span>
       </Link>
       <section className="space-y-6 rounded-lg bg-white p-6">

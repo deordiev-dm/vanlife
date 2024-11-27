@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import Button from "@/components/utils/Button";
+import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { validateEmail } from "@/lib/utils/validateEmail";
+import ErrorPopup from "@/components/ui/ErrorPopup";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -12,19 +13,23 @@ export default function SignIn() {
 
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
   const [error, setError] = useState<Error | null>(null);
+  const [isModalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
-  const pathToRedirect = location.state?.pathname
-    ? location.state.pathname
-    : "/host";
 
+  // path non-authorized user tried to access.
+  const [pathToRedirect] = useState(location.state?.pathname || "/host");
+  const [nonAuthorized, setNonAuthorized] = useState(location.state?.message);
+
+  // this effect ensures that message is shown once.
   useEffect(() => {
-    if (location.state?.message) {
-      setError(new Error(location.state?.message));
+    if (nonAuthorized) {
+      setModalOpen(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setNonAuthorized(null);
+    navigate(location, { replace: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { loginUser } = useAuth();
 
@@ -46,20 +51,34 @@ export default function SignIn() {
     if (!validateEmail(email)) {
       setError(new Error("Invalid email. Please try again."));
       setStatus("idle");
+      setModalOpen(true);
       return;
     } else if (password.length < 6) {
       setError(new Error("Password is too short. Please try again."));
       setStatus("idle");
+      setModalOpen(true);
       return;
     }
 
-    await loginUser(email, password);
-    navigate(pathToRedirect, { replace: true });
+    try {
+      await loginUser(email, password);
+      navigate(pathToRedirect, { replace: true });
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error);
+        setModalOpen(true);
+      }
+    } finally {
+      setStatus("idle");
+    }
   };
 
   return (
     <main className="relative flex flex-col items-center justify-center px-6 pb-12 pt-6">
       <div className="max-w-96">
+        {isModalOpen && (
+          <ErrorPopup setModalOpen={setModalOpen} text={error?.message} />
+        )}
         <h1 className="mb-8 text-center text-3xl font-bold">
           Sign in to your account
         </h1>
@@ -94,13 +113,10 @@ export default function SignIn() {
               className="w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
             />
           </div>
-          {error?.message && (
-            <div className="text-red-500">{error.message}</div>
-          )}
+          {error ? <p className="text-orange-500">{error.message}</p> : null}
           <Button
             as="button"
             disabled={status === "submitting"}
-            colors="orange"
             className={
               status === "submitting"
                 ? "bg-slate-300 hover:bg-slate-300 active:bg-slate-300"

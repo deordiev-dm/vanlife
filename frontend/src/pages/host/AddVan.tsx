@@ -4,11 +4,11 @@ import { storage } from "@/database/firebase";
 import { createVan } from "@/features/vans/database/vans";
 import { useAuth } from "@/hooks/useAuth";
 
-import Button from "@/components/utils/Button";
-import Message from "@/components/utils/Message";
-import NumberInput from "@/components/utils/NumberInput";
-import RadioButton from "@/components/utils/RadioButton";
-import DragNDrop from "@/components/utils/DragNDrop";
+import Button from "@/components/ui/Button";
+import Message from "@/components/ui/Message";
+import NumberInput from "@/components/ui/NumberInput";
+import RadioButton from "@/components/ui/RadioButton";
+import DragNDrop from "@/components/ui/DragNDrop";
 
 type formDataType = {
   name: string;

@@ -1,5 +1,5 @@
 import { Review } from "../../lib/types/types";
-import { FaStar } from "react-icons/fa6";
+// import { FaStar } from "react-icons/fa6";
 
 type Props = {
   reviews: Review[] | null;
@@ -20,7 +20,7 @@ export default function ReviewsChart({ reviews }: Props) {
     <>
       <div className="flex items-center space-x-1">
         <span className="text-3xl font-bold">{overallRating.toFixed(1)}</span>
-        <FaStar className="h-6 w-6 fill-orange-500" />
+        {/* <FaStar className="h-6 w-6 fill-orange-500" /> */}
         <p>overall rating</p>
       </div>
       <div className="space-y-3">

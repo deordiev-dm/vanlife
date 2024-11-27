@@ -13,25 +13,24 @@ type VansContextType = {
 
 export const VansContext = createContext<VansContextType | null>(null);
 
+function sleep(ms: number) {
+  return new Promise((res) => {
+    setTimeout(() => {
+      res(1);
+    }, ms);
+  });
+}
+
 export function VansProvider({ children }: { children: React.ReactNode }) {
   const [vans, setVans] = useState<Van[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
-  /**
-   * Fetches the list of vans from the database.
-   *
-   * This function makes an asynchronous request to the backend API to retrieve
-   * all vans. It handles the loading state, error state, and updates the vans
-   * state with the fetched data.
-   *
-   * @async
-   * @function
-   * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
-   * @throws Will log an error to the console if the fetch operation fails.
-   */
   async function fetchVans(): Promise<void> {
     setIsLoading(true);
+
+    await sleep(500);
+
     try {
       console.info("Making a request to the database to fetch all vans");
       const res = await fetch(`${BASE_URL}/api/vans`);

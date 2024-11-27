@@ -1,197 +1,172 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-// import { MdOutlineModeEdit, MdOutlineEditOff } from "react-icons/md";
-
 import { type Van } from "@/lib/types/types";
-import { editVan } from "@/features/vans/database/vans";
-import Message from "@/components/ui/Message";
+import ErrorPopup from "@/components/ui/ErrorPopup";
+import { editVan } from "@/features/vans/api/vans";
 import { useVans } from "@/hooks/useVans";
+import SuccessPopup from "@/components/ui/SuccessPopup";
+import RadioButton from "@/components/ui/RadioButton";
 
-type VanDetailFieldProps = {
-  label: string;
-  value: Partial<Pick<Van, "name" | "description" | "type">>;
-  van: Van;
-  setSubmitStatus: React.Dispatch<
-    React.SetStateAction<"error" | "success" | null>
-  >;
-};
+type OutletContextProps = { displayedVan: Van };
 
 export default function HostedVanDetails() {
-  const [submitStatus, setSubmitStatus] = useState<"error" | "success" | null>(
-    null,
-  );
-  const { displayedVan } = useOutletContext<{
-    displayedVan: Van;
-  }>();
+  const { displayedVan } = useOutletContext<OutletContextProps>();
+  const [initialVan, setInitialVan] = useState(displayedVan);
+  const [updatedVan, setUpdatedVan] = useState(displayedVan);
+  const [hasVanChanged, setHasVanChanged] = useState(false);
 
-  if (!displayedVan) return <div className="loader"></div>;
-
-  return (
-    <>
-      {submitStatus === "success" && (
-        <Message
-          status="success"
-          onClose={() => setSubmitStatus(null)}
-          title="Success!"
-        >
-          Van info has been updated!
-        </Message>
-      )}
-      <VanDetailField
-        van={displayedVan}
-        label="Name"
-        value={{ name: displayedVan.name }}
-        setSubmitStatus={setSubmitStatus}
-      />
-      <VanDetailField
-        van={displayedVan}
-        label="Category"
-        value={{ type: displayedVan.type }}
-        setSubmitStatus={setSubmitStatus}
-      />
-      <VanDetailField
-        van={displayedVan}
-        label="Description"
-        value={{ description: displayedVan.description }}
-        setSubmitStatus={setSubmitStatus}
-      />
-    </>
-  );
-}
-
-function VanDetailField({
-  van,
-  label,
-  value,
-  setSubmitStatus,
-}: VanDetailFieldProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [inputValue, setInputValue] = useState(Object.values(value)[0]);
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"success" | "loading" | "idle">("idle");
   const [error, setError] = useState<Error | null>(null);
-  const { setVans } = useVans();
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const { value } = event.target;
-    setInputValue(value);
-  }
+  const { fetchVans } = useVans();
 
-  async function handleVanEdit(
-    van: Van,
-    value: string,
-    inputValue: string,
-  ): Promise<void> {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     setError(null);
 
-    if (!inputValue) {
-      setError(new Error("Field cannot be empty"));
-      setTimeout(() => {
-        setError(null);
-      }, 5000);
+    // validate updated data
+    if (JSON.stringify(initialVan) === JSON.stringify(updatedVan)) {
+      setError(new Error("The data is the same."));
+      return;
+    }
+    if (!updatedVan.name) {
+      setError(new Error("Please provide a name for a van."));
+      return;
+    }
+    if (updatedVan.description.length < 50) {
+      setError(new Error("Description is too short"));
       return;
     }
 
-    let fieldToUpdate: Partial<Van> = {};
-    switch (value) {
-      case "name": {
-        fieldToUpdate = { name: inputValue };
-        break;
-      }
-      case "type": {
-        if (["simple", "rugged", "luxury"].includes(inputValue)) {
-          fieldToUpdate = {
-            type: inputValue as "simple" | "rugged" | "luxury",
-          };
-        } else {
-          throw new Error("Invalid type value");
+    async function updateVan() {
+      try {
+        setStatus("loading");
+
+        const result = await editVan(initialVan._id, updatedVan);
+
+        setStatus("success");
+        setInitialVan(result);
+
+        // refetch vans to display new data
+        await fetchVans();
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error);
         }
-        break;
-      }
-      case "description": {
-        fieldToUpdate = { description: inputValue };
-        break;
-      }
-      default: {
-        throw new Error("Invalid field to update");
+
+        setStatus("idle");
       }
     }
 
-    try {
-      setLoading(true);
-
-      const updatedVan = await editVan(van._id, fieldToUpdate);
-      setVans((prevVans) => {
-        return prevVans.map((van) => {
-          if (van._id === updatedVan._id) {
-            return updatedVan;
-          } else {
-            return van;
-          }
-        });
-      });
-
-      setSubmitStatus("success");
-      setTimeout(() => {
-        setSubmitStatus(null);
-      }, 3000);
-      setIsEditing(false);
-    } catch (error) {
-      console.error(error);
-      setSubmitStatus("error");
-    } finally {
-      setLoading(false);
-    }
+    // if ok - initiate HTTP request
+    updateVan();
   }
 
+  // check whether or not the van object has changed
+  useEffect(() => {
+    setHasVanChanged(JSON.stringify(initialVan) !== JSON.stringify(updatedVan));
+    setError(null);
+  }, [initialVan, updatedVan]);
+
   return (
-    <>
-      {error && error.message === "Field cannot be empty" && (
-        <Message status="error" onClose={() => setError(null)} title="Error!">
-          {error.message}
-        </Message>
+    <div>
+      {error && <ErrorPopup error={error} key={Date.now()} />}
+      {status === "success" && (
+        <SuccessPopup message="Changes have been saved successfully!" />
       )}
-      <div>
-        <div className="mb-1 flex items-center gap-x-2">
-          <span className="text-lg font-semibold">{label}: </span>
-          <button
-            type="button"
-            className="rounded p-1 transition-colors hover:bg-orange-400"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {
-              isEditing
-                ? ""
-                : // <MdOutlineEditOff className="h-5 w-5" />
-                  ""
-              // <MdOutlineModeEdit className="h-5 w-5" />
+
+      <form onSubmit={(e) => handleSubmit(e)} className="space-y-10">
+        <div className="space-y-3">
+          <NameInputField
+            value={updatedVan.name}
+            onChange={(newValue) =>
+              setUpdatedVan((prevState) => ({
+                ...prevState,
+                name: newValue,
+              }))
             }
-          </button>
+          />
+          <TypeInputField
+            value={updatedVan.type}
+            onChange={(newValue) => {
+              console.log(newValue);
+              setUpdatedVan((prevState) => ({
+                ...prevState,
+                type: newValue as "simple" | "luxury" | "rugged",
+              }));
+            }}
+          />
         </div>
-        <div>
-          {isEditing ? (
-            <div className="flex items-center gap-x-[2px]">
-              <input
-                type="text"
-                required
-                value={inputValue}
-                onChange={handleInputChange}
-                className="rounded-s-lg border px-3 py-1 transition-colors hover:border-orange-400"
-              />
-              <button
-                onClick={() =>
-                  handleVanEdit(van, Object.keys(value)[0], inputValue)
-                }
-                className="disabled:bg-grey-300 rounded-e-lg border border-orange-400 bg-orange-400 p-1 px-3 text-white transition-colors hover:bg-orange-500 active:bg-orange-600 disabled:pointer-events-none disabled:border-gray-300"
-                disabled={loading || !inputValue}
-              >
-                {loading ? "Loading..." : "Save"}
-              </button>
-            </div>
-          ) : (
-            <span>{Object.values(value)[0]}</span>
-          )}
-        </div>
+
+        <button
+          className="rounded-xl bg-orange-500 px-5 py-2 text-lg font-medium text-white transition-colors hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-500"
+          disabled={status === "loading" || !hasVanChanged}
+        >
+          {status === "loading" ? "Loading..." : "Save changes"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function NameInputField({
+  onChange,
+  value,
+}: {
+  onChange: (newValue: string) => void;
+  value: string;
+}) {
+  return (
+    <div className="flex flex-col items-start">
+      <label htmlFor="name-field" className="mb-1 pl-1 text-lg">
+        Name:
+      </label>
+      <input
+        id="name-field"
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
+        type="text"
+        value={value || ""}
+        className="rounded-lg border p-3 text-lg transition-colors hover:border-orange-400"
+      />
+    </div>
+  );
+}
+
+function TypeInputField({
+  onChange,
+  value,
+}: {
+  onChange: (newValue: string) => void;
+  value: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-lg">Category:</label>
+      <div className="flex flex-wrap gap-x-4">
+        <RadioButton
+          label="Simple"
+          name="type"
+          value={value}
+          onChange={() => onChange("simple")}
+          checked={value === "simple"}
+        />
+        <RadioButton
+          label="Luxury"
+          name="type"
+          value={value}
+          onChange={() => onChange("luxury")}
+          checked={value === "luxury"}
+        />
+        <RadioButton
+          label="Rugged"
+          name="type"
+          value={value}
+          onChange={() => onChange("rugged")}
+          checked={value === "rugged"}
+        />
       </div>
-    </>
+    </div>
   );
 }

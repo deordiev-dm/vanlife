@@ -3,19 +3,17 @@ import { createRoot } from "react-dom/client";
 import "@/style.css";
 import XMarkIcon from "../icons/XMarkIcon";
 
-type ErrorPopupProps = {
-  error: Error;
-  shouldDisappear?: boolean;
+type SuccessPopupProps = {
+  message?: string;
   timerMs?: number;
 };
 
 const ANIMATION_DURATION_MS = 400;
 
-export default function ErrorPopup({
-  error,
-  shouldDisappear = true,
+export default function SuccessPopup({
+  message,
   timerMs = 3000,
-}: ErrorPopupProps) {
+}: SuccessPopupProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<ReturnType<typeof createRoot> | null>(null);
 
@@ -27,18 +25,13 @@ export default function ErrorPopup({
     document.body.appendChild(container);
     rootRef.current = createRoot(container);
 
-    let animationTimeout: NodeJS.Timeout | null = null;
-    let removalTimeout: NodeJS.Timeout | null = null;
+    const animationTimeout: NodeJS.Timeout = setTimeout(() => {
+      setClosing(true);
+    }, timerMs);
 
-    if (shouldDisappear) {
-      animationTimeout = setTimeout(() => {
-        setClosing(true);
-      }, timerMs);
-
-      removalTimeout = setTimeout(() => {
-        cleanupPopup();
-      }, timerMs + ANIMATION_DURATION_MS);
-    }
+    const removalTimeout: NodeJS.Timeout = setTimeout(() => {
+      cleanupPopup();
+    }, timerMs + ANIMATION_DURATION_MS);
 
     return () => {
       if (animationTimeout) clearTimeout(animationTimeout);
@@ -72,22 +65,20 @@ export default function ErrorPopup({
 
   const renderContent = () => (
     <div
-      className={`modal ${isClosing ? "closing" : ""} fixed bottom-2 left-1/2 min-w-80 -translate-x-1/2 overflow-clip rounded-lg bg-red-600 px-6 py-3 text-white`}
+      className={`modal ${isClosing ? "closing" : ""} fixed bottom-2 left-1/2 min-w-80 -translate-x-1/2 overflow-clip rounded-lg bg-green-600 px-6 py-3 text-white`}
     >
       <div className="flex items-center justify-between gap-x-3">
-        <p>{error.message || "An error occurred"}</p>
+        <p>{message || "Success!"}</p>
         <button onClick={handleClose}>
           <XMarkIcon />
         </button>
       </div>
-      {shouldDisappear && (
-        <span
-          style={{
-            animationDuration: `${timerMs}ms`,
-          }}
-          className="timer absolute bottom-0 left-0 h-1 w-full rounded-lg bg-red-200"
-        ></span>
-      )}
+      <span
+        style={{
+          animationDuration: `${timerMs}ms`,
+        }}
+        className="timer absolute bottom-0 left-0 h-1 w-full rounded-lg bg-green-200"
+      ></span>
     </div>
   );
 

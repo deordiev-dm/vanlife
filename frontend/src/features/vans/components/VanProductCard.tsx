@@ -4,24 +4,27 @@ import Badge from "@/components/ui/Badge";
 
 type VanCardProps = {
   van: Van;
-  prevSearchParams: string;
+  prevSearchParams?: string;
+  linkTo: string;
 };
 
 export default function VanProductCard({
   van,
   prevSearchParams,
+  linkTo,
 }: VanCardProps) {
   return (
     <Link
-      to={van._id}
+      to={linkTo}
       className="group flex flex-col space-y-3 rounded-xl bg-orange-100 text-slate-900 shadow-sm transition-colors hover:bg-orange-200"
-      state={prevSearchParams}
+      state={{ prevSearchParams }}
     >
       <div className="min-h-80 flex-grow overflow-clip rounded-xl rounded-b-none">
         <img
           className="h-full w-full bg-orange-100 object-contain transition-transform duration-500 group-hover:scale-105"
           src={van.imageUrl}
           alt=""
+          loading="lazy"
         />
       </div>
       <div className="space-y-4 px-6 pb-8 pt-2">

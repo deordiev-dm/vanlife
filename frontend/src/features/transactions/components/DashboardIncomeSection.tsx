@@ -5,6 +5,22 @@ import DropdownMenu from "@/components/ui/dropdown/DropdownMenu";
 import { useCounterAnimation } from "@/hooks/useCounterAnimation";
 import { Transaction } from "@/lib/types/types";
 import { isWithinNMonths } from "@/lib/utils/isWithinNMonths";
+import { nanoid } from "nanoid";
+
+const DROPDOWN_OPTIONS = [
+  {
+    months: "3",
+    label: "3 months",
+  },
+  {
+    months: "6",
+    label: "half a year",
+  },
+  {
+    months: "12",
+    label: "year",
+  },
+];
 
 type IncomeSectionProps = {
   monthsFilter: number;
@@ -33,52 +49,30 @@ export default function IncomeSection({
   const animatedIncome = useCounterAnimation(income);
 
   return (
-    <section className="-ml-6 -mr-6 space-y-5 bg-[#FFEAD0] p-6">
+    <div className="-mx-6 flex flex-col items-start gap-y-4 rounded-t-lg bg-orange-200 px-6 py-4 sm:mx-0">
       <h1 className="text-3xl font-bold">Welcome!</h1>
-      <div className="flex justify-between gap-4">
-        <DropdownMenu title={`Income in the last ${monthsFilter} months`}>
+      <DropdownMenu title={`last ${monthsFilter} months`}>
+        {DROPDOWN_OPTIONS.map((option) => (
           <DropdownElement
+            key={nanoid()}
             onClick={() =>
               setSearchParams(
-                generateNewSearchParams(searchParams, "months", "1"),
+                generateNewSearchParams(searchParams, "months", option.months),
               )
             }
           >
-            month
+            {option.label}
           </DropdownElement>
-          <DropdownElement
-            onClick={() =>
-              setSearchParams(
-                generateNewSearchParams(searchParams, "months", "3"),
-              )
-            }
-          >
-            3 months
-          </DropdownElement>
-          <DropdownElement
-            onClick={() =>
-              setSearchParams(
-                generateNewSearchParams(searchParams, "months", "6"),
-              )
-            }
-          >
-            6 months
-          </DropdownElement>
-          <DropdownElement
-            onClick={() =>
-              setSearchParams(
-                generateNewSearchParams(searchParams, "months", "12"),
-              )
-            }
-          >
-            year
-          </DropdownElement>
-        </DropdownMenu>
-        <Link to="income" className="hover:underline" state={{ monthsFilter }}>
-          Details
-        </Link>
-      </div>
-      <p className="text-4xl font-extrabold">${animatedIncome}</p>
-    </section>
+        ))}
+      </DropdownMenu>
+      <Link
+        to="income"
+        state={{ monthsFilter }}
+        className="flex gap-x-2 text-2xl font-bold transition-colors hover:text-orange-500"
+      >
+        <h2>Income:</h2>
+        <span>${animatedIncome}</span>
+      </Link>
+    </div>
   );
 }

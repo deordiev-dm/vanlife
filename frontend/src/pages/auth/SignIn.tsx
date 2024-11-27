@@ -4,8 +4,29 @@ import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { validateEmail } from "@/lib/utils/validateEmail";
 import ErrorPopup from "@/components/ui/ErrorPopup";
+import { CustomError } from "@/contexts/AuthContext";
+import FormField from "@/components/forms/FormField";
+
+const FORM_FIELDS = [
+  {
+    name: "email",
+    label: "Email address",
+    type: "text",
+    placeholder: "example@mail.com",
+    required: true,
+  },
+  {
+    name: "password",
+    label: "Password",
+    type: "password",
+    placeholder: "at least 6 characters",
+    required: true,
+  },
+];
 
 export default function SignIn() {
+  const { loginUser } = useAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -13,27 +34,31 @@ export default function SignIn() {
 
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
   const [error, setError] = useState<Error | null>(null);
-  const [isModalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
-
   // path non-authorized user tried to access.
   const [pathToRedirect] = useState(location.state?.pathname || "/host");
-  const [nonAuthorized, setNonAuthorized] = useState(location.state?.message);
+  const [nonAuthorized, setNonAuthorized] = useState(
+    location.state?.triedToAccessProtectedRoute,
+  );
 
   // this effect ensures that message is shown once.
   useEffect(() => {
     if (nonAuthorized) {
-      setModalOpen(true);
+      setError(
+        new Error(
+          "Sign in into your account or create one to access host features.",
+        ),
+      );
     }
     setNonAuthorized(null);
     navigate(location, { replace: true });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const { loginUser } = useAuth();
+  }, []);
 
   function handleInput(target: EventTarget & HTMLInputElement): void {
+    setError(null);
+
     const { name, value } = target;
     setFormData((prevData) => ({
       ...prevData,
@@ -43,30 +68,43 @@ export default function SignIn() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setStatus("submitting");
+
     setError(null);
+    setStatus("submitting");
 
     const { email, password } = { ...formData };
 
     if (!validateEmail(email)) {
-      setError(new Error("Invalid email. Please try again."));
       setStatus("idle");
-      setModalOpen(true);
+      setError(new Error("Invalid email. Please try again."));
+
       return;
     } else if (password.length < 6) {
-      setError(new Error("Password is too short. Please try again."));
       setStatus("idle");
-      setModalOpen(true);
+      setError(new Error("Password is too short. Please try again."));
+
       return;
     }
 
     try {
       await loginUser(email, password);
+      // if everything is ok, redirect user
       navigate(pathToRedirect, { replace: true });
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error);
-        setModalOpen(true);
+      if (error instanceof CustomError) {
+        if (error.status === 400) {
+          setError(new Error("Invalid email or password. Please try again."));
+        } else if (error.status === 500) {
+          setError(
+            new Error(
+              "Something went wrong on our end. Please try again later.",
+            ),
+          );
+        }
+      } else {
+        setError(
+          new Error("Something unexpected happened. Please try again later."),
+        );
       }
     } finally {
       setStatus("idle");
@@ -74,54 +112,32 @@ export default function SignIn() {
   };
 
   return (
-    <main className="relative flex flex-col items-center justify-center px-6 pb-12 pt-6">
-      <div className="max-w-96">
-        {isModalOpen && (
-          <ErrorPopup setModalOpen={setModalOpen} text={error?.message} />
-        )}
-        <h1 className="mb-8 text-center text-3xl font-bold">
+    <main>
+      {error && <ErrorPopup key={Date.now()} error={error} />}
+      <div className="container pb-16 pt-36">
+        <h1 className="mb-8 text-center text-3xl font-bold md:mb-12 md:text-4xl">
           Sign in to your account
         </h1>
-        <form className="mb-8 space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="mb-1 inline-block pl-1" htmlFor="email">
-              Email address<span className="text-red-600">*</span>
-            </label>
-            <input
-              id="email"
-              type="text"
-              name="email"
-              placeholder="example@mail.com"
-              required
-              onChange={(e) => handleInput(e.target as HTMLInputElement)}
-              value={formData.email}
-              className="w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
+        <form
+          className="mb-8 space-y-8 md:mx-auto md:w-[540px]"
+          onSubmit={handleSubmit}
+        >
+          {FORM_FIELDS.map((field) => (
+            <FormField
+              key={field.name}
+              name={field.name}
+              type={field.type}
+              label={field.label}
+              placeholder={field.placeholder}
+              handleInput={handleInput}
+              value={formData[field.name as "email" | "password"]}
+              required={field.required}
             />
-          </div>
-          <div>
-            <label className="mb-1 inline-block pl-1" htmlFor="password">
-              Password<span className="text-red-600">*</span>
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              required
-              placeholder="at least 6 characters"
-              onChange={(e) => handleInput(e.target as HTMLInputElement)}
-              value={formData.password}
-              className="w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
-            />
-          </div>
-          {error ? <p className="text-orange-500">{error.message}</p> : null}
+          ))}
           <Button
             as="button"
             disabled={status === "submitting"}
-            className={
-              status === "submitting"
-                ? "bg-slate-300 hover:bg-slate-300 active:bg-slate-300"
-                : ""
-            }
+            className="disabled:bg-zinc-200 disabled:shadow-none"
           >
             {status === "submitting" ? "Logging in..." : "Sign in"}
           </Button>

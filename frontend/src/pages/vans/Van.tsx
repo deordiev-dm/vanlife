@@ -1,57 +1,31 @@
-import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon";
-
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-
-import { useVans } from "@/hooks/useVans.tsx";
-import ErrorMessage from "@/components/ui/ErrorPopup";
-import { getVanById } from "@/features/vans/database/vans";
-import { type Van } from "@/lib/types/types";
 import LoadingCard from "@/components/ui/LoadingCard";
+import { useQuery } from "@tanstack/react-query";
+import getVanById from "@/features/vans/api/getVanById";
 
 export default function VanDetails() {
   const params = useParams();
   const location = useLocation();
-  const searchParams = location.state?.searchParams || "";
+
+  // save filters from "our vans" page
+  const searchParams = location.state?.prevSearchParams || "";
   const typeFilter = searchParams.match(/type=([^&]+)/);
 
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [error, setError] = useState<unknown>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { vans } = useVans();
-  const [displayedVan, setDisplayedVan] = useState<Van | undefined>(
-    vans.find((van) => van._id == params.id),
-  );
+  // take van id from the address bar
+  const vanId = params.id ?? "";
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!displayedVan) {
-        setIsLoading(true);
-        try {
-          if (params.id) {
-            const van = await getVanById(params.id);
-            setDisplayedVan(van);
-          } else {
-            throw new Error("No id has been provided");
-          }
-        } catch (error) {
-          setError(error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-  }, [displayedVan, params.id]);
-
-  useEffect(() => {
-    if (error) {
-      setModalOpen(true);
-    }
-  }, [error]);
+  const {
+    data: van,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ["van", vanId],
+    queryFn: () => getVanById(vanId),
+    staleTime: 1000 * 60 * 30, // 30 min
+  });
 
   return (
     <main>
@@ -69,27 +43,22 @@ export default function VanDetails() {
           </Link>
 
           <div className="grid gap-y-8 md:grid-cols-2 md:gap-x-16">
-            {isModalOpen && <ErrorMessage setModalOpen={setModalOpen} />}
-            {isLoading && <LoadingCard />}
-            {displayedVan && !error && !isLoading && (
+            {isPending && <LoadingCard />}
+            {van && !error && !isPending && (
               <>
                 <div className="overflow-hidden rounded-md">
-                  <img className="w-full" src={displayedVan.imageUrl} alt="" />
+                  <img className="w-full" src={van.imageUrl} alt="" />
                 </div>
                 <div className="space-y-6 md:pt-4">
-                  <h1 className="text-3xl font-bold lg:text-4xl">
-                    {displayedVan.name}
-                  </h1>
+                  <h1 className="text-3xl font-bold lg:text-4xl">{van.name}</h1>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="font-medium">
-                      <span className="text-2xl font-bold">
-                        ${displayedVan.price}
-                      </span>
+                      <span className="text-2xl font-bold">${van.price}</span>
                       /day
                     </div>
-                    <Badge type={displayedVan.type} />
+                    <Badge type={van.type} />
                   </div>
-                  <p className="text-lg">{displayedVan.description}</p>
+                  <p className="text-lg">{van.description}</p>
                   <Button as="button">Rent this van</Button>
                 </div>
               </>

@@ -1,14 +1,11 @@
-import { Review } from "../../lib/types/types";
-// import { FaStar } from "react-icons/fa6";
+import { Review } from "@/lib/types/types";
 
 type Props = {
   reviews: Review[] | null;
 };
 
 export default function ReviewsChart({ reviews }: Props) {
-  if (!reviews) {
-    return <p>You don't have any reviews for that time period</p>;
-  }
+  if (!reviews) return null;
 
   const overallRating = reviews?.length
     ? reviews.reduce((acc, curr) => {
@@ -20,7 +17,6 @@ export default function ReviewsChart({ reviews }: Props) {
     <>
       <div className="flex items-center space-x-1">
         <span className="text-3xl font-bold">{overallRating.toFixed(1)}</span>
-        {/* <FaStar className="h-6 w-6 fill-orange-500" /> */}
         <p>overall rating</p>
       </div>
       <div className="space-y-3">

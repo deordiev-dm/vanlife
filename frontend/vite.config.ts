@@ -2,7 +2,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
-// https://vitejs.dev/config/
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -11,6 +12,11 @@ export default defineConfig({
   },
   plugins: [react()],
   server: {
-    host: "0.0.0.0", // Allow access from your local network
+    proxy: {
+      "/api": {
+        target: BASE_URL,
+        changeOrigin: true,
+      },
+    },
   },
 });

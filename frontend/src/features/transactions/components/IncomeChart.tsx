@@ -1,6 +1,6 @@
 import Chart from "chart.js/auto";
-import { Transaction } from "../../lib/types/types";
 import { useEffect, useRef } from "react";
+import { Transaction } from "@/lib/types/types";
 
 type IncomeChartProps = {
   transactions: Transaction[] | null;
@@ -33,10 +33,9 @@ function IncomeChart({ transactions, monthsFilter }: IncomeChartProps) {
         labels,
         datasets: [
           {
-            label: "Income in a month",
+            label: "Income",
             data: incomeValues,
             backgroundColor: "#FF8C38",
-            borderRadius: 10,
           },
         ],
       },
@@ -69,7 +68,6 @@ function formatIncomeData(transactions: Transaction[], months: number) {
       date,
       dateId: date.toLocaleString("default", {
         month: "short",
-        year: "numeric",
       }),
       amount: transaction.sum,
     };
@@ -78,12 +76,11 @@ function formatIncomeData(transactions: Transaction[], months: number) {
   const data: { dateId: string; amount: number }[] = [];
   const now = new Date();
 
-  for (let i = months; i >= 0; i--) {
+  for (let i = months - 1; i >= 0; i--) {
     const date = new Date(now.getFullYear(), now.getMonth() - i, now.getDate());
     data.push({
       dateId: date.toLocaleString("default", {
         month: "short",
-        year: "numeric",
       }),
       amount: 0,
     });

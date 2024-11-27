@@ -1,5 +1,5 @@
 import { CSSProperties, useState } from "react";
-// import { MdOutlineKeyboardArrowUp } from "react-icons/md";
+import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
 
 type Props = {
   children: React.ReactNode;
@@ -15,23 +15,18 @@ export default function DropdownMenu({ children, title }: Props) {
     transition: "all ease-in-out 150ms",
   };
 
-  const arrowStyles: CSSProperties = {
-    transform: isMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
-  };
-
   return (
-    <div
+    <span
       tabIndex={0}
-      className="relative flex items-center space-x-1 rounded-md text-black"
+      className="relative inline-flex items-center space-x-1 rounded-md text-black"
       onClick={() => setIsMenuOpen((prevState) => !prevState)}
       onMouseEnter={() => setIsMenuOpen(true)}
       onMouseLeave={() => setIsMenuOpen(false)}
     >
       <span>{title}</span>
-      {/* <MdOutlineKeyboardArrowUp
-        style={arrowStyles}
-        className="transition-transform"
-      /> */}
+      <ChevronDownIcon
+        className={`${isMenuOpen ? "rotate-180" : "rotate-0"} transition-transform`}
+      />
       <div
         style={menuStyles}
         className="absolute right-0 top-full z-10 w-36 px-1 py-2"
@@ -40,6 +35,6 @@ export default function DropdownMenu({ children, title }: Props) {
           {children}
         </div>
       </div>
-    </div>
+    </span>
   );
 }

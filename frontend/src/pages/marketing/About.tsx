@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import img from "@/assets/img/about.jpg";
+import img from "@/assets/img/about.webp";
 
 function About() {
   return (

@@ -3,6 +3,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      screens: {
+        "md-mobile": "480px",
+      },
       container: {
         center: true,
         padding: "1.5rem",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -50,7 +50,7 @@ export default function AuthRequired() {
   }, [token, setCurrentUser]);
 
   if (isLoading) {
-    return <div className="loader"></div>;
+    return;
   }
 
   if (isAuthenticated) {
@@ -60,7 +60,7 @@ export default function AuthRequired() {
   return (
     <Navigate
       replace
-      state={{ message: "You must login first", pathname }}
+      state={{ triedToAccessProtectedRoute: true, pathname }}
       to="/login"
     />
   );

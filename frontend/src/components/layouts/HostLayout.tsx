@@ -14,14 +14,16 @@ export default function HostLayout() {
   return (
     <main>
       <div className="container pb-16 pt-24">
-        <nav className="mb-10 flex flex-wrap gap-5">
+        <nav className="mb-10 flex flex-wrap gap-3">
           {LINKS.map((link) => (
             <NavLink
               key={link.path}
               to={link.path}
               end={link.end}
               state={{ monthsFilter }}
-              className={({ isActive }) => `nav-link ${isActive && "_active"} `}
+              className={({ isActive }) =>
+                `nav-link ${isActive && "_active"} _sm`
+              }
             >
               {link.label}
             </NavLink>

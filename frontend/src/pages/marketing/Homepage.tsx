@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import bg from "@/assets/img/homepage.jpg";
+import bg from "@/assets/img/homepage.webp";
 
 function Homepage() {
   return (

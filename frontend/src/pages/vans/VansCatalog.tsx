@@ -1,40 +1,35 @@
-import { useEffect, useState } from "react";
 import { SetURLSearchParams, useSearchParams } from "react-router-dom";
-
-import { useVans } from "@/hooks/useVans.tsx";
 import generateNewSearchParams from "@/lib/utils/generateNewSearchParams";
-
 import LoadingCard from "@/components/ui/LoadingCard";
 import XMarkIcon from "@/components/icons/XMarkIcon";
 import ErrorPopup from "@/components/ui/ErrorPopup";
-
 import VanProductCard from "@/features/vans/components/VanProductCard";
+import { useQuery } from "@tanstack/react-query";
+import getAllVans from "@/features/vans/api/getAllVans";
 
 const FILTER_OPTIONS = ["simple", "rugged", "luxury"];
 
 export default function VansCatalog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const typeFilter = searchParams.get("type");
-  const [isModalOpen, setModalOpen] = useState(false);
-  const { vans, fetchVans, isLoading, error } = useVans();
 
-  useEffect(() => {
-    if (!vans.length) {
-      fetchVans();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const {
+    data: vans,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ["vans"],
+    queryFn: () => getAllVans(),
+    staleTime: 600000, // 10min
+  });
 
-  useEffect(() => {
-    if (error) {
-      setModalOpen(true);
-    }
-  }, [error]);
+  if (!vans) {
+    return;
+  }
 
   const displayedVans = typeFilter
     ? vans?.filter((van) => van.type === typeFilter)
     : vans;
-
-  const emptyArray = new Array(6).fill(null);
 
   return (
     <main className="container pb-12 pt-28">
@@ -49,24 +44,25 @@ export default function VansCatalog() {
         />
       </div>
       <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-        {isModalOpen && <ErrorPopup setModalOpen={setModalOpen} />}
+        {error && <ErrorPopup error={error} />}
 
-        {!displayedVans.length && !isLoading && !error && (
+        {!displayedVans.length && !isPending && !error && (
           <p className="text-2xl font-medium text-orange-600">
             No vans match your search
           </p>
         )}
 
-        {isLoading &&
+        {isPending &&
           !error &&
-          emptyArray.map((_, i) => <LoadingCard key={i} />)}
+          new Array(6).fill(null).map((_, i) => <LoadingCard key={i} />)}
 
-        {!isLoading &&
+        {!isPending &&
           !error &&
           displayedVans.length > 0 &&
           displayedVans.map((van) => (
             <VanProductCard
               key={van._id}
+              linkTo={van._id}
               van={van}
               prevSearchParams={searchParams.toString()}
             ></VanProductCard>

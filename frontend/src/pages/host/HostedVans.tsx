@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useLayoutEffect, useState } from "react";
 import { useVans } from "../../hooks/useVans";
 import { useAuth } from "../../hooks/useAuth";
 import ErrorMessage from "../../components/ui/ErrorPopup";
-import Button from "../../components/ui/Button";
+import { BecomeAHost } from "@/components/ui/BecomeAHost";
+import VanProductCard from "@/features/vans/components/VanProductCard";
+import LoadingCard from "@/components/ui/LoadingCard";
+import { nanoid } from "nanoid";
+import { Link } from "react-router-dom";
 
 export default function HostedVans() {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,7 +14,7 @@ export default function HostedVans() {
   const { currentUser } = useAuth();
   const { vans, fetchVans } = useVans();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!vans.length) {
       setIsLoading(true);
       fetchVans()
@@ -26,31 +29,32 @@ export default function HostedVans() {
 
   return (
     <section className="space-y-5">
-      <h2 className="text-3xl font-bold">Your listed vans</h2>
-      <div className="space-y-3">
-        {isLoading && <div className="loader"></div>}
-        {error && <ErrorMessage />}
-        {hostedVans.map((van) => (
-          <Link
-            to={van._id}
-            className="flex items-center gap-x-4 rounded-md bg-white p-3"
-            key={van._id}
-          >
-            <img
-              src={van.imageUrl}
-              alt=""
-              className="aspect-square w-28 rounded-md"
-            />
-            <div>
-              <h3 className="text-xl font-semibold">{van.name}</h3>
-              <div className="font-medium text-gray-500">${van.price}/day</div>
-            </div>
-          </Link>
-        ))}
-        <Button as="a" to="add-van" colors="orange">
-          Add a new van
-        </Button>
+      <div className="mb-8 flex items-center gap-x-8">
+        <h2 className="text-3xl font-bold">Your listed vans</h2>
+        <Link
+          to="add-van"
+          className="rounded-lg bg-orange-500 px-5 py-1 text-lg font-semibold text-white transition-colors hover:bg-orange-600"
+        >
+          Add New
+        </Link>
       </div>
+      {error && <ErrorMessage error={error} key={Date.now()} />}
+      {!isLoading && hostedVans.length > 0 ? (
+        <div>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {hostedVans.map((van) => (
+              <VanProductCard key={nanoid()} van={van} linkTo={van._id} />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <LoadingCard />
+          <LoadingCard />
+          <LoadingCard />
+        </div>
+      )}
+      {!isLoading && hostedVans.length === 0 && <BecomeAHost path="add-van" />}
     </section>
   );
 }

@@ -1,18 +1,31 @@
 import { useEffect, useState } from "react";
-// import { GoArrowLeft } from "react-icons/go";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
 import Badge from "@/components/ui/Badge";
 import { useVans } from "@/hooks/useVans";
-import ErrorMessage from "@/components/ui/ErrorPopup";
+import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon";
+import ErrorPopup from "@/components/ui/ErrorPopup";
+import { nanoid } from "nanoid/non-secure";
+import { Van } from "@/lib/types/types";
+
+const NAV_LINKS = [
+  {
+    to: ".",
+    label: "Details",
+    end: true,
+  },
+  {
+    to: "pricing",
+    label: "Pricing",
+  },
+  {
+    to: "photos",
+    label: "Photos",
+  },
+];
 
 export default function HostedVan() {
-  const activeStyles = {
-    textDecoration: "underline",
-    color: "black",
-  };
-
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<unknown>();
+  const [error, setError] = useState<Error | null>(null);
   const params = useParams();
 
   const { vans, fetchVans } = useVans();
@@ -24,7 +37,9 @@ export default function HostedVan() {
           await fetchVans();
         }
       } catch (err) {
-        setError(err);
+        if (err instanceof Error) {
+          setError(err);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -35,64 +50,58 @@ export default function HostedVan() {
 
   const displayedVan = vans.find((van) => van._id === params.id);
 
-  if (error) {
-    <ErrorMessage />;
-  }
-
   if (!displayedVan || isLoading) {
     return <div className="loader"></div>;
   }
 
   return (
     <div className="space-y-6">
-      <Link to=".." relative="path" className="flex items-center gap-x-3">
-        {/* <GoArrowLeft className="w-5 fill-[#858585]" /> */}
-        <span className="font-medium underline">Back to all vans</span>
+      <Link to=".." relative="path" className="group flex items-center gap-x-3">
+        <ArrowLeftIcon className="h-5 w-5 transition group-hover:-translate-x-2" />
+        <span className="nav-link">Back to all vans</span>
       </Link>
-      <section className="space-y-6 rounded-lg bg-white p-6">
-        <div className="flex items-center gap-x-4">
-          <img
-            src={displayedVan.imageUrl}
-            alt=""
-            className="aspect-square w-40 rounded-md"
-          />
-          <div className="space-y-2">
-            <Badge type={displayedVan.type} />
-            <h1 className="text-2xl font-bold">{displayedVan.name}</h1>
-            <p className="text-xl font-medium">
-              <span className="text-lg">${displayedVan.price}/</span>day
-            </p>
-          </div>
-        </div>
-
+      <section className="space-y-6">
+        <HostedVanCard van={displayedVan} />
         <nav className="space-x-3">
-          <NavLink
-            className="text-gray-600 transition-colors hover:text-black"
-            style={(obj) => (obj.isActive ? activeStyles : undefined)}
-            to="."
-            end
-          >
-            Details
-          </NavLink>
-          <NavLink
-            className="text-gray-600 transition-colors hover:text-black"
-            style={(obj) => (obj.isActive ? activeStyles : undefined)}
-            to="pricing"
-          >
-            Pricing
-          </NavLink>
-          <NavLink
-            className="text-gray-600 transition-colors hover:text-black"
-            style={(obj) => (obj.isActive ? activeStyles : undefined)}
-            to="photos"
-          >
-            Photos
-          </NavLink>
+          {NAV_LINKS.map((link) => (
+            <NavLink
+              key={nanoid()}
+              to={link.to}
+              end={link.end}
+              className={(obj) =>
+                obj.isActive ? "nav-link _sm _active" : "nav-link _sm"
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
         </nav>
         <section className="space-y-3">
           <Outlet context={{ displayedVan }} />
         </section>
       </section>
+      {error && <ErrorPopup error={error} />}
+    </div>
+  );
+}
+
+function HostedVanCard({ van }: { van: Van }) {
+  return (
+    <div className="grid gap-y-8 md:grid-cols-2 md:gap-x-16">
+      <div className="overflow-hidden rounded-md">
+        <img className="w-full" src={van.imageUrl} alt="" />
+      </div>
+      <div className="space-y-6 md:pt-4">
+        <h1 className="text-3xl font-bold lg:text-4xl">{van.name}</h1>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="font-medium">
+            <span className="text-2xl font-bold">${van.price}</span>
+            /day
+          </div>
+          <Badge type={van.type} />
+        </div>
+        <p className="text-lg">{van.description}</p>
+      </div>
     </div>
   );
 }

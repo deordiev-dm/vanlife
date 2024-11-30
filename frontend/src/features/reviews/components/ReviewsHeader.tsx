@@ -18,7 +18,6 @@ function ReviewsHeader({ months, setMonths }: Props) {
     <div className="flex items-center space-x-4">
       <h1 className="text-3xl font-bold">Your reviews</h1>
       <DropdownMenu title={`last ${MONTHS_MAP[months]}`}>
-        <DropdownElement onClick={() => setMonths(1)}>month</DropdownElement>
         <DropdownElement onClick={() => setMonths(3)}>3 months</DropdownElement>
         <DropdownElement onClick={() => setMonths(6)}>6 months</DropdownElement>
         <DropdownElement onClick={() => setMonths(12)}>year</DropdownElement>

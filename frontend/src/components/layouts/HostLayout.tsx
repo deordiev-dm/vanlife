@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useSearchParams } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 
 const LINKS = [
   { label: "Dashboard", path: ".", end: true },
@@ -8,9 +8,6 @@ const LINKS = [
 ];
 
 export default function HostLayout() {
-  const [searchParams, _] = useSearchParams();
-  const monthsFilter = Number(searchParams.get("months")) || 3;
-
   return (
     <main>
       <div className="container pb-16 pt-24">
@@ -20,7 +17,6 @@ export default function HostLayout() {
               key={link.path}
               to={link.path}
               end={link.end}
-              state={{ monthsFilter }}
               className={({ isActive }) =>
                 `nav-link ${isActive && "_active"} _sm`
               }

@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
-import { Link, NavLink, Outlet, useParams } from "react-router-dom";
+import { Link, NavLink, useParams } from "react-router-dom";
 import Badge from "@/components/ui/Badge";
-import { useVans } from "@/hooks/useVans";
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon";
 import ErrorPopup from "@/components/ui/ErrorPopup";
 import { nanoid } from "nanoid/non-secure";
 import { Van } from "@/lib/types/types";
+import { useQuery } from "@tanstack/react-query";
+import getVanById from "@/features/vans/api/getVanById";
+import HostedVanDetails from "./HostedVanDetails";
 
 const NAV_LINKS = [
   {
@@ -24,34 +25,27 @@ const NAV_LINKS = [
 ];
 
 export default function HostedVan() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
   const params = useParams();
 
-  const { vans, fetchVans } = useVans();
+  // take van id from the address bar
+  const vanId = params.id ?? "";
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!vans.length) {
-          await fetchVans();
-        }
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const {
+    data: van,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ["van", vanId],
+    queryFn: () => getVanById(vanId),
+    staleTime: 1000 * 60 * 30, // 30 min
+  });
 
-    fetchData();
-  }, [fetchVans, vans.length]);
+  if (isPending) {
+    return <span className="loader"></span>;
+  }
 
-  const displayedVan = vans.find((van) => van._id === params.id);
-
-  if (!displayedVan || isLoading) {
-    return <div className="loader"></div>;
+  if (van === undefined) {
+    return;
   }
 
   return (
@@ -61,7 +55,7 @@ export default function HostedVan() {
         <span className="nav-link">Back to all vans</span>
       </Link>
       <section className="space-y-6">
-        <HostedVanCard van={displayedVan} />
+        <HostedVanCard van={van} />
         <nav className="space-x-3">
           {NAV_LINKS.map((link) => (
             <NavLink
@@ -77,7 +71,7 @@ export default function HostedVan() {
           ))}
         </nav>
         <section className="space-y-3">
-          <Outlet context={{ displayedVan }} />
+          <HostedVanDetails van={van} />
         </section>
       </section>
       {error && <ErrorPopup error={error} />}

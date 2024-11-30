@@ -1,37 +1,19 @@
-import { Link } from "react-router-dom";
-import generateNewSearchParams from "@/lib/utils/generateNewSearchParams";
+import { Link, SetURLSearchParams } from "react-router-dom";
 import DropdownElement from "@/components/ui/dropdown/DropdownElement";
 import DropdownMenu from "@/components/ui/dropdown/DropdownMenu";
 import { useCounterAnimation } from "@/hooks/useCounterAnimation";
 import { Transaction } from "@/lib/types/types";
 import { isWithinNMonths } from "@/lib/utils/isWithinNMonths";
-import { nanoid } from "nanoid";
-
-const DROPDOWN_OPTIONS = [
-  {
-    months: "3",
-    label: "3 months",
-  },
-  {
-    months: "6",
-    label: "half a year",
-  },
-  {
-    months: "12",
-    label: "year",
-  },
-];
+import { DROPDOWN_OPTIONS } from "@/lib/data";
 
 type IncomeSectionProps = {
   monthsFilter: number;
-  searchParams: URLSearchParams;
-  setSearchParams: (params: URLSearchParams) => void;
+  setSearchParams: SetURLSearchParams;
   transactions: Transaction[] | null;
 };
 
 export default function IncomeSection({
   monthsFilter,
-  searchParams,
   setSearchParams,
   transactions,
 }: IncomeSectionProps) {
@@ -52,13 +34,14 @@ export default function IncomeSection({
     <div className="-mx-6 flex flex-col items-start gap-y-4 rounded-t-lg bg-orange-200 px-6 py-4 sm:mx-0">
       <h1 className="text-3xl font-bold">Welcome!</h1>
       <DropdownMenu title={`last ${monthsFilter} months`}>
-        {DROPDOWN_OPTIONS.map((option) => (
+        {DROPDOWN_OPTIONS.map((option, index) => (
           <DropdownElement
-            key={nanoid()}
+            key={index}
             onClick={() =>
-              setSearchParams(
-                generateNewSearchParams(searchParams, "months", option.months),
-              )
+              setSearchParams((prevParams) => ({
+                ...prevParams,
+                months: option.months,
+              }))
             }
           >
             {option.label}

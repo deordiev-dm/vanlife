@@ -1,20 +1,15 @@
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import { type Van } from "@/lib/types/types";
 import ErrorPopup from "@/components/ui/ErrorPopup";
-import { editVan } from "@/features/vans/api/vans";
+import { editVan } from "@/features/vans/api/editVan";
 import { useVans } from "@/hooks/useVans";
 import SuccessPopup from "@/components/ui/SuccessPopup";
 import RadioButton from "@/components/ui/RadioButton";
+import { Van } from "@/lib/types/types";
 
-type OutletContextProps = { displayedVan: Van };
-
-export default function HostedVanDetails() {
-  const { displayedVan } = useOutletContext<OutletContextProps>();
-  const [initialVan, setInitialVan] = useState(displayedVan);
-  const [updatedVan, setUpdatedVan] = useState(displayedVan);
+export default function HostedVanDetails({ van }: { van: Van }) {
+  const [initialVan, setInitialVan] = useState(van);
+  const [updatedVan, setUpdatedVan] = useState(van);
   const [hasVanChanged, setHasVanChanged] = useState(false);
-
   const [status, setStatus] = useState<"success" | "loading" | "idle">("idle");
   const [error, setError] = useState<Error | null>(null);
 
@@ -68,6 +63,8 @@ export default function HostedVanDetails() {
     setError(null);
   }, [initialVan, updatedVan]);
 
+  if (!van) return;
+
   return (
     <div>
       {error && <ErrorPopup error={error} key={Date.now()} />}
@@ -89,10 +86,18 @@ export default function HostedVanDetails() {
           <TypeInputField
             value={updatedVan.type}
             onChange={(newValue) => {
-              console.log(newValue);
               setUpdatedVan((prevState) => ({
                 ...prevState,
                 type: newValue as "simple" | "luxury" | "rugged",
+              }));
+            }}
+          />
+          <DescriptionInputField
+            value={updatedVan.description}
+            onChange={(newValue) => {
+              setUpdatedVan((prevState) => ({
+                ...prevState,
+                description: newValue,
               }));
             }}
           />
@@ -109,13 +114,12 @@ export default function HostedVanDetails() {
   );
 }
 
-function NameInputField({
-  onChange,
-  value,
-}: {
-  onChange: (newValue: string) => void;
+type NameInputFieldProps = {
   value: string;
-}) {
+  onChange: (newValue: string) => void;
+};
+
+function NameInputField({ onChange, value }: NameInputFieldProps) {
   return (
     <div className="flex flex-col items-start">
       <label htmlFor="name-field" className="mb-1 pl-1 text-lg">
@@ -134,13 +138,7 @@ function NameInputField({
   );
 }
 
-function TypeInputField({
-  onChange,
-  value,
-}: {
-  onChange: (newValue: string) => void;
-  value: string;
-}) {
+function TypeInputField({ onChange, value }: NameInputFieldProps) {
   return (
     <div className="space-y-2">
       <label className="text-lg">Category:</label>
@@ -167,6 +165,24 @@ function TypeInputField({
           checked={value === "rugged"}
         />
       </div>
+    </div>
+  );
+}
+
+function DescriptionInputField({ value, onChange }: NameInputFieldProps) {
+  return (
+    <div className="flex flex-col items-start">
+      <label htmlFor="description-textarea" className="text lg mb-1 pl-1">
+        Description:
+      </label>
+      <textarea
+        id="name-field"
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
+        value={value || ""}
+        className="min-h-40 w-full rounded-lg border p-3 text-lg transition-colors hover:border-orange-400"
+      />
     </div>
   );
 }

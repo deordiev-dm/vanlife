@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import getHostReviews from "@/features/reviews/api/getHostReviews";
 import getHostTransactions from "@/features/transactions/api/getHostTransactions";
@@ -14,51 +13,50 @@ import { useQuery } from "@tanstack/react-query";
 export default function Dashboard() {
   const { currentUser } = useAuth();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
   const location = useLocation();
   const monthsFromLocation = location.state?.monthsFilter as number | undefined;
   const [searchParams, setSearchParams] = useSearchParams();
 
-  useEffect(() => {
-    if (monthsFromLocation) {
-      setSearchParams({ months: monthsFromLocation.toString() });
-    }
-  }, [monthsFromLocation, setSearchParams]);
+  if (monthsFromLocation) {
+    setSearchParams({ months: monthsFromLocation.toString() });
+  }
 
   const monthsFilter =
     Number(searchParams.get("months")) || monthsFromLocation || 3;
 
   const {
-    data: transactions,
-    isPending: isTransactionsPending,
-    isError: isTransactionError,
+    data: vans,
+    isPending: isVansPending,
+    error: vansError,
   } = useQuery({
-    queryKey: ["hostTransactions", currentUser?._id],
-    queryFn: () => getHostTransactions(currentUser?._id),
+    queryKey: ["hostVans", currentUser],
+    queryFn: () => getHostVans(currentUser?._id || ""),
     staleTime: Infinity,
   });
 
   const {
-    data: vans,
-    isPending,
-    isError,
+    data: transactions,
+    isPending: isTransactionsPending,
+    error: transactionsError,
   } = useQuery({
-    queryKey: ["hostVans", currentUser._id],
-    queryFn: () => getHostVans(currentUser._id),
+    queryKey: ["hostTransactions", currentUser],
+    queryFn: () => getHostTransactions(currentUser?._id || ""),
     staleTime: Infinity,
   });
 
   const {
     data: reviews,
     isPending: isReviewsPending,
-    isError: isReviewsError,
+    error: reviewsError,
   } = useQuery({
-    queryKey: ["hostReviews", currentUser._id],
-    queryFn: () => getHostReviews(currentUser._id),
+    queryKey: ["hostReviews", currentUser],
+    queryFn: () => getHostReviews(currentUser?._id || ""),
     staleTime: Infinity,
   });
+
+  if (isVansPending || isTransactionsPending || isReviewsPending) {
+    return <span className="loader"></span>;
+  }
 
   if (
     vans === undefined ||
@@ -70,25 +68,26 @@ export default function Dashboard() {
 
   return (
     <>
-      {error && <ErrorPopup key={Date.now()} error={error} />}
-      {!isLoading && vans.length ? (
-        <div>
-          <IncomeSection
-            monthsFilter={monthsFilter}
-            transactions={transactions}
-            setSearchParams={setSearchParams}
-            searchParams={searchParams}
-          />
-          <ReviewScoreSection reviews={reviews} monthsFilter={monthsFilter} />
-
-          {currentUser && (
-            <VansListSection vans={vans} userId={currentUser._id} />
-          )}
-        </div>
-      ) : (
-        <div className="loader"></div>
+      {(vansError || transactionsError || reviewsError) && (
+        <ErrorPopup
+          key={Date.now()}
+          error={new Error("Failed to load resources. Please try again later.")}
+        />
       )}
-      {!isLoading && vans.length === 0 && <BecomeAHost path="vans/add-van" />}
+      <div>
+        <IncomeSection
+          monthsFilter={monthsFilter}
+          transactions={transactions}
+          setSearchParams={setSearchParams}
+          searchParams={searchParams}
+        />
+        <ReviewScoreSection reviews={reviews} monthsFilter={monthsFilter} />
+
+        {currentUser && (
+          <VansListSection vans={vans} userId={currentUser._id} />
+        )}
+      </div>
+      {vans.length === 0 && <BecomeAHost path="vans/add-van" />}
     </>
   );
 }

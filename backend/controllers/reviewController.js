@@ -8,7 +8,7 @@ const getVanReviews = async (req, res) => {
     const reviews = await Review.find({ vanId: vanId });
 
     if (!reviews || reviews.length === 0) {
-      return res.status(404).json({ message: 'No reviews found' });
+      return res.json([]);
     }
 
     res.json(reviews);
@@ -42,7 +42,7 @@ const getHostReviews = async (req, res) => {
     ]);
 
     if (!reviews || reviews.length === 0) {
-      return res.status(404).json({ message: 'No reviews found for that host' });
+      return res.json([]);
     }
 
     res.json(reviews);

@@ -1,12 +1,15 @@
-import { useState } from "react";
-import Button from "../../components/utils/Button";
+import { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { createVan, storage } from "../../utils/api";
-import { useAuth } from "../../hooks/useAuth";
-import Message from "../../components/utils/Message";
-import NumberInput from "../../components/utils/NumberInput";
-import RadioButton from "../../components/utils/RadioButton";
-import DragNDrop from "../../components/utils/DragNDrop";
+import { storage } from "@/database/firebase";
+import { createVan } from "@/features/vans/api/vans";
+import { useAuth } from "@/hooks/useAuth";
+
+import Button from "@/components/ui/Button";
+import NumberInput from "@/components/ui/NumberInput";
+import RadioButton from "@/components/ui/RadioButton";
+import DragNDrop from "@/components/ui/DragNDrop";
+import ErrorPopup from "@/components/ui/ErrorPopup";
+import SuccessPopup from "@/components/ui/SuccessPopup";
 
 type formDataType = {
   name: string;
@@ -29,11 +32,11 @@ export default function AddVan() {
     null,
   );
   const [inputError, setInputError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const { currentUser } = useAuth();
 
   function handleInput(target: HTMLInputElement | HTMLTextAreaElement): void {
-    setInputError(false);
     const { name, value } = target;
 
     setFormData((prevData) => ({
@@ -42,11 +45,15 @@ export default function AddVan() {
     }));
   }
 
+  useEffect(() => {
+    setError(null);
+  }, [formData]);
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setInputError(false);
     setSubmitStatus(null);
+    setError(null);
 
     if (!currentUser) return;
 
@@ -57,7 +64,7 @@ export default function AddVan() {
       !formData.type ||
       !formData.image
     ) {
-      setInputError(true);
+      setError(new Error("Please, fill in all the required fields."));
       return;
     }
 
@@ -74,7 +81,8 @@ export default function AddVan() {
         console.error("Image upload failed:", error);
         // display an error
         setIsSubmitting(false);
-        setSubmitStatus("error");
+        console.log("here I am");
+        setError(new Error("Image upload failed. Please, try again."));
       },
       async () => {
         // on success
@@ -102,7 +110,9 @@ export default function AddVan() {
           });
         } catch (error) {
           console.error(error);
-          setSubmitStatus("error");
+          if (error instanceof Error) {
+            setError(error);
+          }
         } finally {
           setIsSubmitting(false);
         }
@@ -112,9 +122,9 @@ export default function AddVan() {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-8">
         <h1 className="text-3xl font-bold">Host a new van</h1>
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
               htmlFor="name"
@@ -220,7 +230,6 @@ export default function AddVan() {
           </div>
           <Button
             as="button"
-            colors="orange"
             disabled={isSubmitting}
             className="disabled:bg-gray-300"
           >
@@ -228,32 +237,9 @@ export default function AddVan() {
           </Button>
         </form>
       </div>
-      {inputError && (
-        <Message
-          status={"error"}
-          onClose={() => setInputError(false)}
-          title="Error: The form has not been fully completed!"
-        >
-          Please fill out all the required fields
-        </Message>
-      )}
+      {error && <ErrorPopup error={error} key={Date.now()} />}
       {submitStatus === "success" && (
-        <Message
-          status={"success"}
-          onClose={() => setSubmitStatus(null)}
-          title="Form data has been submitted successfully!"
-        >
-          The van is now available to rent!
-        </Message>
-      )}
-      {submitStatus === "error" && (
-        <Message
-          status={"error"}
-          onClose={() => setSubmitStatus(null)}
-          title="Internal Error!"
-        >
-          There was an error while submitting the van. Please try again.
-        </Message>
+        <SuccessPopup message="Added van successfully!" />
       )}
     </>
   );

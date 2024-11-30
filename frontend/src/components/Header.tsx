@@ -1,62 +1,89 @@
 import { NavLink, Link } from "react-router-dom";
-import { IoLogOutOutline } from "react-icons/io5";
-import { useAuth } from "../hooks/useAuth";
+import { useRef, useState } from "react";
+import { Turn as Hamburger } from "hamburger-react";
+import { useWindowSize, useClickAway } from "react-use";
+
+const LINKS = [
+  { label: "Homepage", path: "" },
+  { label: "About", path: "/about" },
+  { label: "Our Vans", path: "/vans" },
+  { label: "Host", path: "/host" },
+  { label: "Sign-in", path: "login" },
+];
 
 function Header() {
-  const activeStyles = {
-    borderBottom: "1px solid #111827",
-    color: "#111827",
-  };
-
-  const { logOutUser } = useAuth();
+  const { width } = useWindowSize();
 
   return (
-    <header className="flex min-h-16 items-center justify-between bg-[#FFF7ED] px-6 py-4">
-      <Link
-        className="text-2xl font-black transition-all hover:drop-shadow-lg"
-        to="."
-      >
-        #VANLIFE
-      </Link>
-      <nav className="flex items-center gap-x-2 font-semibold text-[#4d4d4d]">
-        <NavLink
-          className="transition-all hover:text-gray-900"
-          to="/host"
-          style={(obj) => (obj.isActive ? activeStyles : undefined)}
+    <header className="fixed left-0 top-0 z-[100] w-full items-center justify-between text-slate-950">
+      <div className="header-container container flex min-h-16 items-center justify-between py-1 md:py-4">
+        <Link
+          to="."
+          className="relative z-[51] text-3xl font-extrabold tracking-tight"
         >
-          Host
-        </NavLink>
-        <NavLink
-          className="transition-all hover:text-gray-900"
-          to="about"
-          style={(obj) => (obj.isActive ? activeStyles : undefined)}
-          end
-        >
-          About
-        </NavLink>
-        <NavLink
-          className="transition-all hover:text-gray-900"
-          to="vans"
-          style={(obj) => (obj.isActive ? activeStyles : undefined)}
-          end
-        >
-          Vans
-        </NavLink>
-        <NavLink
-          className="transition-all hover:text-gray-900"
-          to="login"
-          style={(obj) => (obj.isActive ? activeStyles : undefined)}
-        >
-          Login
-        </NavLink>
-        <button
-          onClick={logOutUser}
-          className="group-[button]: h-8 w-8 rounded border p-1 transition-all hover:bg-orange-200"
-        >
-          <IoLogOutOutline className="h-full w-full stroke-black" />
-        </button>
-      </nav>
+          #VANLIFE
+        </Link>
+        {/* render mobile or desktop menu based on screen width */}
+        {width < 768 ? <MobileNav /> : <DesktopNav />}
+      </div>
     </header>
+  );
+}
+
+function DesktopNav() {
+  return (
+    <div>
+      <nav className="relative z-[51] flex items-center space-x-5">
+        {LINKS.map((link) => (
+          <NavLink
+            key={link.label}
+            to={link.path}
+            className={({ isActive }) => `nav-link ${isActive && "_active"}`}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+function MobileNav() {
+  const [isOpen, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useClickAway(ref, () => {
+    setOpen(false);
+  });
+
+  return (
+    <div className="" ref={ref}>
+      <nav
+        className="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center space-y-12 overflow-y-auto bg-orange-50 pb-16 pt-32 text-3xl font-semibold"
+        style={{
+          transform: isOpen ? "translateX(0%)" : "translateX(100%)",
+          transitionProperty: "transform",
+          transitionDuration: "400ms",
+          transitionTimingFunction: "ease-in-out",
+        }}
+      >
+        {LINKS.map((link) => (
+          <NavLink
+            key={link.label}
+            to={link.path}
+            className={({ isActive }) =>
+              `nav-link ${isActive && "_active"} _lg`
+            }
+            onClick={() => setOpen(false)}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
+      <div className="relative z-[51]">
+        <Hamburger size={32} toggled={isOpen} toggle={setOpen} rounded />
+      </div>
+    </div>
   );
 }
 

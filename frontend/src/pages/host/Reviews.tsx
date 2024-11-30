@@ -1,43 +1,37 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { getUserReviews, type Review } from "../../utils/api";
-import ErrorMessage from "../../components/utils/ErrorMessage";
-import ReviewsHeader from "../../components/reviews/ReviewsHeader";
-import ReviewsChart from "../../components/reviews/ReviewsChart";
-import { isWithinNMonths } from "../../utils/isWithinNMonths";
-import ReviewsCards from "../../components/reviews/ReviewsCards";
+import getHostReviews from "@/features/reviews/api/getHostReviews";
+import ErrorMessage from "../../components/ui/ErrorPopup";
+import ReviewsHeader from "@/features/reviews/components/ReviewsHeader";
+import ReviewsChart from "@/features/reviews/components/ReviewsChart";
+import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";
+import ReviewsCards from "@/features/reviews/components/ReviewsCards";
+import ErrorPopup from "../../components/ui/ErrorPopup";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Reviews() {
   const { currentUser } = useAuth();
-
-  const [reviews, setReviews] = useState<Review[] | null>(null);
   const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<unknown>(null);
+  const {
+    data: reviews,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ["hostReviews", currentUser?._id],
+    queryFn: () => getHostReviews(currentUser?._id),
+    staleTime: Infinity,
+  });
 
-  useEffect(() => {
-    if (!currentUser) return;
-
-    const fetchData = async () => {
-      try {
-        const data = await getUserReviews(currentUser._id);
-        setReviews(data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [currentUser]);
-
-  if (error) {
-    return <ErrorMessage />;
+  if (reviews === undefined) {
+    return;
   }
 
-  if (isLoading) {
+  if (error) {
+    return <ErrorMessage error={error} />;
+  }
+
+  if (isPending) {
     return (
       <div className="flex items-center justify-center">
         <span className="loader"></span>
@@ -45,7 +39,7 @@ export default function Reviews() {
     );
   }
 
-  const filteredReviews = reviews
+  const filteredReviews = reviews?.length
     ? reviews
         .filter((review) =>
           isWithinNMonths(new Date(review.createdAt).getTime(), months),
@@ -57,10 +51,19 @@ export default function Reviews() {
     : null;
 
   return (
-    <>
+    <div className="space-y-5">
+      {error && <ErrorPopup error={error} key={Date.now()} />}
       <ReviewsHeader months={months} setMonths={setMonths} />
-      <ReviewsChart reviews={filteredReviews} />
-      <ReviewsCards reviews={filteredReviews} />
-    </>
+      {filteredReviews?.length ? (
+        <>
+          <ReviewsChart reviews={filteredReviews} />
+          <ReviewsCards reviews={filteredReviews} />
+        </>
+      ) : (
+        <div className="rounded-lg bg-orange-500 p-4 text-lg text-white">
+          You don't have any reviews for that time period
+        </div>
+      )}
+    </div>
   );
 }

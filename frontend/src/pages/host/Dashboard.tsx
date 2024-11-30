@@ -5,24 +5,28 @@ import getHostVans from "@/features/vans/api/getHostVans";
 import IncomeSection from "@/features/transactions/components/DashboardIncomeSection";
 import ReviewScoreSection from "@/features/reviews/components/ReviewScoreSection";
 import VansListSection from "@/features/vans/components/VansListSection";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import ErrorPopup from "@/components/ui/ErrorPopup";
 import { BecomeAHost } from "@/components/ui/BecomeAHost";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+
+export const DEFAULT_NUMBER_OF_MONTHS = 3;
 
 export default function Dashboard() {
   const { currentUser } = useAuth();
-
-  const location = useLocation();
-  const monthsFromLocation = location.state?.monthsFilter as number | undefined;
   const [searchParams, setSearchParams] = useSearchParams();
 
-  if (monthsFromLocation) {
-    setSearchParams({ months: monthsFromLocation.toString() });
-  }
-
   const monthsFilter =
-    Number(searchParams.get("months")) || monthsFromLocation || 3;
+    Number(searchParams.get("months")) || DEFAULT_NUMBER_OF_MONTHS;
+
+  useEffect(() => {
+    setSearchParams((prev) => ({
+      ...prev,
+      months: monthsFilter,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     data: vans,
@@ -79,7 +83,6 @@ export default function Dashboard() {
           monthsFilter={monthsFilter}
           transactions={transactions}
           setSearchParams={setSearchParams}
-          searchParams={searchParams}
         />
         <ReviewScoreSection reviews={reviews} monthsFilter={monthsFilter} />
 

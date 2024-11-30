@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "@/database/firebase";
-import { createVan } from "@/features/vans/api/vans";
+import { createVan } from "@/features/vans/api/createVan";
 import { useAuth } from "@/hooks/useAuth";
 
 import Button from "@/components/ui/Button";
@@ -81,7 +81,6 @@ export default function AddVan() {
         console.error("Image upload failed:", error);
         // display an error
         setIsSubmitting(false);
-        console.log("here I am");
         setError(new Error("Image upload failed. Please, try again."));
       },
       async () => {

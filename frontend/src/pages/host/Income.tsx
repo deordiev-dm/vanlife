@@ -1,69 +1,39 @@
-import { useEffect, useState } from "react";
-import { type Transaction } from "@/lib/types/types";
-import { getUserTransactions } from "@/features/transactions/api/getHostTransactions";
+import getHostTransactions from "@/features/transactions/api/getHostTransactions";
 import { isWithinNMonths } from "@/lib/utils/isWithinNMonths";
 import IncomeChart from "@/features/transactions/components/IncomeChart";
 import UserTransactions from "@/features/transactions/components/UserTransactions";
 import IncomeHeader from "@/features/transactions/components/IncomeHeader";
 import { useAuth } from "@/hooks/useAuth";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import ErrorPopup from "@/components/ui/ErrorPopup";
-
-const DEFAULT_NUMBER_OF_MONTHS = 3;
+import { useQuery } from "@tanstack/react-query";
+import { DEFAULT_NUMBER_OF_MONTHS } from "./Dashboard";
+import { useEffect } from "react";
 
 export default function Income() {
   const { currentUser } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
-
-  const [error, setError] = useState<Error | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const location = useLocation();
-  const monthsFromLocation = location.state?.monthsFilter as number | undefined;
-
-  useEffect(() => {
-    if (monthsFromLocation === undefined) return;
-
-    if (monthsFromLocation > 1 && monthsFromLocation <= 12) {
-      setSearchParams({ months: monthsFromLocation.toString() });
-      return;
-    }
-
-    setSearchParams({ months: `${DEFAULT_NUMBER_OF_MONTHS}` });
-    setError(new Error("Invalid month range."));
-  }, [monthsFromLocation, setSearchParams]);
-
-  const monthsFromSP = Number(searchParams.get("months"));
-
   const monthsFilter =
-    monthsFromSP > 1 && monthsFromSP <= 12
-      ? monthsFromSP
-      : monthsFromLocation
-        ? monthsFromLocation
-        : DEFAULT_NUMBER_OF_MONTHS;
+    Number(searchParams.get("months")) || DEFAULT_NUMBER_OF_MONTHS;
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!currentUser) {
-          console.error("User is not logged in");
-          throw new Error("User is not logged in");
-        }
+    setSearchParams((prev) => ({
+      ...prev,
+      months: monthsFilter,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-        const transactionsData = await getUserTransactions(currentUser._id);
-        setTransactions(transactionsData);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [currentUser]);
+  const {
+    data: transactions,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ["hostTransactions", currentUser],
+    queryFn: () => getHostTransactions(currentUser?._id || ""),
+    staleTime: Infinity,
+  });
 
   const transactionsWithinMonths = transactions
     ? transactions?.filter((transaction) =>
@@ -79,7 +49,7 @@ export default function Income() {
     0,
   );
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="absolute left-1/2 top-1/2 flex items-center justify-center">
         <span className="loader"></span>

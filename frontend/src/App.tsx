@@ -15,9 +15,6 @@ import Reviews from "@/pages/host/Reviews";
 import AddVan from "@/pages/host/AddVan";
 import HostedVans from "@/pages/host/HostedVans";
 import HostedVan from "@/pages/host/hostedVan/HostedVan";
-import HostedVanDetails from "@/pages/host/hostedVan/HostedVanDetails";
-import HostedVanPricing from "@/pages/host/hostedVan/HostedVanPricing";
-import HostedVanPhotos from "@/pages/host/hostedVan/HostedVanPhotos";
 import NotFound from "@/pages/NotFound";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -48,11 +45,7 @@ export default function App() {
 
                   <Route path="vans" element={<HostedVans />} />
                   <Route path="vans/add-van" element={<AddVan />} />
-                  <Route path="vans/:id" element={<HostedVan />}>
-                    <Route index element={<HostedVanDetails />} />
-                    <Route path="pricing" element={<HostedVanPricing />} />
-                    <Route path="photos" element={<HostedVanPhotos />} />
-                  </Route>
+                  <Route path="vans/:id" element={<HostedVan />}></Route>
                 </Route>
               </Route>
               <Route path="*" element={<NotFound />} />

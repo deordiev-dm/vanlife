@@ -1,5 +1,3 @@
-import { useLayoutEffect, useState } from "react";
-import { useVans } from "../../hooks/useVans";
 import { useAuth } from "../../hooks/useAuth";
 import ErrorMessage from "../../components/ui/ErrorPopup";
 import { BecomeAHost } from "@/components/ui/BecomeAHost";
@@ -7,21 +5,29 @@ import VanProductCard from "@/features/vans/components/VanProductCard";
 import LoadingCard from "@/components/ui/LoadingCard";
 import { nanoid } from "nanoid";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import getHostVans from "@/features/vans/api/getHostVans";
 
 export default function HostedVans() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const { currentUser } = useAuth();
-  const { vans, fetchVans } = useVans();
 
-  useLayoutEffect(() => {
-    if (!vans.length) {
-      setIsLoading(true);
-      fetchVans()
-        .catch((err) => setError(err))
-        .finally(() => setIsLoading(false));
-    }
-  }, [fetchVans, vans.length]);
+  const {
+    data: vans,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ["hostVans", currentUser],
+    queryFn: () => getHostVans(currentUser?._id || ""),
+    staleTime: Infinity,
+  });
+
+  if (isPending) {
+    return <span className="loader"></span>;
+  }
+
+  if (vans === undefined) {
+    return;
+  }
 
   const hostedVans = currentUser
     ? vans.filter((van) => van.hostId === currentUser._id)
@@ -39,7 +45,7 @@ export default function HostedVans() {
         </Link>
       </div>
       {error && <ErrorMessage error={error} key={Date.now()} />}
-      {!isLoading && hostedVans.length > 0 ? (
+      {!isPending && hostedVans.length > 0 ? (
         <div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {hostedVans.map((van) => (
@@ -54,7 +60,7 @@ export default function HostedVans() {
           <LoadingCard />
         </div>
       )}
-      {!isLoading && hostedVans.length === 0 && <BecomeAHost path="add-van" />}
+      {!isPending && hostedVans.length === 0 && <BecomeAHost path="add-van" />}
     </section>
   );
 }

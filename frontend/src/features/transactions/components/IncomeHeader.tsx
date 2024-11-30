@@ -1,17 +1,16 @@
 import { useCounterAnimation } from "@/hooks/useCounterAnimation";
 import DropdownElement from "@/components/ui/dropdown/DropdownElement";
 import DropdownMenu from "@/components/ui/dropdown/DropdownMenu";
-import generateNewSearchParams from "@/lib/utils/generateNewSearchParams";
+import { DROPDOWN_OPTIONS } from "@/lib/data";
+import { SetURLSearchParams } from "react-router-dom";
 
 type IncomeHeaderProps = {
   income: number;
   monthsFilter: number;
-  searchParams: URLSearchParams;
-  setSearchParams: (params: URLSearchParams) => void;
+  setSearchParams: SetURLSearchParams;
 };
 
 function IncomeHeader({
-  searchParams,
   setSearchParams,
   monthsFilter,
   income,
@@ -22,33 +21,19 @@ function IncomeHeader({
     <div className="flex flex-col items-start space-y-3">
       <h1 className="text-3xl font-bold">Income: ${animatedIncome}</h1>
       <DropdownMenu title={`in the last ${monthsFilter} months`}>
-        <DropdownElement
-          onClick={() =>
-            setSearchParams(
-              generateNewSearchParams(searchParams, "months", "3"),
-            )
-          }
-        >
-          3 months
-        </DropdownElement>
-        <DropdownElement
-          onClick={() =>
-            setSearchParams(
-              generateNewSearchParams(searchParams, "months", "6"),
-            )
-          }
-        >
-          6 months
-        </DropdownElement>
-        <DropdownElement
-          onClick={() =>
-            setSearchParams(
-              generateNewSearchParams(searchParams, "months", "12"),
-            )
-          }
-        >
-          year
-        </DropdownElement>
+        {DROPDOWN_OPTIONS.map((option, index) => (
+          <DropdownElement
+            key={index}
+            onClick={() =>
+              setSearchParams((prevParams) => ({
+                ...prevParams,
+                months: option.months,
+              }))
+            }
+          >
+            {option.label}
+          </DropdownElement>
+        ))}
       </DropdownMenu>
     </div>
   );

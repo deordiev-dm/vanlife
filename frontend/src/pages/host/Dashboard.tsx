@@ -1,26 +1,21 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import {
-  getHostVans,
-  getUserReviews,
-  getUserTransactions,
-  type Review,
-  type Transaction,
-} from "../../utils/api";
-import ErrorMessage from "../../components/utils/ErrorMessage";
-import IncomeSection from "../../components/dashboard/IncomeSection";
-import ReviewScoreSection from "../../components/dashboard/ReviewScoreSection";
-import VansListSection from "../../components/dashboard/VansListSection";
+import { useAuth } from "@/hooks/useAuth";
+import getHostReviews from "@/features/reviews/api/getHostReviews";
+import getHostTransactions from "@/features/transactions/api/getHostTransactions";
+import getHostVans from "@/features/vans/api/getHostVans";
+import IncomeSection from "@/features/transactions/components/DashboardIncomeSection";
+import ReviewScoreSection from "@/features/reviews/components/ReviewScoreSection";
+import VansListSection from "@/features/vans/components/VansListSection";
 import { useLocation, useSearchParams } from "react-router-dom";
-import { Van } from "../../utils/types";
+import ErrorPopup from "@/components/ui/ErrorPopup";
+import { BecomeAHost } from "@/components/ui/BecomeAHost";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
-  const [vans, setVans] = useState<Van[] | null>(null);
   const { currentUser } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
-  const [reviews, setReviews] = useState<Review[] | null>(null);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<unknown>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const location = useLocation();
   const monthsFromLocation = location.state?.monthsFilter as number | undefined;
@@ -35,64 +30,65 @@ export default function Dashboard() {
   const monthsFilter =
     Number(searchParams.get("months")) || monthsFromLocation || 3;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!currentUser) {
-        setError("User is not authenticated");
-        return;
-      }
+  const {
+    data: transactions,
+    isPending: isTransactionsPending,
+    isError: isTransactionError,
+  } = useQuery({
+    queryKey: ["hostTransactions", currentUser?._id],
+    queryFn: () => getHostTransactions(currentUser?._id),
+    staleTime: Infinity,
+  });
 
-      try {
-        setIsLoading(true);
+  const {
+    data: vans,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ["hostVans", currentUser._id],
+    queryFn: () => getHostVans(currentUser._id),
+    staleTime: Infinity,
+  });
 
-        if (!vans) {
-          const hostVans = await getHostVans(currentUser._id);
-          setVans(hostVans);
-        }
+  const {
+    data: reviews,
+    isPending: isReviewsPending,
+    isError: isReviewsError,
+  } = useQuery({
+    queryKey: ["hostReviews", currentUser._id],
+    queryFn: () => getHostReviews(currentUser._id),
+    staleTime: Infinity,
+  });
 
-        const [transactionsData, reviewsData] = await Promise.all([
-          getUserTransactions(currentUser._id),
-          getUserReviews(currentUser._id),
-        ]);
-
-        setTransactions(transactionsData);
-        setReviews(reviewsData);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (error || !currentUser) {
-    return <ErrorMessage />;
-  }
-
-  if (isLoading || !vans) {
-    return (
-      <div className="absolute left-1/2 top-1/2 flex items-center justify-center">
-        <span className="loader"></span>
-      </div>
-    );
+  if (
+    vans === undefined ||
+    reviews === undefined ||
+    transactions === undefined
+  ) {
+    return;
   }
 
   return (
     <>
-      <div>
-        <IncomeSection
-          monthsFilter={monthsFilter}
-          transactions={transactions}
-          setSearchParams={setSearchParams}
-          searchParams={searchParams}
-        />
-        <ReviewScoreSection reviews={reviews} monthsFilter={monthsFilter} />
-      </div>
-      <VansListSection vans={vans} userId={currentUser._id} />
+      {error && <ErrorPopup key={Date.now()} error={error} />}
+      {!isLoading && vans.length ? (
+        <div>
+          <IncomeSection
+            monthsFilter={monthsFilter}
+            transactions={transactions}
+            setSearchParams={setSearchParams}
+            searchParams={searchParams}
+          />
+          <ReviewScoreSection reviews={reviews} monthsFilter={monthsFilter} />
+
+          {currentUser && (
+            <VansListSection vans={vans} userId={currentUser._id} />
+          )}
+        </div>
+      ) : (
+        <div className="loader"></div>
+      )}
+      {!isLoading && vans.length === 0 && <BecomeAHost path="vans/add-van" />}
     </>
   );
 }

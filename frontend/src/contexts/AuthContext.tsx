@@ -1,13 +1,20 @@
 import { createContext, useState } from "react";
-import { type SignUpUser, type User } from "../utils/types";
+import { type SignUpUser, type User } from "../lib/types/types";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+export class CustomError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "CustomError";
+    this.status = status;
+  }
+}
 
 export type AuthContextType = {
   currentUser: User | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
-  isAuthLoading: boolean;
-  authError: unknown;
   loginUser: (email: string, password: string) => Promise<void>;
   registerUser: (newUser: SignUpUser) => Promise<void>;
   logOutUser: () => void;
@@ -21,62 +28,45 @@ type AuthProviderProps = {
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
-  const [authError, setAuthError] = useState<unknown>(null);
 
   const loginUser = async (email: string, password: string) => {
-    setIsAuthLoading(true);
+    const response = await fetch(`${BASE_URL}/api/users/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/users/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-
-      const { token, user } = await response.json();
-
-      localStorage.setItem("token", token);
-      setCurrentUser(user);
-    } catch (error) {
-      console.error(error);
-      setAuthError(error);
-    } finally {
-      setIsAuthLoading(false);
+    if (!response.ok) {
+      const errorData = await response.json();
+      const { message } = errorData;
+      throw new CustomError(response.status, message);
     }
+
+    const { token, user } = await response.json();
+
+    localStorage.setItem("token", token);
+    setCurrentUser(user);
   };
 
   const registerUser = async (newUser: SignUpUser) => {
-    setIsAuthLoading(true);
+    const response = await fetch(`${BASE_URL}/api/users/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newUser),
+    });
 
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/users/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-      });
-
-      if (!response.ok) {
-        throw new Error("Registration failed");
-      }
-
-      const { user, token } = await response.json();
-
-      localStorage.setItem("token", token);
-      setCurrentUser(user);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsAuthLoading(false);
+    if (!response.ok) {
+      throw new Error("Registration failed");
     }
+
+    const { user, token } = await response.json();
+
+    localStorage.setItem("token", token);
+    setCurrentUser(user);
   };
 
   const logOutUser = () => {
@@ -89,8 +79,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       value={{
         currentUser,
         setCurrentUser,
-        isAuthLoading,
-        authError,
         loginUser,
         registerUser,
         logOutUser,

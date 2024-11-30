@@ -2,15 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --slate-100: #f1f5f9;
+  --slate-950: #020617;
+  --orange-50: #fff7ed;
+  --orange-100: #ffedd5;
+}
+
 body {
-  font-family: "Inter";
-  background-color: #fff7ed;
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: var(--orange-50);
+  position: relative;
+}
+
+p {
+  text-align: justify;
 }
 
 #root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100svh;
 }
 
 main {
@@ -25,14 +38,74 @@ label {
   cursor: pointer;
 }
 
+.header-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--orange-100);
+  z-index: 51;
+}
+
+.nav-link {
+  position: relative;
+  transition: color ease 300ms;
+  font-size: 1.125rem /* 18px */;
+  line-height: 1.75rem /* 28px */;
+  font-weight: 500;
+  padding: 2px 0;
+}
+
+.nav-link._sm {
+  font-size: 1.05rem;
+  padding-bottom: 2px;
+}
+
+@media screen and (min-width: 450px) {
+  .nav-link._sm {
+    font-size: 1.1rem;
+  }
+}
+
+.nav-link._lg {
+  font-size: 1.75rem;
+  padding-bottom: 8px;
+}
+
+.nav-link::before {
+  position: absolute;
+  content: "";
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--slate-950);
+  transition: width ease 300ms;
+}
+
+.nav-link:hover::before {
+  width: 100%;
+}
+
+.nav-link._active::before {
+  width: 100%;
+}
+
 .loader {
-  margin: auto;
+  position: fixed;
+  left: 50%;
+  bottom: 50%;
+  transform: translate(-50%, -50%);
   font-size: 10px;
   width: 1em;
   height: 1em;
+  color: orange;
   border-radius: 50%;
   text-indent: -9999em;
-  animation: mulShdSpin 1.3s infinite linear;
+  animation: mulShdSpin 1s infinite linear;
+  z-index: 9999;
 }
 
 @keyframes mulShdSpin {
@@ -124,5 +197,50 @@ label {
       -2em 2em 0 0,
       -3em 0em 0 0,
       -2em -2em 0 0.2em;
+  }
+}
+
+.modal {
+  animation: appear 400ms ease;
+}
+
+.closing {
+  animation: disappear 400ms ease forwards;
+}
+
+@keyframes appear {
+  0% {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%, 0%);
+  }
+}
+
+@keyframes disappear {
+  0% {
+    opacity: 1;
+    transform: translateY(-50%, 0%);
+  }
+  100% {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+}
+
+.timer {
+  animation-name: timer;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes timer {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
   }
 }

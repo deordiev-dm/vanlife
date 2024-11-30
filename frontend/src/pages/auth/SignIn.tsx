@@ -37,6 +37,7 @@ export default function SignIn() {
 
   const navigate = useNavigate();
   const location = useLocation();
+
   // path non-authorized user tried to access.
   const [pathToRedirect] = useState(location.state?.pathname || "/host");
   const [nonAuthorized, setNonAuthorized] = useState(
@@ -54,6 +55,7 @@ export default function SignIn() {
     }
     setNonAuthorized(null);
     navigate(location, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleInput(target: EventTarget & HTMLInputElement): void {

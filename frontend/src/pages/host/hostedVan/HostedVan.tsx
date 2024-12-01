@@ -1,31 +1,21 @@
-import { Link, NavLink, useParams } from "react-router-dom";
-import Badge from "@/components/ui/Badge";
+import { Link, useParams } from "react-router-dom";
 import ArrowLeftIcon from "@/components/icons/ArrowLeftIcon";
 import ErrorPopup from "@/components/ui/ErrorPopup";
-import { nanoid } from "nanoid/non-secure";
-import { Van } from "@/lib/types/types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import getVanById from "@/features/vans/api/getVanById";
-import HostedVanDetails from "./HostedVanDetails";
-
-const NAV_LINKS = [
-  {
-    to: ".",
-    label: "Details",
-    end: true,
-  },
-  {
-    to: "pricing",
-    label: "Pricing",
-  },
-  {
-    to: "photos",
-    label: "Photos",
-  },
-];
+import { updateVan } from "@/features/vans/api/updateVan";
+import NameInput from "./components/NameInput";
+import CategoryInput from "./components/CategoryInput";
+import DescriptionInput from "./components/DescriptionInput";
+import Button from "@/components/ui/Button";
+import SuccessPopup from "@/components/ui/SuccessPopup";
+import HostedVanCard from "./components/HostedVanCard";
+import PriceInput from "./components/PriceInput";
+import { useState } from "react";
 
 export default function HostedVan() {
   const params = useParams();
+  const [inputError, setInputError] = useState<Error | null>(null);
 
   // take van id from the address bar
   const vanId = params.id ?? "";
@@ -40,6 +30,66 @@ export default function HostedVan() {
     staleTime: 1000 * 60 * 30, // 30 min
   });
 
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: updateVan,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["van", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["vans"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["hostVans"],
+        exact: false,
+      });
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setInputError(null);
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const data = Object.fromEntries(formData.entries()) as {
+      name: string;
+      price: string;
+      description: string;
+      type: "simple" | "luxury" | "rugged";
+    };
+
+    console.log(data.name, data.type, data.price, data.description);
+
+    if (van === undefined) {
+      return;
+    }
+
+    if (!data.name) {
+      setInputError(new Error("Van name cannot be empty. Please try again."));
+      return;
+    }
+    if (
+      data.type !== "simple" &&
+      data.type !== "luxury" &&
+      data.type !== "rugged"
+    ) {
+      setInputError(new Error("Incorrect van category. Please try again."));
+      return;
+    }
+    if (Number(data.price) < 0) {
+      setInputError(new Error("Incorrect van category. Please try again."));
+      return;
+    }
+    if (data.description.length < 20) {
+      setInputError(new Error("Description is too short. Please try again."));
+      return;
+    }
+
+    mutation.mutate({ vanId: van._id, fieldsToUpdate: data });
+  }
+
   if (isPending) {
     return <span className="loader"></span>;
   }
@@ -49,53 +99,27 @@ export default function HostedVan() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Link to=".." relative="path" className="group flex items-center gap-x-3">
         <ArrowLeftIcon className="h-5 w-5 transition group-hover:-translate-x-2" />
         <span className="nav-link">Back to all vans</span>
       </Link>
-      <section className="space-y-6">
-        <HostedVanCard van={van} />
-        <nav className="space-x-3">
-          {NAV_LINKS.map((link) => (
-            <NavLink
-              key={nanoid()}
-              to={link.to}
-              end={link.end}
-              className={(obj) =>
-                obj.isActive ? "nav-link _sm _active" : "nav-link _sm"
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-        <section className="space-y-3">
-          <HostedVanDetails van={van} />
-        </section>
-      </section>
+      <HostedVanCard van={van} />
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <NameInput defaultValue={van.name} />
+        <CategoryInput currentCategory={van.type} />
+        <DescriptionInput defaultValue={van.description} />
+        <PriceInput defaultValue={van.price} />
+        <Button as="button" disabled={mutation.isPending}>
+          Save changes
+        </Button>
+        {mutation.isError && <ErrorPopup error={mutation.error} />}
+        {mutation.isSuccess && (
+          <SuccessPopup message={"Saved changes successfully!"} />
+        )}
+      </form>
       {error && <ErrorPopup error={error} />}
-    </div>
-  );
-}
-
-function HostedVanCard({ van }: { van: Van }) {
-  return (
-    <div className="grid gap-y-8 md:grid-cols-2 md:gap-x-16">
-      <div className="overflow-hidden rounded-md">
-        <img className="w-full" src={van.imageUrl} alt="" />
-      </div>
-      <div className="space-y-6 md:pt-4">
-        <h1 className="text-3xl font-bold lg:text-4xl">{van.name}</h1>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="font-medium">
-            <span className="text-2xl font-bold">${van.price}</span>
-            /day
-          </div>
-          <Badge type={van.type} />
-        </div>
-        <p className="text-lg">{van.description}</p>
-      </div>
+      {inputError && <ErrorPopup error={inputError} />}
     </div>
   );
 }

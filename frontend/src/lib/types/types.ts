@@ -4,7 +4,7 @@ export type Van = {
   name: string;
   description: string;
   imageUrl: string;
-  price: number;
+  price: number | string;
   type: "simple" | "rugged" | "luxury";
 };
 

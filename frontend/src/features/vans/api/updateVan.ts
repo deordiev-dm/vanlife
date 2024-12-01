@@ -1,9 +1,14 @@
 import { Van } from "@/lib/types/types";
 
-export async function editVan(
-  vanId: string,
-  fieldsToUpdate: Partial<Van>,
-): Promise<Van> {
+type updateVanParams = {
+  vanId: string;
+  fieldsToUpdate: Partial<Van>;
+};
+
+export async function updateVan({
+  vanId,
+  fieldsToUpdate,
+}: updateVanParams): Promise<Van> {
   const response = await fetch(`/api/vans/${vanId}`, {
     method: "PUT",
     headers: {

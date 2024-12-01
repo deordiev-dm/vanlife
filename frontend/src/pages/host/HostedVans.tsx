@@ -2,7 +2,6 @@ import { useAuth } from "../../hooks/useAuth";
 import ErrorMessage from "../../components/ui/ErrorPopup";
 import { BecomeAHost } from "@/components/ui/BecomeAHost";
 import VanProductCard from "@/features/vans/components/VanProductCard";
-import LoadingCard from "@/components/ui/LoadingCard";
 import { nanoid } from "nanoid";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -29,10 +28,6 @@ export default function HostedVans() {
     return;
   }
 
-  const hostedVans = currentUser
-    ? vans.filter((van) => van.hostId === currentUser._id)
-    : [];
-
   return (
     <section className="space-y-5">
       <div className="mb-8 flex items-center gap-x-8">
@@ -44,23 +39,15 @@ export default function HostedVans() {
           Add New
         </Link>
       </div>
-      {error && <ErrorMessage error={error} key={Date.now()} />}
-      {!isPending && hostedVans.length > 0 ? (
-        <div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {hostedVans.map((van) => (
-              <VanProductCard key={nanoid()} van={van} linkTo={van._id} />
-            ))}
-          </div>
-        </div>
-      ) : (
+      <div>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <LoadingCard />
-          <LoadingCard />
-          <LoadingCard />
+          {vans.map((van) => (
+            <VanProductCard key={nanoid()} van={van} linkTo={van._id} />
+          ))}
         </div>
-      )}
-      {!isPending && hostedVans.length === 0 && <BecomeAHost path="add-van" />}
+      </div>
+      {error && <ErrorMessage error={error} key={Date.now()} />}
+      {!isPending && vans.length === 0 && <BecomeAHost path="add-van" />}
     </section>
   );
 }

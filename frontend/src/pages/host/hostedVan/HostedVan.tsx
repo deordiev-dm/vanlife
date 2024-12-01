@@ -60,9 +60,23 @@ export default function HostedVan() {
       type: "simple" | "luxury" | "rugged";
     };
 
-    console.log(data.name, data.type, data.price, data.description);
-
     if (van === undefined) {
+      return;
+    }
+
+    // don't make a request if the data hasn't changed
+    // needed to use String(...) because price is a number in a database, but a string in data
+    // this is ulgy, I know
+    if (
+      JSON.stringify(data) ===
+      JSON.stringify({
+        name: van.name,
+        type: van.type,
+        description: van.description,
+        price: String(van.price),
+      })
+    ) {
+      setInputError(new Error("The data hasn't changed."));
       return;
     }
 
@@ -118,8 +132,8 @@ export default function HostedVan() {
           <SuccessPopup message={"Saved changes successfully!"} />
         )}
       </form>
-      {error && <ErrorPopup error={error} />}
-      {inputError && <ErrorPopup error={inputError} />}
+      {error && <ErrorPopup error={error} key={Date.now()} />}
+      {inputError && <ErrorPopup error={inputError} key={Date.now()} />}
     </div>
   );
 }

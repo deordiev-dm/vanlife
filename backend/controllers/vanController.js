@@ -35,7 +35,7 @@ const getHostVans = async (req, res) => {
     const vans = await Van.find({ hostId: userId });
 
     if (!vans.length) {
-      return res.status(404).json({ message: 'No vans found' });
+      return res.json([]);
     }
 
     res.json(vans);

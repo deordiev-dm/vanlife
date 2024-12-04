@@ -30,15 +30,18 @@ export default function HostedVans() {
 
   return (
     <section className="space-y-5">
-      <div className="mb-8 flex items-center gap-x-8">
-        <h2 className="text-3xl font-bold">Your listed vans</h2>
+      <div className="mb-8 flex items-center justify-between gap-x-8">
+        <h1 className="text-3xl font-extrabold text-gray-800">
+          Your Listed Vans
+        </h1>
         <Link
           to="add-van"
-          className="rounded-lg bg-orange-500 px-5 py-1 text-lg font-semibold text-white transition-colors hover:bg-orange-600"
+          className="flex items-center gap-2 rounded-lg bg-orange-500 px-6 py-2 text-lg font-semibold text-white shadow-md transition-all duration-300 hover:bg-orange-600 hover:shadow-lg active:scale-95"
         >
           Add New
         </Link>
       </div>
+
       <div>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {vans.map((van) => (

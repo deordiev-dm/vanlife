@@ -1,26 +1,31 @@
 import DropdownElement from "@/components/ui/dropdown/DropdownElement";
 import DropdownMenu from "@/components/ui/dropdown/DropdownMenu";
+import { DROPDOWN_OPTIONS } from "@/lib/data";
+import { SetURLSearchParams } from "react-router-dom";
 
-const MONTHS_MAP = {
-  1: "month",
-  3: "3 months",
-  6: "6 months",
-  12: "year",
+type ReviewsHeaderProps = {
+  monthsFilter: number;
+  setSearchParams: SetURLSearchParams;
 };
 
-type Props = {
-  months: 1 | 3 | 6 | 12;
-  setMonths: React.Dispatch<React.SetStateAction<1 | 3 | 6 | 12>>;
-};
-
-function ReviewsHeader({ months, setMonths }: Props) {
+function ReviewsHeader({ monthsFilter, setSearchParams }: ReviewsHeaderProps) {
   return (
-    <div className="flex items-center space-x-4">
-      <h1 className="text-3xl font-bold">Your reviews</h1>
-      <DropdownMenu title={`last ${MONTHS_MAP[months]}`}>
-        <DropdownElement onClick={() => setMonths(3)}>3 months</DropdownElement>
-        <DropdownElement onClick={() => setMonths(6)}>6 months</DropdownElement>
-        <DropdownElement onClick={() => setMonths(12)}>year</DropdownElement>
+    <div className="space-y-2">
+      <h1 className="text-3xl font-extrabold text-gray-800">Your reviews</h1>
+      <DropdownMenu title={`in the last ${monthsFilter} months`}>
+        {DROPDOWN_OPTIONS.map((option, index) => (
+          <DropdownElement
+            key={index}
+            onClick={() =>
+              setSearchParams((prevParams) => ({
+                ...prevParams,
+                months: option.months,
+              }))
+            }
+          >
+            {option.label}
+          </DropdownElement>
+        ))}
       </DropdownMenu>
     </div>
   );

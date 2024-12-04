@@ -15,10 +15,6 @@ body {
   position: relative;
 }
 
-p {
-  text-align: justify;
-}
-
 #root {
   display: flex;
   flex-direction: column;

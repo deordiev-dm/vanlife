@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import { Transaction } from "@/lib/types/types";
 
 type Props = {
@@ -11,18 +10,32 @@ function UserTransactions({ transactions }: Props) {
   );
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">
-        Your Transactions ({transactions.length})
-      </h2>
-      <div className="grid gap-x-4 gap-y-6 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid gap-x-4 gap-y-6 md:grid-cols-2">
         {sortedTransactions.map((transaction) => (
           <article
-            key={nanoid()}
-            className="flex items-center justify-between rounded-lg bg-white p-4"
+            key={transaction._id}
+            className="rounded-lg bg-orange-100 p-6 shadow-sm"
           >
-            <div className="text-2xl font-semibold">${transaction.sum}</div>
-            <div className="text-md">
-              {`${new Date(transaction.createdAt).getDate()}/${new Date(transaction.createdAt).getMonth() + 1}/${new Date(transaction.createdAt).getFullYear()}`}
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="flex-1">
+                <header className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <span className="text-3xl font-bold text-orange-500">
+                      ${transaction.sum}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {new Date(transaction.createdAt).toLocaleDateString(
+                      "default",
+                      {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}
+                  </span>
+                </header>
+              </div>
             </div>
           </article>
         ))}

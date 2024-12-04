@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import getHostReviews from "@/features/reviews/api/getHostReviews";
 import ErrorMessage from "../../components/ui/ErrorPopup";
@@ -8,10 +8,23 @@ import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";
 import ReviewsCards from "@/features/reviews/components/ReviewsCards";
 import ErrorPopup from "../../components/ui/ErrorPopup";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
+import { DEFAULT_NUMBER_OF_MONTHS } from "./Dashboard";
 
 export default function Reviews() {
   const { currentUser } = useAuth();
-  const [months, setMonths] = useState<1 | 3 | 6 | 12>(3);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const monthsFilter =
+    Number(searchParams.get("months")) || DEFAULT_NUMBER_OF_MONTHS;
+
+  useEffect(() => {
+    setSearchParams((prev) => ({
+      ...prev,
+      months: monthsFilter,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     data: reviews,
@@ -39,22 +52,27 @@ export default function Reviews() {
     );
   }
 
-  const filteredReviews = reviews?.length
-    ? reviews
-        .filter((review) =>
-          isWithinNMonths(new Date(review.createdAt).getTime(), months),
-        )
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        )
-    : null;
+  if (reviews === undefined) {
+    return;
+  }
+
+  const filteredReviews = reviews
+    .filter((review) =>
+      isWithinNMonths(new Date(review.createdAt).getTime(), monthsFilter),
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       {error && <ErrorPopup error={error} key={Date.now()} />}
-      <ReviewsHeader months={months} setMonths={setMonths} />
-      {filteredReviews?.length ? (
+      <ReviewsHeader
+        monthsFilter={monthsFilter}
+        setSearchParams={setSearchParams}
+      />
+      {filteredReviews.length ? (
         <>
           <ReviewsChart reviews={filteredReviews} />
           <ReviewsCards reviews={filteredReviews} />

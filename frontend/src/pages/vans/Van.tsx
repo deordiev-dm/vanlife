@@ -50,7 +50,9 @@ export default function VanDetails() {
                   <img className="w-full" src={van.imageUrl} alt="" />
                 </div>
                 <div className="space-y-6 md:pt-4">
-                  <h1 className="text-3xl font-bold lg:text-4xl">{van.name}</h1>
+                  <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl">
+                    {van.name}
+                  </h1>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="font-medium">
                       <span className="text-2xl font-bold">${van.price}</span>

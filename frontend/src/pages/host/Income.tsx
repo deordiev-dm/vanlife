@@ -62,7 +62,6 @@ export default function Income() {
       {error && <ErrorPopup error={error} />}
       <IncomeHeader
         monthsFilter={monthsFilter}
-        searchParams={searchParams}
         setSearchParams={setSearchParams}
         income={income}
       />

@@ -35,14 +35,28 @@ function IncomeChart({ transactions, monthsFilter }: IncomeChartProps) {
           {
             label: "Income",
             data: incomeValues,
-            backgroundColor: "#FF8C38",
+            backgroundColor: "#f97316",
+            borderRadius: 10,
           },
         ],
       },
       options: {
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
         scales: {
           y: {
             beginAtZero: true,
+            display: false,
+          },
+          x: {
+            grid: {
+              display: true,
+              color: "rgba(0, 0, 0, 0.1)",
+              lineWidth: 1,
+            },
           },
         },
       },

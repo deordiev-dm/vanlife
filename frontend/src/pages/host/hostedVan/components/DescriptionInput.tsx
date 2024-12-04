@@ -14,6 +14,8 @@ export default function DescriptionInput({
         Description:
       </label>
       <textarea
+        required
+        minLength={80}
         id="name-field"
         name="description"
         className="min-h-40 w-full rounded-lg border p-3 text-lg transition-colors hover:border-orange-400"

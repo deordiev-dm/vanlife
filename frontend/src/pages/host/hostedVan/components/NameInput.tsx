@@ -12,6 +12,7 @@ export default function NameInput({ defaultValue = "" }: NameInputProps) {
         id="name-field"
         name="name"
         type="text"
+        required
         defaultValue={defaultValue}
         className="rounded-lg border p-3 text-lg transition-colors hover:border-orange-400"
       />

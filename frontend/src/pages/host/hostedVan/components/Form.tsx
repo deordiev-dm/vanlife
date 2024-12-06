@@ -38,6 +38,9 @@ function Form({ van }: { van: Van }) {
         exact: false,
       });
     },
+    onError: () => {
+      setIsModalOpen(true);
+    },
   });
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -92,7 +95,7 @@ function Form({ van }: { van: Van }) {
           />
         </Modal>
       )}
-      {mutation.isError && (
+      {mutation.isError && isModalOpen && (
         <Modal>
           <WarningNotification
             message={mutation.error.message}

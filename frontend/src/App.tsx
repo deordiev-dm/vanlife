@@ -4,7 +4,7 @@ import Layout from "@/components/layouts/Layout";
 import HostLayout from "@/components/layouts/HostLayout";
 import Homepage from "@/pages/marketing/Homepage";
 import About from "@/pages/marketing/About";
-import VanDetails from "@/pages/vans/Van";
+import VanDetails from "@/pages/vans/van/Van";
 import AuthRequired from "@/components/layouts/AuthRequired";
 import SignIn from "@/pages/auth/SignIn";
 import SignUp from "@/pages/auth/SignUp";
@@ -17,7 +17,7 @@ import HostedVan from "@/pages/host/hostedVan/HostedVan";
 import NotFound from "@/pages/NotFound";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import OurVans from "./pages/vans/ourVans/ourVans";
+import OurVans from "@/pages/vans/ourVans/OurVans";
 
 const queryClient = new QueryClient();
 

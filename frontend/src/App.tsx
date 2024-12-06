@@ -4,7 +4,6 @@ import Layout from "@/components/layouts/Layout";
 import HostLayout from "@/components/layouts/HostLayout";
 import Homepage from "@/pages/marketing/Homepage";
 import About from "@/pages/marketing/About";
-import VansCatalog from "@/pages/vans/VansCatalog";
 import VanDetails from "@/pages/vans/Van";
 import AuthRequired from "@/components/layouts/AuthRequired";
 import SignIn from "@/pages/auth/SignIn";
@@ -18,6 +17,7 @@ import HostedVan from "@/pages/host/hostedVan/HostedVan";
 import NotFound from "@/pages/NotFound";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import OurVans from "./pages/vans/ourVans/ourVans";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +31,7 @@ export default function App() {
               <Route index element={<Homepage />} />
               <Route path="about" element={<About />} />
 
-              <Route path="vans" element={<VansCatalog />} />
+              <Route path="vans" element={<OurVans />} />
               <Route path="vans/:id" element={<VanDetails />} />
 
               <Route path="login" element={<SignIn />} />

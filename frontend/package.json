@@ -13,7 +13,6 @@
   "dependencies": {
     "@tanstack/react-query": "^5.61.5",
     "chart.js": "^4.4.4",
-    "classnames": "^2.5.1",
     "eslint-plugin-react": "^7.37.2",
     "firebase": "^10.13.1",
     "hamburger-react": "^2.5.1",

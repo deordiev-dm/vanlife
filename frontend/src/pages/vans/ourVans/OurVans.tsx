@@ -1,4 +1,4 @@
-import OurVansHeader from "./components/ourVansHeader";
+import OurVansHeader from "./components/OurVansHeader";
 import VanGrid from "./components/VanGrid";
 
 export default function OurVans() {

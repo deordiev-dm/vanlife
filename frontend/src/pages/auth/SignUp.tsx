@@ -2,22 +2,20 @@ import { useState } from "react";
 import Button from "@/components/ui/Button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { validateEmail } from "@/lib/utils/validateEmail";
 import FormField from "@/components/forms/FormField";
-import ErrorPopup from "@/components/ui/ErrorPopup";
+import WarningNotification from "@/components/ui/WarningNotification";
 
 const FORM_FIELDS = [
   {
     name: "name",
     label: "Your name",
-    type: "text",
     placeholder: "e.g. Joe Doe",
     required: true,
   },
   {
     name: "email",
     label: "Email address",
-    type: "text",
+    type: "email",
     placeholder: "example@mail.com",
     required: true,
   },
@@ -27,6 +25,7 @@ const FORM_FIELDS = [
     type: "password",
     placeholder: "at least 6 characters",
     required: true,
+    minLength: 6,
   },
   {
     name: "passwordConfirmation",
@@ -34,6 +33,7 @@ const FORM_FIELDS = [
     type: "password",
     placeholder: "re-enter your password",
     required: true,
+    minLength: 6,
   },
 ];
 
@@ -47,7 +47,8 @@ export default function SignUp() {
   });
 
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
-  const [error, setError] = useState<Error | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,8 +57,10 @@ export default function SignUp() {
     : "/host";
 
   const { registerUser } = useAuth();
+
   function handleInput(target: EventTarget & HTMLInputElement): void {
-    setError(null);
+    setWarning(null);
+    setIsModalOpen(false);
 
     const { name, value } = target;
     setFormData((prevData) => ({
@@ -68,23 +71,19 @@ export default function SignUp() {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     setStatus("submitting");
-    setError(null);
+
+    setWarning(null);
+    setIsModalOpen(false);
 
     const { name, role, email, password, passwordConfirmation } = {
       ...formData,
     };
 
-    if (!validateEmail(email)) {
-      setError(new Error("Invalid email"));
-      setStatus("idle");
-      return;
-    } else if (password.length < 6) {
-      setError(new Error("Password is too short"));
-      setStatus("idle");
-      return;
-    } else if (password != passwordConfirmation) {
-      setError(new Error("Passwords do not match"));
+    if (password != passwordConfirmation) {
+      setWarning("Passwords do not match");
+      setIsModalOpen(true);
       setStatus("idle");
       return;
     }
@@ -98,7 +97,12 @@ export default function SignUp() {
       .then(() => {
         navigate(pathToRedirect, { replace: true });
       })
-      .catch((err) => setError(err))
+      .catch((err) => {
+        if (err instanceof Error) {
+          setWarning(err.message);
+          setIsModalOpen(true);
+        }
+      })
       .finally(() => setStatus("idle"));
   }
 
@@ -115,13 +119,9 @@ export default function SignUp() {
           {FORM_FIELDS.map((field) => (
             <FormField
               key={field.name}
-              name={field.name}
-              type={field.type}
-              label={field.label}
-              placeholder={field.placeholder}
               handleInput={handleInput}
               value={formData[field.name as "email" | "password"]}
-              required={field.required}
+              {...field}
             />
           ))}
           <Button
@@ -137,7 +137,9 @@ export default function SignUp() {
           </Button>
         </form>
       </div>
-      {error && <ErrorPopup error={error} key={Date.now()} />}
+      {warning && isModalOpen && (
+        <WarningNotification message={warning} setIsOpen={setIsModalOpen} />
+      )}
     </main>
   );
 }

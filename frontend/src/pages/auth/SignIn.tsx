@@ -3,9 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { validateEmail } from "@/lib/utils/validateEmail";
-import ErrorPopup from "@/components/ui/ErrorPopup";
-import { CustomError } from "@/contexts/AuthContext";
 import FormField from "@/components/forms/FormField";
+import WarningNotification from "@/components/ui/WarningNotification";
 
 const FORM_FIELDS = [
   {
@@ -21,6 +20,7 @@ const FORM_FIELDS = [
     type: "password",
     placeholder: "at least 6 characters",
     required: true,
+    minLength: 6,
   },
 ];
 
@@ -33,7 +33,8 @@ export default function SignIn() {
   });
 
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
-  const [error, setError] = useState<Error | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,11 +48,10 @@ export default function SignIn() {
   // this effect ensures that message is shown once.
   useEffect(() => {
     if (nonAuthorized) {
-      setError(
-        new Error(
-          "Sign in into your account or create one to access host features.",
-        ),
+      setWarning(
+        "Sign in into your account or create one to access host features.",
       );
+      setIsModalOpen(true);
     }
     setNonAuthorized(null);
     navigate(location, { replace: true });
@@ -59,7 +59,8 @@ export default function SignIn() {
   }, []);
 
   function handleInput(target: EventTarget & HTMLInputElement): void {
-    setError(null);
+    setWarning(null);
+    setIsModalOpen(false);
 
     const { name, value } = target;
     setFormData((prevData) => ({
@@ -71,19 +72,16 @@ export default function SignIn() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setError(null);
+    setWarning(null);
+    setIsModalOpen(false);
     setStatus("submitting");
 
     const { email, password } = { ...formData };
 
     if (!validateEmail(email)) {
       setStatus("idle");
-      setError(new Error("Invalid email. Please try again."));
-
-      return;
-    } else if (password.length < 6) {
-      setStatus("idle");
-      setError(new Error("Password is too short. Please try again."));
+      setIsModalOpen(true);
+      setWarning("Invalid email. Please try again.");
 
       return;
     }
@@ -93,20 +91,9 @@ export default function SignIn() {
       // if everything is ok, redirect user
       navigate(pathToRedirect, { replace: true });
     } catch (error) {
-      if (error instanceof CustomError) {
-        if (error.status === 400) {
-          setError(new Error("Invalid email or password. Please try again."));
-        } else if (error.status === 500) {
-          setError(
-            new Error(
-              "Something went wrong on our end. Please try again later.",
-            ),
-          );
-        }
-      } else {
-        setError(
-          new Error("Something unexpected happened. Please try again later."),
-        );
+      if (error instanceof Error) {
+        setWarning(error.message);
+        setIsModalOpen(true);
       }
     } finally {
       setStatus("idle");
@@ -115,7 +102,9 @@ export default function SignIn() {
 
   return (
     <main>
-      {error && <ErrorPopup key={Date.now()} error={error} />}
+      {isModalOpen && warning && (
+        <WarningNotification message={warning} setIsOpen={setIsModalOpen} />
+      )}
       <div className="container pb-16 pt-36">
         <h1 className="mb-8 text-center text-3xl font-bold md:mb-12 md:text-4xl">
           Sign in to your account
@@ -127,13 +116,9 @@ export default function SignIn() {
           {FORM_FIELDS.map((field) => (
             <FormField
               key={field.name}
-              name={field.name}
-              type={field.type}
-              label={field.label}
-              placeholder={field.placeholder}
               handleInput={handleInput}
               value={formData[field.name as "email" | "password"]}
-              required={field.required}
+              {...field}
             />
           ))}
           <Button

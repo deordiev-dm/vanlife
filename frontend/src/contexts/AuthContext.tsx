@@ -1,15 +1,6 @@
 import { createContext, useState } from "react";
 import { type SignUpUser, type User } from "../lib/types/types";
 
-export class CustomError extends Error {
-  status: number;
-  constructor(status: number, message: string) {
-    super(message);
-    this.name = "CustomError";
-    this.status = status;
-  }
-}
-
 export type AuthContextType = {
   currentUser: User | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -36,10 +27,12 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       body: JSON.stringify({ email, password }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      const { message } = errorData;
-      throw new CustomError(response.status, message);
+    if (response.status === 400) {
+      throw new Error("Invalid email or password. Please try again.");
+    } else if (response.status === 500) {
+      throw new Error(
+        "Something went wrong on our end. Please try again later.",
+      );
     }
 
     const { token, user } = await response.json();

@@ -9,7 +9,6 @@ import AuthRequired from "@/components/layouts/AuthRequired";
 import SignIn from "@/pages/auth/SignIn";
 import SignUp from "@/pages/auth/SignUp";
 import Dashboard from "@/pages/host/Dashboard";
-import Income from "@/pages/host/Income";
 import Reviews from "@/pages/host/Reviews";
 import AddVan from "@/pages/host/AddVan";
 import HostedVans from "@/pages/host/HostedVans";
@@ -18,6 +17,9 @@ import NotFound from "@/pages/NotFound";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import OurVans from "@/pages/vans/ourVans/OurVans";
+import { lazy } from "react";
+
+const Income = lazy(() => import("@/pages/host/Income"));
 
 const queryClient = new QueryClient();
 

@@ -31,7 +31,6 @@ export default function AddVan() {
   const [submitStatus, setSubmitStatus] = useState<"error" | "success" | null>(
     null,
   );
-  const [inputError, setInputError] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const { currentUser } = useAuth();
@@ -138,7 +137,7 @@ export default function AddVan() {
               placeholder="Create a name for your van"
               onChange={(e) => handleInput(e.target as HTMLInputElement)}
               value={formData.name}
-              className={`input-validate w-full rounded-lg border p-3 transition-colors hover:border-orange-400 ${inputError && !formData.name ? "border-red-500" : ""}`}
+              className={`input-validate w-full rounded-lg border p-3 transition-colors hover:border-orange-400`}
             />
           </div>
           <div>
@@ -154,7 +153,7 @@ export default function AddVan() {
               placeholder="Tell everyone why your van is going to create a memorable trip"
               onChange={(e) => handleInput(e.target as HTMLTextAreaElement)}
               value={formData.description}
-              className={`input-validate min-h-20 w-full rounded-lg border p-3 transition-colors hover:border-orange-400 ${inputError && !formData.description ? "border-red-500" : ""}`}
+              className={`input-validate min-h-20 w-full rounded-lg border p-3 transition-colors hover:border-orange-400`}
             />
           </div>
           <div>
@@ -179,7 +178,6 @@ export default function AddVan() {
                   price: newValue,
                 }))
               }
-              className={`${inputError && formData.price < 20 && "border-red-500"}`}
             />
           </div>
           <div>
@@ -224,7 +222,6 @@ export default function AddVan() {
                 }))
               }
               image={formData.image}
-              inputError={inputError}
             />
           </div>
           <Button

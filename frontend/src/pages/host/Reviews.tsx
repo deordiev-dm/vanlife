@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import getHostReviews from "@/features/reviews/api/getHostReviews";
-import ErrorMessage from "../../components/ui/ErrorPopup";
 import ReviewsHeader from "@/features/reviews/components/ReviewsHeader";
 import ReviewsChart from "@/features/reviews/components/ReviewsChart";
 import { isWithinNMonths } from "../../lib/utils/isWithinNMonths";
 import ReviewsCards from "@/features/reviews/components/ReviewsCards";
-import ErrorPopup from "../../components/ui/ErrorPopup";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { DEFAULT_NUMBER_OF_MONTHS } from "./Dashboard";
+import Loader from "@/components/ui/Loader";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 
 export default function Reviews() {
   const { currentUser } = useAuth();
@@ -36,24 +36,12 @@ export default function Reviews() {
     staleTime: Infinity,
   });
 
-  if (reviews === undefined) {
-    return;
+  if (isPending) {
+    return <Loader />;
   }
 
   if (error) {
-    return <ErrorMessage error={error} />;
-  }
-
-  if (isPending) {
-    return (
-      <div className="flex items-center justify-center">
-        <span className="loader"></span>
-      </div>
-    );
-  }
-
-  if (reviews === undefined) {
-    return;
+    return <ErrorMessage />;
   }
 
   const filteredReviews = reviews
@@ -67,7 +55,6 @@ export default function Reviews() {
 
   return (
     <div className="space-y-8">
-      {error && <ErrorPopup error={error} key={Date.now()} />}
       <ReviewsHeader
         monthsFilter={monthsFilter}
         setSearchParams={setSearchParams}

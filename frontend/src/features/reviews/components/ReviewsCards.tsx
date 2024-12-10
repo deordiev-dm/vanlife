@@ -12,7 +12,10 @@ export default function ReviewsCards({ reviews }: Props) {
     <div className="grid gap-6">
       {reviews.map((review) => {
         return (
-          <article className="rounded-lg bg-orange-100 p-6 shadow-sm">
+          <article
+            key={review._id}
+            className="rounded-lg bg-orange-100 p-6 shadow-sm"
+          >
             <div className="flex flex-col gap-4 sm:flex-row">
               <img
                 src={review.van.imageUrl}

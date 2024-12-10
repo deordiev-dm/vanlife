@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "@/database/firebase";
 import { createVan } from "@/features/vans/api/createVan";
@@ -8,8 +8,8 @@ import Button from "@/components/ui/Button";
 import NumberInput from "@/components/ui/NumberInput";
 import RadioButton from "@/components/ui/RadioButton";
 import DragNDrop from "@/components/ui/DragNDrop";
-import ErrorPopup from "@/components/ui/ErrorPopup";
-import SuccessPopup from "@/components/ui/SuccessPopup";
+import WarningNotification from "@/components/ui/WarningNotification";
+import SuccessNotification from "@/components/ui/SuccessNotification";
 
 type formDataType = {
   name: string;
@@ -32,10 +32,14 @@ export default function AddVan() {
     null,
   );
   const [error, setError] = useState<Error | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { currentUser } = useAuth();
 
   function handleInput(target: HTMLInputElement | HTMLTextAreaElement): void {
+    setError(null);
+    setIsModalOpen(false);
+
     const { name, value } = target;
 
     setFormData((prevData) => ({
@@ -44,15 +48,12 @@ export default function AddVan() {
     }));
   }
 
-  useEffect(() => {
-    setError(null);
-  }, [formData]);
-
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setSubmitStatus(null);
     setError(null);
+    setIsModalOpen(false);
 
     if (!currentUser) return;
 
@@ -64,6 +65,7 @@ export default function AddVan() {
       !formData.image
     ) {
       setError(new Error("Please, fill in all the required fields."));
+      setIsModalOpen(true);
       return;
     }
 
@@ -81,6 +83,7 @@ export default function AddVan() {
         // display an error
         setIsSubmitting(false);
         setError(new Error("Image upload failed. Please, try again."));
+        setIsModalOpen(true);
       },
       async () => {
         // on success
@@ -99,6 +102,7 @@ export default function AddVan() {
         try {
           await createVan(newVan);
           setSubmitStatus("success");
+          setIsModalOpen(true);
           setFormData({
             name: "",
             description: "",
@@ -110,6 +114,7 @@ export default function AddVan() {
           console.error(error);
           if (error instanceof Error) {
             setError(error);
+            setIsModalOpen(true);
           }
         } finally {
           setIsSubmitting(false);
@@ -233,9 +238,18 @@ export default function AddVan() {
           </Button>
         </form>
       </div>
-      {error && <ErrorPopup error={error} key={Date.now()} />}
-      {submitStatus === "success" && (
-        <SuccessPopup message="Added van successfully!" />
+
+      {error && isModalOpen && (
+        <WarningNotification
+          message={error.message}
+          setIsOpen={setIsModalOpen}
+        />
+      )}
+      {submitStatus === "success" && isModalOpen && (
+        <SuccessNotification
+          message="Added van successfully!"
+          setIsOpen={setIsModalOpen}
+        />
       )}
     </>
   );

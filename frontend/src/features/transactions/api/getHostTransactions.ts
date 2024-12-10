@@ -1,9 +1,5 @@
 import { Transaction } from "@/lib/types/types";
 
-export function getUserTransactions() {
-  throw new Error("Remove this function");
-}
-
 async function getHostTransactions(hostId: string) {
   const res = await fetch(`/api/users/${hostId}/hostTransactions`);
 

@@ -5,10 +5,11 @@ import UserTransactions from "@/features/transactions/components/UserTransaction
 import IncomeHeader from "@/features/transactions/components/IncomeHeader";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
-import ErrorPopup from "@/components/ui/ErrorPopup";
 import { useQuery } from "@tanstack/react-query";
 import { DEFAULT_NUMBER_OF_MONTHS } from "./Dashboard";
 import { useEffect } from "react";
+import Loader from "@/components/ui/Loader";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 
 export default function Income() {
   const { currentUser } = useAuth();
@@ -35,31 +36,25 @@ export default function Income() {
     staleTime: Infinity,
   });
 
-  const transactionsWithinMonths = transactions
-    ? transactions?.filter((transaction) =>
-        isWithinNMonths(
-          new Date(transaction.createdAt).getTime(),
-          monthsFilter,
-        ),
-      )
-    : [];
+  if (isPending) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <ErrorMessage />;
+  }
+
+  const transactionsWithinMonths = transactions.filter((transaction) =>
+    isWithinNMonths(new Date(transaction.createdAt).getTime(), monthsFilter),
+  );
 
   const income = transactionsWithinMonths.reduce(
     (acc, curr) => acc + curr.sum,
     0,
   );
 
-  if (isPending) {
-    return (
-      <div className="absolute left-1/2 top-1/2 flex items-center justify-center">
-        <span className="loader"></span>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8">
-      {error && <ErrorPopup error={error} />}
       <IncomeHeader
         monthsFilter={monthsFilter}
         setSearchParams={setSearchParams}

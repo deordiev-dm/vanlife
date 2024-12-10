@@ -17,7 +17,8 @@ import NotFound from "@/pages/NotFound";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import OurVans from "@/pages/vans/ourVans/OurVans";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
+import Loader from "./components/ui/Loader";
 
 const Income = lazy(() => import("@/pages/host/Income"));
 
@@ -26,36 +27,38 @@ const queryClient = new QueryClient();
 export default function App() {
   return (
     <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <CombinedProvider>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Homepage />} />
-              <Route path="about" element={<About />} />
+      <Suspense fallback={<Loader />}>
+        <QueryClientProvider client={queryClient}>
+          <CombinedProvider>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Homepage />} />
+                <Route path="about" element={<About />} />
 
-              <Route path="vans" element={<OurVans />} />
-              <Route path="vans/:id" element={<VanDetails />} />
+                <Route path="vans" element={<OurVans />} />
+                <Route path="vans/:id" element={<VanDetails />} />
 
-              <Route path="login" element={<SignIn />} />
-              <Route path="signup" element={<SignUp />} />
+                <Route path="login" element={<SignIn />} />
+                <Route path="signup" element={<SignUp />} />
 
-              <Route element={<AuthRequired />}>
-                <Route path="host" element={<HostLayout />}>
-                  <Route index element={<Dashboard />} />
-                  <Route path="income" element={<Income />} />
-                  <Route path="reviews" element={<Reviews />} />
+                <Route element={<AuthRequired />}>
+                  <Route path="host" element={<HostLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="income" element={<Income />} />
+                    <Route path="reviews" element={<Reviews />} />
 
-                  <Route path="vans" element={<HostedVans />} />
-                  <Route path="vans/add-van" element={<AddVan />} />
-                  <Route path="vans/:id" element={<HostedVan />}></Route>
+                    <Route path="vans" element={<HostedVans />} />
+                    <Route path="vans/add-van" element={<AddVan />} />
+                    <Route path="vans/:id" element={<HostedVan />}></Route>
+                  </Route>
                 </Route>
+                <Route path="*" element={<NotFound />} />
               </Route>
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </CombinedProvider>
-        <ReactQueryDevtools />
-      </QueryClientProvider>
+            </Routes>
+          </CombinedProvider>
+          <ReactQueryDevtools />
+        </QueryClientProvider>
+      </Suspense>
     </BrowserRouter>
   );
 }

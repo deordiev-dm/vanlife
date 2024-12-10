@@ -6,10 +6,10 @@ import IncomeSection from "@/features/transactions/components/DashboardIncomeSec
 import ReviewScoreSection from "@/features/reviews/components/ReviewScoreSection";
 import VansListSection from "@/features/vans/components/VansListSection";
 import { useSearchParams } from "react-router-dom";
-import ErrorPopup from "@/components/ui/ErrorPopup";
 import { BecomeAHost } from "@/components/ui/BecomeAHost";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import ErrorMessage from "@/components/ui/ErrorMessage";
 
 export const DEFAULT_NUMBER_OF_MONTHS = 3;
 
@@ -62,22 +62,11 @@ export default function Dashboard() {
     return <span className="loader"></span>;
   }
 
-  if (
-    vans === undefined ||
-    reviews === undefined ||
-    transactions === undefined
-  ) {
-    return;
-  }
+  if (vansError || transactionsError || reviewsError)
+    return <ErrorMessage key={Date.now()} />;
 
   return (
     <>
-      {(vansError || transactionsError || reviewsError) && (
-        <ErrorPopup
-          key={Date.now()}
-          error={new Error("Failed to load resources. Please try again later.")}
-        />
-      )}
       <div>
         <IncomeSection
           monthsFilter={monthsFilter}

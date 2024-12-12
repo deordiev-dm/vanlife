@@ -50,16 +50,11 @@ const errorStyle: CSSProperties = {
 };
 
 type DragNDropProps = {
-  setImage: (files: File[]) => void;
-  image: File | null;
   inputError?: boolean;
+  setImage: React.Dispatch<React.SetStateAction<File | null>>;
 };
 
-export default function DragNDrop({
-  setImage,
-  image,
-  inputError,
-}: DragNDropProps) {
+export default function DragNDrop({ inputError, setImage }: DragNDropProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const {
@@ -74,7 +69,7 @@ export default function DragNDrop({
       const file = acceptedFiles[0];
       if (file && file.type.startsWith("image/")) {
         setIsDragging(false);
-        setImage(acceptedFiles);
+        setImage(file);
         setImagePreview(URL.createObjectURL(acceptedFiles[0]));
       }
     },
@@ -106,27 +101,38 @@ export default function DragNDrop({
   const style = useMemo(
     () => ({
       ...baseStyle,
-      ...(inputError && !image && errorStyle),
+      ...(inputError && !imagePreview && errorStyle),
       ...(isFocused && focusedStyle),
       ...(isDragging && draggingStyle),
       ...(isDragAccept && acceptedStyle),
       ...(isDragReject && rejectStyle),
     }),
-    [isFocused, isDragAccept, isDragReject, isDragging, image, inputError],
+    [
+      isFocused,
+      isDragAccept,
+      isDragReject,
+      isDragging,
+      imagePreview,
+      inputError,
+    ],
   );
 
   return (
     <div {...getRootProps({ style })}>
-      <input {...getInputProps()} />
+      <input
+        {...getInputProps({
+          id: "image-upload",
+        })}
+      />
       <div className="flex flex-col items-center">
         {!isDragActive && (
           <p>Drag 'n' drop the van image here, or click to select one</p>
         )}
         {isDragAccept && <p>Drop the van image right here...</p>}
         {isDragReject && <p>Only images are allowed</p>}
-        {image && (
+        {imagePreview && (
           <div className="mt-2 flex items-center gap-x-2">
-            <p className="text-sm text-gray-500">Selected file: {image.name}</p>
+            <p className="text-sm text-gray-500">Selected file: {}</p>
             {imagePreview && (
               <img
                 src={imagePreview}

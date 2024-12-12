@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.61.5",
+    "browser-image-compression": "^2.0.2",
     "chart.js": "^4.4.4",
     "eslint-plugin-react": "^7.37.2",
     "firebase": "^10.13.1",

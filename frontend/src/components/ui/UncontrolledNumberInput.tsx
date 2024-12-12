@@ -1,19 +1,16 @@
 import { useState } from "react";
 
-type UncontrolledNumberInputProps = {
-  id?: string;
-  name: string;
-  step?: number;
-  max?: number;
-  defaultValue?: number | string;
-};
+type UncontrolledNumberInputProps =
+  React.InputHTMLAttributes<HTMLInputElement> & {
+    step?: number;
+    max?: number;
+  };
 
 export default function UncontrolledNumberInput({
-  id,
-  name,
-  step = 1,
+  step = 5,
   max = 99999,
   defaultValue = 0,
+  ...inputProps
 }: UncontrolledNumberInputProps) {
   const [inputValue, setInputValue] = useState<number>(Number(defaultValue));
 
@@ -48,8 +45,7 @@ export default function UncontrolledNumberInput({
     <div className="flex items-center gap-2">
       <IncDecButton type="dec" />
       <input
-        id={id}
-        name={name}
+        {...inputProps}
         type="text"
         value={inputValue}
         onChange={(e) => handleInputChange(e.target.value)}

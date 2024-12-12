@@ -21,7 +21,7 @@ export default function VanProductCard({
     >
       <div className="relative overflow-hidden bg-gray-100">
         <img
-          className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-56 w-full object-contain transition-transform duration-500 group-hover:scale-105"
           src={van.imageUrl}
           alt={`${van.name} image`}
           loading="lazy"

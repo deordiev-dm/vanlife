@@ -1,4 +1,5 @@
 import React from "react";
+import Label from "./Label";
 
 type FormFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
@@ -13,13 +14,9 @@ export default function FormField({
 }: FormFieldProps) {
   return (
     <div>
-      <label
-        className="mb-1 inline-block pl-1 text-lg"
-        htmlFor={inputProps.name}
-      >
+      <Label required={required} htmlFor={inputProps.name || ""}>
         {label}
-        {required && <span className="text-red-600">*</span>}
-      </label>
+      </Label>
       <input
         {...inputProps}
         required={required}

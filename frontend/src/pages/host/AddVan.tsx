@@ -133,7 +133,7 @@ export default function AddVan() {
               minLength={20}
               required
               placeholder="Tell everyone why your van is going to create a memorable trip"
-              className="input-validate min-h-20 w-full rounded-lg border p-3 transition-colors hover:border-orange-400"
+              className="input-validate min-h-48 w-full rounded-lg border p-3 text-lg transition-colors hover:border-orange-400"
             />
           </div>
           <div>

@@ -129,11 +129,23 @@ export default function SignIn() {
             {status === "submitting" ? "Logging in..." : "Sign in"}
           </Button>
         </form>
-        <p className="text-center font-medium">
+        <p className="mb-2 text-center font-medium">
           Don't have an account?{" "}
           <Link className="text-orange-400 hover:underline" to="/signup">
-            Create on now!
+            Create one now!
           </Link>
+        </p>
+        <p className="text-center font-medium">
+          Or sign in to a{" "}
+          <button
+            onClick={async () => {
+              await loginUser("demo@example.com", "demopassword");
+              navigate("../host", { replace: true });
+            }}
+            className="text-orange-400 hover:underline"
+          >
+            demo account
+          </button>
         </p>
       </div>
     </main>

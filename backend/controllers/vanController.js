@@ -2,9 +2,25 @@ const Van = require('../models/Van');
 const mongoose = require('mongoose');
 
 const getAllVans = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 6;
+  const skip = (page - 1) * limit;
+  const typeFilter = req.query.type;
+
   try {
-    const vans = await Van.find();
-    res.json(vans);
+    const query = typeFilter ? { type: typeFilter } : {};
+
+    const [vans, total] = await Promise.all([
+      Van.find(query)
+        .sort(typeFilter ? { [typeFilter]: 1 } : {})
+        .skip(skip)
+        .limit(limit),
+      Van.countDocuments(query)
+    ]);
+
+    const pageCount = Math.ceil(total / limit);
+
+    res.json({ vans, pageCount });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error ' });
@@ -63,7 +79,7 @@ const addVan = async (req, res) => {
       imageUrl,
       name,
       price,
-      type,
+      type
     });
 
     await van.save();
@@ -97,10 +113,27 @@ const editVanData = async (req, res) => {
   }
 };
 
+const deleteVan = async (req, res) => {
+  const { vanId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(vanId)) {
+      return res.status(400).json({ message: `Invalid van ID: ${vanId}` });
+    }
+
+    await Van.findByIdAndDelete(vanId);
+    res.json({ message: 'Van deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting van', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   getAllVans,
   getVanById,
   getHostVans,
   addVan,
   editVanData,
+  deleteVan
 };

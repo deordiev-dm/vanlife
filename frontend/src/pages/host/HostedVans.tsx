@@ -37,7 +37,7 @@ function Grid() {
   const { currentUser } = useAuth();
 
   const { data, isPending, error } = useQuery({
-    queryKey: ["hostVans", currentUser],
+    queryKey: ["vans", "host", currentUser],
     queryFn: () => getHostVans(currentUser?._id || ""),
     staleTime: Infinity,
   });

@@ -11,7 +11,7 @@ export default function CategoryInput({ currentCategory }: CategoryInputProps) {
   return (
     <div>
       <label className="mb-2 inline-block text-xl font-bold">Category:</label>
-      <div className="flex flex-wrap gap-x-4">
+      <div className="flex flex-wrap gap-x-4 gap-y-2">
         {buttons.map((button) => (
           <UncontrolledRadioButton
             key={button}

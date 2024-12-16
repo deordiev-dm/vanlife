@@ -33,7 +33,7 @@ export default function Dashboard() {
     isPending: isVansPending,
     error: vansError,
   } = useQuery({
-    queryKey: ["hostVans", currentUser],
+    queryKey: ["vans", "host", currentUser],
     queryFn: () => getHostVans(currentUser?._id || ""),
     staleTime: Infinity,
   });
@@ -43,7 +43,7 @@ export default function Dashboard() {
     isPending: isTransactionsPending,
     error: transactionsError,
   } = useQuery({
-    queryKey: ["hostTransactions", currentUser],
+    queryKey: ["transactions", "host", currentUser],
     queryFn: () => getHostTransactions(currentUser?._id || ""),
     staleTime: Infinity,
   });
@@ -53,7 +53,7 @@ export default function Dashboard() {
     isPending: isReviewsPending,
     error: reviewsError,
   } = useQuery({
-    queryKey: ["hostReviews", currentUser],
+    queryKey: ["reviews", "host", currentUser],
     queryFn: () => getHostReviews(currentUser?._id || ""),
     staleTime: Infinity,
   });

@@ -31,7 +31,7 @@ export default function Income() {
     isPending,
     error,
   } = useQuery({
-    queryKey: ["hostTransactions", currentUser],
+    queryKey: ["transactions", "host", currentUser],
     queryFn: () => getHostTransactions(currentUser?._id || ""),
     staleTime: Infinity,
   });

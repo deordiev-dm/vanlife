@@ -5,6 +5,7 @@ import HostedVanCard from "./components/HostedVanCard";
 import HostedVanHeader from "./components/HostedVanHeader";
 import Form from "./components/Form";
 import ErrorMessage from "@/components/ui/ErrorMessage";
+import DeleteVan from "./components/DeleteVan";
 
 export default function HostedVan() {
   const params = useParams();
@@ -30,7 +31,13 @@ export default function HostedVan() {
       {van && (
         <>
           <HostedVanCard van={van} />
-          <Form van={van} />
+          <div className="rounded bg-white p-4">
+            <h2 className="mb-6 text-3xl font-semibold">
+              Edit Van Information
+            </h2>
+            <Form van={van} />
+          </div>
+          <DeleteVan van={van} />
         </>
       )}
     </div>

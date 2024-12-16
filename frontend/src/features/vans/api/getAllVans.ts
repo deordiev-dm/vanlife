@@ -1,11 +1,20 @@
 import { Van } from "@/lib/types/types";
 
-export default async function getAllVans() {
-  const res = await fetch("/api/vans");
+export default async function getAllVans(
+  page: number,
+  typeFilter: Pick<Van, "type"> | null = null,
+) {
+  let url = `/api/vans?page=${page}`;
 
-  if (!res.ok) {
-    throw new Error("Failed to get all vans.");
+  if (typeFilter) {
+    url += `&type=${typeFilter}`;
   }
 
-  return (await res.json()) as Van[];
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch vans.");
+  }
+
+  return (await res.json()) as { vans: Van[]; pageCount: number };
 }

@@ -31,7 +31,7 @@ export default function Reviews() {
     isPending,
     error,
   } = useQuery({
-    queryKey: ["hostReviews", currentUser],
+    queryKey: ["reviews", "host", currentUser],
     queryFn: () => getHostReviews(currentUser?._id || ""),
     staleTime: Infinity,
   });

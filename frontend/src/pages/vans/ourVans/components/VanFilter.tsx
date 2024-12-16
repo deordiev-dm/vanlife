@@ -1,21 +1,14 @@
-import { SetURLSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import FilterButton from "./FilterButton";
 import generateNewSearchParams from "@/lib/utils/generateNewSearchParams";
 import XMarkIcon from "@/components/icons/XMarkIcon";
 
 const FILTER_OPTIONS = ["simple", "rugged", "luxury"];
 
-type VanFilterProps = {
-  typeFilter: string | null;
-  searchParams: URLSearchParams;
-  setSearchParams: SetURLSearchParams;
-};
+function VanFilter() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const typeFilter = searchParams.get("type");
 
-function VanFilter({
-  typeFilter,
-  setSearchParams,
-  searchParams,
-}: VanFilterProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {FILTER_OPTIONS.map((option) => (
@@ -23,9 +16,11 @@ function VanFilter({
           key={option}
           typeFilter={typeFilter}
           onClick={() =>
-            setSearchParams(
-              generateNewSearchParams(searchParams, "type", option),
-            )
+            setSearchParams((prev) => {
+              prev.set("type", option);
+              prev.set("page", "1");
+              return prev;
+            })
           }
           filterOption={option}
         >

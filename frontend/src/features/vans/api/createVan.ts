@@ -1,7 +1,9 @@
 import { Van } from "@/lib/types/types";
 
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 export const createVan = async (vanCreationData: Omit<Van, "_id">) => {
-  const response = await fetch(`/api/vans`, {
+  const response = await fetch(`${VITE_BACKEND_URL}/api/vans`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

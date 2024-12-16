@@ -22,7 +22,7 @@ app.use(express.json());
 
 connectDB();
 
-app.use(cors());
+app.use(cors({ origin: ['http://localhost:5173', 'https://deordiev-dm-vanlife.netlify.app'] }));
 
 app.use('/api/vans', vanRoutes);
 app.use('/api/users', userRoutes);

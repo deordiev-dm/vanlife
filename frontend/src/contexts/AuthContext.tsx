@@ -1,6 +1,8 @@
 import { createContext, useState } from "react";
 import { type SignUpUser, type User } from "../lib/types/types";
 
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 export type AuthContextType = {
   currentUser: User | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -19,7 +21,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const loginUser = async (email: string, password: string) => {
-    const response = await fetch("/api/users/login", {
+    const response = await fetch(`${VITE_BACKEND_URL}/api/users/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +44,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const registerUser = async (newUser: SignUpUser) => {
-    const response = await fetch("/api/users/register", {
+    const response = await fetch(`${VITE_BACKEND_URL}/api/users/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
